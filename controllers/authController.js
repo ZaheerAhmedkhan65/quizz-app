@@ -6,7 +6,6 @@ const JWT_SECRET = '2a991f724f33ef14aacc3529a2a8e5747215370b96ca9b77478d76d5733f
 const signup = async (req, res) => {
     const { username,email, password } = req.body;
     
-    console.log(req.body);
     // Check if user already exists
     const existingUser = await User.findByUsername(username);
     if (existingUser) {
@@ -34,7 +33,6 @@ const login = async (req, res) => {
     if (!isPasswordValid) {
         return res.status(400).json({ message: 'Invalid credentials' });
     }
-    console.log("user: ",user);
     // Generate JWT
     const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
 

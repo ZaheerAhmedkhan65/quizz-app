@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
         stopTimer();
         let results = calculateResults();
         alert(`Quiz Completed!\nCorrect Answers: ${results.correctAnswers}/${results.totalQuestions}\nScore: ${results.score}`);
-        console.log(selectedAnswers);
+        window.location.href = "/";
     }
 
     startTimer();

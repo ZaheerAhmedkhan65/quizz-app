@@ -42,8 +42,6 @@ class Quizz {
             WHERE q.quiz_id = ?`, 
             [quizzId]
         );
-        console.log("Quiz id in getQuestionsAndOptions: ",quizzId);
-    
         const questionsMap = new Map();
     
         rows.forEach(row => {

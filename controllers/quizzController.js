@@ -20,7 +20,6 @@ const showQuizz = async (req, res) => {
         const course = await Course.findById(req.params.course_id);
 
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-        console.log(quizData);
 
         res.status(200).render('quizz', { quizz, title: quizz.title,quizData,course,user:req.user||null });
     } catch (err) {
@@ -66,8 +65,6 @@ const createQuestion = async (req, res) => {
 
 const createOption = async (req, res) => {
     try {
-        console.log(req.body);
-        console.log(req.params.question_id);
         await Option.create(req.body.option_text,req.params.question_id, req.body.is_correct);
         res.status(201).redirect("/api/courses/" + req.params.course_id + "/quizzes/" + req.params.id);
     } catch (err) {
@@ -80,7 +77,6 @@ const takeQuizz = async (req, res) => {
         const quizz = await Quizz.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-        console.log(quizData);
         res.status(200).render('takeQuizz', { quizz, title: quizz.title,quizData,course,user:req.user||null });
     } catch (err) {
         res.status(500).json({ message: err.message });

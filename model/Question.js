@@ -12,9 +12,7 @@ class Question {
     }
 
     static async findByQuizzId(quizzId) {
-        console.log("quiz id in question: ",quizzId);
         const [rows] = await db.query('SELECT * FROM questions WHERE quiz_id = ?', [quizzId]);
-        console.log(rows);
         return rows;
     }
 
