@@ -1,0 +1,98 @@
+body{
+    background-color: #e9e9e9 !important;
+    font-family: 'Open Sans', sans-serif !important;
+    overflow-x: hidden !important;
+    user-select: none !important;
+    -moz-user-select: none !important;
+    -webkit-user-select: none !important;
+}
+.progress-container {
+    position: relative;
+    width: 30px;
+    height: 30px;
+}
+
+svg {
+    transform: rotate(-90deg);
+}
+
+.progress-ring {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 3;
+}
+
+.progress-ring-progress {
+    fill: none;
+    stroke: #4caf50;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 62.8;  /* Circumference of the circle (2 * π * r, r = 10) */
+    stroke-dashoffset: 62.8; /* Start with an empty progress */
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 6px;
+    font-weight: bold;
+}
+.progress-bar-container {
+    position: relative;
+    width: 100%;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    padding: 20px 0px 0px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #4caf50;
+    width: 0%; /* Start at 0 */
+    border-radius: 5px;
+    color: white;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+#questions-container{
+    scrollbar-width: 10px;
+    scrollbar-color: #4CAF50 #e9e9e9;
+    overflow-y: scroll;
+}
+#questions-container::-webkit-scrollbar{
+    width: 10px;
+}
+#questions-container::-webkit-scrollbar-track{
+    background: #e9e9e9;
+}
+#questions-container::-webkit-scrollbar-thumb{
+    background: #4CAF50;
+    border-radius: 5px;
+}
+
+#timer{
+    border: 3px solid black;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 10px;
+    position: absolute;
+    left: 50%;
+}

@@ -1,0 +1,57 @@
+<%- include('partials/_header') %>
+    
+        <div class="col-lg-3">
+                <h1 class="m-0 p-0"><%= quizz.title %></h1>
+                <form action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="mt-3 d-flex align-items-center gap-1">
+                    <input type="text" name="question_text" class="form-control" placeholder="Enter Question text" required>
+                    <button type="submit" class="btn btn-sm btn-primary">Create</button>
+                </form>
+
+                <a class="btn btn-sm btn-success my-3" href="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/take" >Take quiz</a>
+        </div>
+        <div id="questions-container" class="col-lg-6 overflow-auto" style="height: 90vh;">
+            <h1 class="m-0 p-0 mb-3">Questions</h1>
+            <ul class="list-group mb-5">
+                <% quizData.forEach((question, index) => { %>
+                    <li class="list-group-item bg-primary-subtle rounded-0 mb-2">
+                        <div class="border border-1 border-dark p-3">
+                            <strong ><%=index+1%> : <%= question.question_text %></strong>
+                        </div>
+                        <h5 class="mt-3">Options</h5>
+                        <ul class="list-group">
+                            <% question.options.forEach(option => { %>
+                                <li class="list-group-item rounded-0 d-flex align-items-center gap-1">
+                                    <!-- Ensure each question has its own radio group by using question.id -->
+                                    <input type="radio" name="question_<%= question.id %>" 
+                                           id="option_<%= option.id %>" 
+                                           value="<%= option.option_text %>">
+                                    <label for="option_<%= option.id %>"><%= option.option_text %> <%= option.is_correct ? '(Correct)' : '' %></label>
+                                </li>
+                            <% }) %>
+                        </ul>
+                        <% if (question.options.length <= 3) { %>
+                        <!-- Form to create an option -->
+                        <form action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions/<%= question.id %>/options" method="post">
+                            <input type="text" name="option_text" class="form-control mt-3" placeholder="Enter Option text" required>
+                            <select name="is_correct" class="form-select mt-3">
+                                <option value="0">Incorrect</option>
+                                <option value="1">Correct</option>
+                            </select>
+                            <div class="text-end mb-2">
+                                <button type="submit" class="btn btn-sm btn-primary mt-3">Add Option</button>
+                            </div>
+                        </form>
+                        <% } %>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                let questionsContainer = document.getElementById("questions-container");
+                questionsContainer.scrollTop = questionsContainer.scrollHeight;
+
+            })
+        </script>
+    <%- include('partials/_footer') %>
