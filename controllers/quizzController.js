@@ -2,6 +2,7 @@ const Quizz = require('../model/Quizz');
 const Course = require('../model/Course');
 const Question = require('../model/Question');
 const Option = require('../model/Option');
+const QuizResult = require('../model/QuizResult');
 let user = null;
 
 const getAll = async (req, res) => {
@@ -20,8 +21,22 @@ const showQuizz = async (req, res) => {
         const course = await Course.findById(req.params.course_id);
 
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-
-        res.status(200).render('quizz', { quizz, title: quizz.title,quizData,course,user:req.user||null });
+        const quizResults = await QuizResult.findByQuizId(req.params.id);
+        let questions = [];
+        let answers = [];
+        let questionText;
+        let answerText;
+        let percentage = (quizResults.score / quizResults.total_marks * 100).toFixed(2);
+        for(let question in quizResults.answers){
+            questionText = await Question.findById(question);
+            answerText = await Option.findById(quizResults.answers[question])
+            questions.push(questionText);
+            answers.push(answerText);
+        }
+        console.log("questions : ",questions);
+        console.log("answers : ",answers);
+        
+        res.status(200).render('quizz', { quizz, title: quizz.title,quizData,quizResults,course,user:req.user,questions,answers,percentage });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -77,9 +92,32 @@ const takeQuizz = async (req, res) => {
         const quizz = await Quizz.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-        res.status(200).render('takeQuizz', { quizz, title: quizz.title,quizData,course,user:req.user||null });
+        console.log("user",req.user);
+        res.status(200).render('takeQuizz', { quizz, title: quizz.title,quizData,course,user:req.user });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 }
-module.exports = { getAll, showQuizz, create, update, deleteQuizz, createQuestion, createOption, takeQuizz };
+
+const saveResults = async (req, res) => {
+    try {
+        const { user_id, course_id, quiz_id, total_marks, score, answers } = req.body;
+
+        // Log the received data for debugging
+        console.log("Received quiz results:", req.body);
+
+        // Save the results to the database
+        const quizResult = await QuizResult.create(user_id, course_id, quiz_id, total_marks, score, answers);
+
+        // Send a success response
+        res.status(200).json({
+            success: true,
+            message: "Quiz results saved successfully",
+            data: quizResult
+        });
+    } catch (err) {
+        console.error("Error saving quiz results:", err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+module.exports = { getAll, showQuizz, create, update, deleteQuizz, createQuestion, createOption, takeQuizz, saveResults };

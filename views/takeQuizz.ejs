@@ -32,5 +32,10 @@
 <script type="application/json" id="quiz-data">
     <%- JSON.stringify(quizData) %>
 </script>
+<script>
+    let courseId = "<%= course.id %>";
+    let quizzId = "<%= quizz.id %>";
+    let userId = "<%= user.userId %>";
+</script>
 <script src="/js/takeQuizz.js"></script>
 <%- include('partials/_footer') -%>

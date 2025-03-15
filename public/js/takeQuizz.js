@@ -8,7 +8,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let questionsNavigationContainer = document.querySelector("#questions-navigation-container");
     let totalTime = quizData.length * 60;
     let timerInterval;
-
+    console.log(courseId);
+    console.log(quizzId);
+    console.log(userId);
     function calculateTime() {
         let minutes = Math.floor(totalTime / 60);
         let seconds = totalTime % 60;
@@ -58,7 +60,44 @@ document.addEventListener("DOMContentLoaded", function () {
         stopTimer();
         let results = calculateResults();
         alert(`Quiz Completed!\nCorrect Answers: ${results.correctAnswers}/${results.totalQuestions}\nScore: ${results.score}`);
-        window.location.href = "/";
+    
+        let quizResultsData = {
+            user_id: userId,   // Make sure userId, courseId, quizzId are defined globally
+            course_id: courseId,
+            quiz_id: quizzId,
+            total_marks: quizData.length, // Assuming each question is 1 mark
+            score: results.correctAnswers, // Number of correct answers
+            answers: selectedAnswers // Object { question_id: selected_option_id }
+        };
+    
+        console.log("Sending quiz results:", quizResultsData); // Debugging log
+    
+        // Send data to the server
+        fetch("/api/courses/" + courseId + "/quizzes/" + quizzId + "/quiz_results", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(quizResultsData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert(`Quiz results saved successfully!\nCorrect Answers: ${results.correctAnswers}/${results.totalQuestions}\nScore: ${results.score}`);
+                window.location.href = "/api/courses/"+courseId+"/quizzes/"+quizzId;
+            } else {
+                alert("Error saving results. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while submitting the quiz. Please try again.");
+        });
     }
 
     startTimer();
