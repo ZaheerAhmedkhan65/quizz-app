@@ -4,13 +4,12 @@ const quizzController = require('../controllers/quizzController');
 const authenticate = require('../middleware/authenticate');
 
 router.get('/:course_id/quizzes',authenticate,quizzController.getAll);
+router.post('/:course_id/quizzes',authenticate,quizzController.create);
 router.get('/:course_id/quizzes/:id',authenticate,quizzController.showQuizz);
-router.post('/:course_id/quizzes/:id',authenticate,quizzController.create);
 router.put('/:course_id/quizzes/:id',authenticate,quizzController.update);
 // router.delete('/:id',authenticate,quizzController.deleteQuizz);
 
 router.get('/:course_id/quizzes/:id/take',authenticate,quizzController.takeQuizz);
-
 
 router.post('/:course_id/quizzes/:id/quiz_results',authenticate,quizzController.saveResults);
 

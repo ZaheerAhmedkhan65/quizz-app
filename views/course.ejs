@@ -2,7 +2,7 @@
     
         <div class="col-lg-3">
                 <h1 class="m-0 p-0"><%= course.title %></h1>
-                <form action="/api/quizzes/<%= course.id %>" method="post" class="d-flex align-items-center gap-1 mt-3">
+                <form action="/api/courses/<%= course.id %>/quizzes" method="post" class="d-flex align-items-center gap-1 mt-3">
                     <input type="text" name="title" class="form-control" placeholder="Enter quizz title">
                     <button type="submit" class="btn btn-sm btn-primary">Create</button>
                 </form>
