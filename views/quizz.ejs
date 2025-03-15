@@ -50,13 +50,30 @@
         <% if(quizResults != null) {%>
         <div class="col-lg-3">
             <h1 class="m-0 p-0">Quiz Results</h1>
-            <div class="d-flex align-items-center justify-content-between">
-                <p class="m-0">Obtained Marks : <%= quizResults.score %></p>
-                <p class="m-0">Percantage : <%= percentage %> %</p>
-                <p class="m-0">Total Marks : <%= quizResults.total_marks %></p>
-            </div>
+            <table class="table m-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="py-0">Total Marks</th>
+                        <th class="py-0">Obtained Marks</th>
+                        <th class="py-0">Percentage (%)</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td class="py-0">
+                            <%= quizResults.total_marks %>
+                        </td>
+                        <td class="py-0">
+                            <%= quizResults.score %>
+                        </td>
+                        <td class="py-0 ">
+                            <%= percentage %>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
             <h3  class="m-0">Results :</h3>
-            <ul class="list-group">
+            <ul id="results-container" class="list-group">
                 <% questions.forEach((question,index) => { %>
                     <li class="list-group-item bg-transparent">
                         <strong>#<%= index+1 %> : <%= question.question_text %></strong><br>
