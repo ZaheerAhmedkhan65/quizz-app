@@ -1,7 +1,6 @@
 const Course = require('../model/Course');
 const UserCourse = require('../model/UserCourse');
 const Quizz = require('../model/Quizz');
-let user = null;
 
 const getAll = async (req, res) => {
     try {
