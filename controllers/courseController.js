@@ -25,7 +25,7 @@ const showCourse = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const course = await Course.create(req.body.title);
+        const course = await Course.create(req.body.title, req.user.userId);
         await UserCourse.create(req.user.userId, course.id);
         res.status(201).redirect('/api/dashboard');
     } catch (err) {

@@ -11,8 +11,13 @@ class Course {
         return rows[0];
     }
 
-    static async create(title) {
-        const [result] = await db.query('INSERT INTO courses (title) VALUES (?)', [title]);
+    static async findByUserId(userId) {
+        const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
+        return rows;
+    }
+
+    static async create(title, user_id) {
+        const [result] = await db.query('INSERT INTO courses (title, user_id) VALUES (?, ?)', [title, user_id]);
         const [course] = await db.query('SELECT * FROM courses WHERE id = ?', [result.insertId]); // Get full course
         return course[0]; // Return course object
         // return result.insertId;
