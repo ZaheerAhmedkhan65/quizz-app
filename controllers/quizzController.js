@@ -87,8 +87,8 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const quizz = await Quizz.update(req.params.id, req.body.title, req.body.totalQuestions);
-        res.status(200).json(quizz);
+        const quizz = await Quizz.update(req.params.id, req.body.title);
+        res.status(200).redirect("/api/courses/"+req.params.course_id);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

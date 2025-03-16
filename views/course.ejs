@@ -10,10 +10,18 @@
                 <% if(quizzs.length > 0) {%>
                 <ul class="list-group mt-3">
                     <% quizzs.forEach(quizz => { %>
-                        <li class="list-group-item bg-primary-subtle rounded-0 mb-1">
+                        <li id="quizz_<%= quizz.id %>" class="list-group-item bg-primary-subtle rounded-0 mb-1 d-flex align-items-center justify-content-between">
                             <a href="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>" class="text-decoration-none text-dark">
-                               <strong style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> <%= quizz.title %> </strong>
+                               <strong style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-title = "quizz-title"> <%= quizz.title %> </strong>
                             </a>
+                            <div class="btn-group dropup">
+                                <button type="button" class="bg-transparent border-0" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li class="dropdown-item" data-id="<%= quizz.id %>">edit</li>
+                                </ul>
+                            </div>
                         </li>
                     <% }) %>
                 </ul>
@@ -33,16 +41,38 @@
     <script src="/js/courseProgressBar.js"></script>
     <script src="/js/notifications.js"></script>
     <script src="/js/checkForDuplicate.js"></script>
-
+    <script type="application/json" id="quizzs-data">
+        <%- JSON.stringify(quizzs) %>
+    </script>
+    
     <script>
-        let quizzs = <%- JSON.stringify(quizzs) %>;
+        let quizzs = JSON.parse(document.getElementById("quizzs-data").textContent);;
 
         document.addEventListener('DOMContentLoaded', () => {
             let title = document.getElementById('title');
             let createBtn = document.getElementById('createBtn');
             checkForDuplicate(quizzs, title, "quizz title", 'title', createBtn, "Quizz");
         });
-
     </script>
-
+    <script>
+         document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
+            editBtn.addEventListener('click', () => {
+                let id = editBtn.getAttribute('data-id');
+                let courseId = "<%= course.id %>";
+                let quizzContainer = document.getElementById(`quizz_${id}`);
+                let quizzTitle = quizzContainer.querySelector('strong[data-title="quizz-title"]');
+        
+                // Prevent duplicate form insertion
+                if (quizzContainer.querySelector('form')) return;
+        
+                quizzContainer.innerHTML = `
+                    <form action="/api/courses/${courseId}/quizzes/${id}" method="post" class="d-flex align-items-center justify-content-between gap-2 w-100">
+                        <input type="text" name="title" value="${quizzTitle.textContent}" class="form-control" placeholder="Enter quizz title" required>
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                `;
+        
+            });
+        });
+    </script>
     <%- include('partials/_footer') %>

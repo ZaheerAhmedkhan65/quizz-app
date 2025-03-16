@@ -13,8 +13,8 @@ class Quizz {
         return result.affectedRows;
     }
 
-    static async update(id, title, totalQuestions) {
-        const [result] = await db.query('UPDATE quizzes SET title = ? , total_questions = ? WHERE id = ?', [title, totalQuestions, id]);
+    static async update(id, title) {
+        const [result] = await db.query('UPDATE quizzes SET title = ? WHERE id = ?', [title, id]);
         return result.affectedRows;
     }
 

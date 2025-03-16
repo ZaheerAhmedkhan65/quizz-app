@@ -42,7 +42,7 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const course = await Course.update(req.params.id, req.body.title);
+        await Course.update(req.params.id, req.body.title);
         res.status(200).redirect('/api/dashboard');
     } catch (err) {
         res.status(500).json({ message: err.message });
