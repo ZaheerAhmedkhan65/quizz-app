@@ -19,9 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function startTimer() {
         timerInterval = setInterval(() => {
-            if (totalTime <= 0) {
+            if (totalTime <= 0 ) {
                 clearInterval(timerInterval);
-                alert("Time is up! Submitting the quiz...");
+                showNotification("Time is up! Submitting the quiz...");
                 submitQuiz();
                 return;
             }
@@ -60,17 +60,14 @@ document.addEventListener("DOMContentLoaded", function () {
         stopTimer();
         let results = calculateResults();
         alert(`Quiz Completed!\nCorrect Answers: ${results.correctAnswers}/${results.totalQuestions}\nScore: ${results.score}`);
-    
         let quizResultsData = {
-            user_id: userId,   // Make sure userId, courseId, quizzId are defined globally
+            user_id: userId,
             course_id: courseId,
             quiz_id: quizzId,
-            total_marks: quizData.length, // Assuming each question is 1 mark
-            score: results.correctAnswers, // Number of correct answers
-            answers: selectedAnswers // Object { question_id: selected_option_id }
+            total_marks: quizData.length,
+            score: results.correctAnswers,
+            answers: selectedAnswers
         };
-    
-        console.log("Sending quiz results:", quizResultsData); // Debugging log
     
         // Send data to the server
         fetch("/api/courses/" + courseId + "/quizzes/" + quizzId + "/quiz_results", {
@@ -98,8 +95,26 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("An error occurred while submitting the quiz. Please try again.");
         });
     }
-
-    startTimer();
+    
+    if(quizData.length == 0) {
+        document.body.innerHTML = "";
+        document.body.classList.add("d-flex","align-items-center","justify-content-center","vh-100");
+        document.body.innerHTML = `
+        <div class="border border-2 border-dark" style="height: 50vh;">
+            <div class="p-2">
+                <h1 class="text-center">No questions found for this quiz.</h1>
+                <p class="text-center">Please create some questions first and try again.</p>
+            </div>
+            <div class="d-flex justify-content-center">
+                <a href="/api/courses/${courseId}/quizzes/${quizzId}" class="btn btn-primary">Go Back</a>
+            </div>
+        </div>
+        `;
+        // window.location.href = "/api/courses/"+courseId+"/quizzes/"+quizzId;
+    }else{
+        startTimer();
+    }
+    
 
     function updateQuestionNavigation() {
         questionsNavigationContainer.innerHTML = "";

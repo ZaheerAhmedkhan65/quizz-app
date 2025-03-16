@@ -11,6 +11,8 @@ class Course {
         return rows[0];
     }
 
+
+
     static async findByUserId(userId) {
         const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
         return rows;
@@ -33,8 +35,8 @@ class Course {
         return result.affectedRows;
     }
 
-    static async findByTitle(title) {
-        const [rows] = await db.query('SELECT * FROM courses WHERE title = ?', [title]);
+    static async findByTitle(userId, title) {
+        const [rows] = await db.query('SELECT * FROM courses WHERE title = ? AND user_id = ?', [title , userId]);
         return rows[0];
     }
 }

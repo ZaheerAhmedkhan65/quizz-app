@@ -10,8 +10,8 @@
                     <% } %>                    
                 </div>
                 <form action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="mt-3 d-flex align-items-center gap-1">
-                    <input type="text" name="question_text" class="form-control" placeholder="Enter Question text" required>
-                    <button type="submit" class="btn btn-sm btn-primary">Create</button>
+                    <input type="text" id="question-text" name="question_text" class="form-control" placeholder="Enter Question text" required>
+                    <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
                 </form>
         </div>
         <div class="col-lg-6" style="height: 90vh; overflow: hidden;">
@@ -118,4 +118,30 @@
                 resultsContainer.style.height = `calc(80vh - ${resultsTable.offsetHeight}px)`;
                 });
         </script>
+        <script src="/js/notifications.js"></script>
+        <script src="/js/checkForDuplicate.js"></script>
+<script>
+let quizData = <%- JSON.stringify(quizData) %>;
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkForDuplicate(quizData, document.getElementById('question-text'), "question text", 'question_text', document.getElementById('createBtn'), "Question");
+
+    document.querySelectorAll('form[action*="/options"]').forEach(form => {
+        let optionInput = form.querySelector('input[name="option_text"]');
+        let submitButton = form.querySelector('button[type="submit"]');
+        
+        if (optionInput) {
+            optionInput.addEventListener('input', () => {
+                const questionId = form.action.split('/').slice(-2, -1)[0]; // Extract question ID
+                const question = quizData.find(q => q.id == questionId);
+                
+                if (question) {
+                    checkForDuplicate(question.options, optionInput, "option text" ,'option_text', submitButton, "Option");
+                }
+            });
+        }
+    });
+});
+
+</script>
     <%- include('partials/_footer') %>

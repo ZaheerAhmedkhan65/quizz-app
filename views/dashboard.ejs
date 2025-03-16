@@ -3,8 +3,8 @@
         <div class="col-lg-3 d-flex flex-column">
                 <form action="/api/courses" method="post" class="mt-3 d-flex align-items-center gap-1">
                     <input type="hidden" name="user_id" value="<%= user.userId %>">
-                    <input type="text" name="title" placeholder="Enter course title" class="form-control" required>
-                    <input type="submit" class="btn btn-sm btn-primary" value="create">
+                    <input type="text" id="title" name="title" placeholder="Enter course title" class="form-control" required>
+                    <input type="submit" id="createBtn" class="btn btn-sm btn-primary" value="create">
                 </form>
                 <h4 class="mt-3">Courses</h4>
                 <% if(courses.length >0){%>
@@ -39,5 +39,18 @@
         </div>
 
    <script src="/js/courseProgress.js"></script>
-    
+   <script src="/js/notifications.js"></script>
+   <script src="/js/checkForDuplicate.js"></script>
+    <script>
+        let courses = <%- JSON.stringify(courses) %>;
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            let title = document.getElementById('title');
+            let createBtn = document.getElementById('createBtn');
+
+            checkForDuplicate(courses, title,'title','title', createBtn, "Course");
+        });
+
+    </script>
 <%- include('partials/_footer') %>

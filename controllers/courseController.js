@@ -1,6 +1,9 @@
 const Course = require('../model/Course');
 const UserCourse = require('../model/UserCourse');
 const Quizz = require('../model/Quizz');
+const User = require('../model/User');
+
+const { render } = require('ejs');
 
 const getAll = async (req, res) => {
     try {
@@ -24,6 +27,11 @@ const showCourse = async (req, res) => {
 
 const create = async (req, res) => {
     try {
+        
+        const existingCourse = await Course.findByTitle(req.user.userId, req.body.title);
+        if (existingCourse) {
+            return res.status(400).json({ message: 'Course already exists' });
+        }
         const course = await Course.create(req.body.title, req.user.userId);
         await UserCourse.create(req.user.userId, course.id);
         res.status(201).redirect('/api/dashboard');

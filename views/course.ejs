@@ -3,8 +3,8 @@
         <div class="col-lg-3">
                 <h1 style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="m-0 p-0"><%= course.title %></h1>
                 <form action="/api/courses/<%= course.id %>/quizzes" method="post" class="d-flex align-items-center gap-1 mt-3">
-                    <input type="text" name="title" class="form-control" placeholder="Enter quizz title">
-                    <button type="submit" class="btn btn-sm btn-primary">Create</button>
+                    <input type="text" name="title" id="title" class="form-control" placeholder="Enter quizz title" required>
+                    <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
                 </form>
                 <h4 class="mt-3">Quizzes List</h4>
                 <% if(quizzs.length > 0) {%>
@@ -31,5 +31,18 @@
     
 
     <script src="/js/courseProgressBar.js"></script>
+    <script src="/js/notifications.js"></script>
+    <script src="/js/checkForDuplicate.js"></script>
+
+    <script>
+        let quizzs = <%- JSON.stringify(quizzs) %>;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let title = document.getElementById('title');
+            let createBtn = document.getElementById('createBtn');
+            checkForDuplicate(quizzs, title, "quizz title", 'title', createBtn, "Quizz");
+        });
+
+    </script>
 
     <%- include('partials/_footer') %>

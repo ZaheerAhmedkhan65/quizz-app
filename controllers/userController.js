@@ -7,7 +7,7 @@ const userDashboard = async (req, res) => {
         const user = await User.findById(req.user.userId);
         const progress = await UserCourse.getProgressByUserId(req.user.userId);  
         const courses = await Course.findByUserId(req.user.userId);  
-        res.render('dashboard', { user, courses, progress, title:"Dashboard" });
+        res.render('dashboard', { user, courses, progress, title:"Dashboard", message: null });
     } catch (err) {
         console.error(err); 
     }
