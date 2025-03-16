@@ -12,7 +12,7 @@ class QuizResult {
 
     static async findByQuizId(quizzId) {
         const [quiz_result] = await db.query("SELECT * FROM quiz_results WHERE quiz_id = ?", [quizzId]);
-        return quiz_result[0];
+        return quiz_result;
     }
 }
 

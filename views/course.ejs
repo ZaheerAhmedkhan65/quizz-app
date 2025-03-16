@@ -1,7 +1,7 @@
 <%- include('partials/_header') %>
     
         <div class="col-lg-3">
-                <h1 class="m-0 p-0"><%= course.title %></h1>
+                <h1 style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="m-0 p-0"><%= course.title %></h1>
                 <form action="/api/courses/<%= course.id %>/quizzes" method="post" class="d-flex align-items-center gap-1 mt-3">
                     <input type="text" name="title" class="form-control" placeholder="Enter quizz title">
                     <button type="submit" class="btn btn-sm btn-primary">Create</button>
@@ -12,7 +12,7 @@
                     <% quizzs.forEach(quizz => { %>
                         <li class="list-group-item bg-primary-subtle rounded-0 mb-1">
                             <a href="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>" class="text-decoration-none text-dark">
-                               <strong> <%= quizz.title %> </strong>
+                               <strong style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"> <%= quizz.title %> </strong>
                             </a>
                         </li>
                     <% }) %>

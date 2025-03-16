@@ -17,37 +17,62 @@ const getAll = async (req, res) => {
 const showQuizz = async (req, res) => {
     try {
         const quizz = await Quizz.findById(req.params.id);
-
         const course = await Course.findById(req.params.course_id);
 
-        console.log("quiz id",req.params.id);
-        console.log("course id",req.params.course_id);
+        console.log("quiz id", req.params.id);
+        console.log("course id", req.params.course_id);
 
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-
         const quizResults = await QuizResult.findByQuizId(req.params.id);
 
         console.log(quizResults);
+
         let questions = [];
         let answers = [];
-        let questionText;
-        let answerText;
         let percentage = 0;
-        if(quizResults != null){
-            percentage = (quizResults.score / quizResults.total_marks * 100).toFixed(2);
-            for(let question in quizResults.answers){
-                questionText = await Question.findById(question);
-                answerText = await Option.findById(quizResults.answers[question])
-                questions.push(questionText);
-                answers.push(answerText);
+
+        if (quizResults && quizResults.length > 0) {
+            for (const result of quizResults) {
+                console.log("Processing result:", result);
+
+                for (const questionId in result.answers) {
+                    console.log("Fetching question for ID:", questionId);
+                    
+                    let questionText = await Question.findById(questionId);
+                    let answerText = await Option.findById(result.answers[questionId]);
+
+                    questions.push(questionText);
+                    answers.push(answerText);
+
+                    console.log("Question:", questionText);
+                    console.log("Answer:", answerText);
+                }
             }
+
+            // Calculate percentage if needed
+            percentage = ((quizResults.reduce((sum, res) => sum + res.score, 0) / 
+                           quizResults.reduce((sum, res) => sum + res.total_marks, 0)) * 100).toFixed(2);
         }
-        
-        res.status(200).render('quizz', { quizz, title: quizz.title,quizData,quizResults,course,user:req.user,questions,answers,percentage });
+
+        console.log("Final Questions:", questions);
+        console.log("Final Answers:", answers);
+
+        res.status(200).render('quizz', { 
+            quizz, 
+            title: quizz.title, 
+            quizData, 
+            quizResults, 
+            course, 
+            user: req.user, 
+            questions, 
+            answers, 
+            percentage 
+        });
+
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
-}
+};
 
 const create = async (req, res) => {
     try {

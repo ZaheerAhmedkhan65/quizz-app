@@ -14,7 +14,7 @@
                     %>
                         <li class="list-group-item bg-primary-subtle rounded-0 mb-1 d-flex justify-content-between align-items-center">
                             <a href="/api/courses/<%= course.id %>" class="text-decoration-none text-dark">
-                                <strong><%= course.title %></strong>
+                                <strong style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= course.title %></strong>
                             </a>
                             <% if(courseProgress) { %> 
                                 <div class="progress-container">
