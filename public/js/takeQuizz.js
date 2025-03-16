@@ -88,7 +88,6 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(data => {
             if (data.success) {
-                alert(`Quiz results saved successfully!\nCorrect Answers: ${results.correctAnswers}/${results.totalQuestions}\nScore: ${results.score}`);
                 window.location.href = "/api/courses/"+courseId+"/quizzes/"+quizzId;
             } else {
                 alert("Error saving results. Please try again.");
@@ -102,52 +101,84 @@ document.addEventListener("DOMContentLoaded", function () {
 
     startTimer();
 
+    function updateQuestionNavigation() {
+        questionsNavigationContainer.innerHTML = "";
+        quizData.forEach((question, index) => {
+            let questionLink = document.createElement("div");
+            questionLink.classList.add("btn", "rounded-circle", "btn-primary");
+    
+            // Add 'btn-warning' to the current question
+            if (index === currentQuestionIndex) {
+                questionLink.classList.add("btn-warning");
+            }
+    
+            // Add 'btn-success' if the question has a selected answer
+            if (selectedAnswers[question.id]) {
+                questionLink.classList.add("btn-success");
+            }
+    
+            questionLink.innerText = index + 1;
+            questionLink.addEventListener("click", () => {
+                currentQuestionIndex = index;
+                loadQuestion();
+            });
+    
+            questionsNavigationContainer.appendChild(questionLink);
+        });
+    }
+    
     function loadQuestion() {
         let question = quizData[currentQuestionIndex];
         document.getElementById("question-text").innerText = question.question_text;
-
+    
         let optionsContainer = document.getElementById("options-container");
         optionsContainer.innerHTML = "";
-
+    
         questionIndexContainer.innerText = "Question " + (currentQuestionIndex + 1) + " of " + quizData.length;
-
+    
         backBtn.disabled = currentQuestionIndex === 0;
         nextBtn.textContent = currentQuestionIndex < quizData.length - 1 ? "Next" : "Submit";
-
+    
         question.options.forEach(option => {
             let listItem = document.createElement("li");
-            listItem.classList.add("list-group-item", "p-3", "rounded-0", "d-flex","align-items-center", "gap-1",);
-
+            listItem.classList.add("list-group-item", "p-3", "rounded-0", "d-flex", "align-items-center", "gap-1");
+    
             let radioInput = document.createElement("input");
             radioInput.type = "radio";
             radioInput.name = "question_" + question.id;
             radioInput.id = "option_" + option.id;
             radioInput.value = option.id;
-
+    
             if (selectedAnswers[question.id] == option.id) {
                 radioInput.checked = true;
             }
-
+    
             radioInput.addEventListener("change", () => {
                 selectedAnswers[question.id] = option.id;
+                updateQuestionNavigation(); // Update navigation buttons when an answer is selected
             });
-
+    
             let label = document.createElement("label");
             label.setAttribute("for", "option_" + option.id);
             label.innerText = option.option_text;
-
+    
             listItem.appendChild(radioInput);
             listItem.appendChild(label);
             optionsContainer.appendChild(listItem);
         });
+    
+        updateQuestionNavigation(); // Update navigation UI after loading question
     }
+    
 
     nextBtn.addEventListener("click", () => {
         if (currentQuestionIndex < quizData.length - 1) {
             currentQuestionIndex++;
             loadQuestion();
         } else {
-            submitQuiz();
+            if (confirm("Are you sure you want to submit the quiz?")) {
+                submitQuiz();
+            };
         }
     });
 
