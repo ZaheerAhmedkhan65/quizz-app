@@ -21,7 +21,8 @@ class QuizResult {
             [userId, courseId]
         );
         return rows.length ? rows[0].quizzes_attempted : 0; // Ensure it returns an integer
-    }   
+    }
+
 }
 
 module.exports = QuizResult;

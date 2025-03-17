@@ -1,6 +1,6 @@
 <%- include('partials/_header') %>
-    <div class="row d-flex justify-content-center align-items-center">
-            <div class="col-lg-6">
+    <div class="row">
+            <div class="col-lg-6 d-flex justify-content-center">
                 <div class="col-lg-6 mt-5">
                     <h4>Sign in</h4>
                     <form action="/auth/signin" method="post">
@@ -22,6 +22,14 @@
                             <span class="text-primary">Sign up</span>
                         </a>
                     </form>
+                </div>
+            </div>
+            <div class="col-lg-6 d-flex justify-content-start">
+                <div class="col-lg-10 mt-5">
+                    <h4>Instruction Video</h4>
+                    <div class="card rounded-0">
+                        <video src="/videos/quizz attempt video.mp4" controls autoplay="true" loop class="mt-2" style="width: 100%; height: auto;"></video>
+                    </div>
                 </div>
             </div>
     </div>

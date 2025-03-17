@@ -9,11 +9,12 @@
                         </a>
                     <% } %>                    
                 </div>
-                <form action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="mt-3 d-flex align-items-center gap-1">
+                <form action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="d-flex align-items-center gap-1">
                     <input type="text" id="question-text" name="question_text" class="form-control" placeholder="Enter Question text" required>
                     <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
                 </form>
         </div>
+        <%if(quizData.length > 0){%>
         <div class="col-lg-6" style="height: 90vh; overflow: hidden;">
             <h1 class="m-0 p-0 mb-3">Questions</h1>
             <% if(quizData.length > 0) { %>
@@ -110,9 +111,23 @@
                     <% }); %>
                 </ul>
             </div>
-            
         <%}%>
-        
+       <%}else{%>
+        <div class="col-lg-9">
+            <div class="row mt-3">
+                <div class="col-lg-8">
+                    <h4>Quizz Question Creation Video</h4>
+                    <div class="card rounded-0">
+                            <video src="/videos/question creation video.mp4" controls autoplay="true" loop class="mt-2" style="width: 100%; height: auto;"></video>
+                    </div>
+                    <p class="mt-2">Watch the video to learn how to create a quizz question and options for it.  </p>
+                </div>
+                <div class="col-lg-4">
+            
+                </div>
+            </div>      
+        </div>
+        <%}%>
         
 
         <script>

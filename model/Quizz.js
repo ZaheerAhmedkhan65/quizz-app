@@ -32,6 +32,28 @@ class Quizz {
         const [rows] = await db.query('SELECT * FROM quizzes WHERE course_id = ?', [courseId]);
         return rows;
     }
+
+    static async getQuizAttemptCount(quizzId) {
+        const [rows] = await db.query(
+            "SELECT COUNT(*) AS attempt_count FROM quiz_results WHERE quiz_id = ?",
+            [quizzId]
+        );
+        return rows.length ? rows[0].attempt_count : 0;
+    }
+    
+    static async updateQuizzProgressBasedOnAttempts(quizzId) {
+        const attemptCount = await this.getQuizAttemptCount(quizzId);
+        
+        let progress = (attemptCount >= 5) ? 100.00 : (attemptCount / 5) * 100; // Normalize progress
+    
+        await db.query(
+            "UPDATE quizzes SET quizz_progress = ? WHERE id = ?",
+            [progress, quizzId]
+        );
+    
+        return progress;
+    }
+    
    
     static async updateQuizzTotalQuestions(quizzId, totalQuestions) {
         const [result] = await db.query('UPDATE quizzes SET total_questions = ? WHERE id = ?', [totalQuestions, quizzId]);

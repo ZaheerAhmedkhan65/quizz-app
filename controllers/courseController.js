@@ -19,6 +19,7 @@ const showCourse = async (req, res) => {
         const course = await Course.findById(req.params.id);
         const progress = await UserCourse.findByUserIdAndCourseId(req.user.userId, req.params.id);
         const quizzs = await Quizz.findByCourseId(req.params.id);
+        console.log("quizzes",quizzs);
         res.status(200).render('course', { course, progress, title: course.title, user:req.user||null,quizzs });
     } catch (err) {
         res.status(500).json({ message: err.message });

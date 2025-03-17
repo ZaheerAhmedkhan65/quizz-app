@@ -66,6 +66,27 @@ const create = async (req, res) => {
         await Quizz.create(req.body.title, req.params.course_id);
         const quizzes = await Quizz.findByCourseId(req.params.course_id);
         await Course.updateTotalQuizzes(req.params.course_id, quizzes.length);
+
+        // Fetch total quizzes
+        const totalQuizzes = await Course.getTotalQuizzes(req.params.course_id);
+        if (!totalQuizzes) {
+            return res.status(400).json({ message: "No quizzes available for this course." });
+        }
+
+        // Fetch quizzes attempted
+        const quizzesAttempted = await QuizResult.quizzesAttempted(req.user.userId, req.params.course_id);
+        console.log("Quizzes Attempted:", quizzesAttempted);
+        console.log("Total Quizzes:", totalQuizzes);
+
+        // Calculate progress
+        let courseProgress = (quizzesAttempted / totalQuizzes) * 100;
+        courseProgress = Math.min(courseProgress, 100.00); // Prevent exceeding 100%
+
+        console.log("Course Progress:", courseProgress);
+
+        // Update progress in `user_courses`
+        await UserCourse.updateProgress(req.user.userId, req.params.course_id, courseProgress);
+
         res.status(201).redirect('/api/courses/' + req.params.course_id);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -160,6 +181,8 @@ const saveResults = async (req, res) => {
 
         // Update progress in `user_courses`
         await UserCourse.updateProgress(user_id, course_id, courseProgress);
+        
+        await Quizz.updateQuizzProgressBasedOnAttempts(quiz_id);
 
         return res.status(200).json({
             success: true,

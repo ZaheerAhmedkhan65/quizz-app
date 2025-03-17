@@ -3,6 +3,7 @@ document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
         let id = editBtn.getAttribute('data-id');
         let quizzContainer = document.getElementById(`quizz_${id}`);
         let quizzTitle = quizzContainer.querySelector('strong[data-title="quizz-title"]');
+        let courseId = quizzContainer.getAttribute('course-id');
 
         // Prevent duplicate form insertion
         if (quizzContainer.querySelector('form')) return;
@@ -12,7 +13,7 @@ document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
             .map(title => title.textContent.trim().toLowerCase());
 
         quizzContainer.innerHTML = `
-            <form action="/api/courses/<%= course.id %>/quizzes/${id}" method="post" class="d-flex flex-column w-100">
+            <form action="/api/courses/${courseId}/quizzes/${id}" method="post" class="d-flex flex-column w-100">
                 <div class="d-flex align-items-center gap-1 justify-content-between w-100">
                     <input type="text" name="title" value="${quizzTitle.textContent}" class="form-control" placeholder="Enter quiz title" required id="editTitle_${id}">
                     <button type="submit" class="btn btn-sm btn-primary">Update</button>
