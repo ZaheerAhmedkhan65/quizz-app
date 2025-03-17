@@ -68,24 +68,5 @@
         });
     </script>
 
-    <script>
-        document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
-            editBtn.addEventListener('click', () => {
-                let id = editBtn.getAttribute('data-id');
-                let courseContainer = document.getElementById(`course_${id}`);
-                let courseTitle = courseContainer.querySelector('strong[data-title="course-title"]');
-        
-                // Prevent duplicate form insertion
-                if (courseContainer.querySelector('form')) return;
-        
-                courseContainer.innerHTML = `
-                    <form action="/api/courses/${id}" method="post" class="d-flex align-items-center justify-content-between w-100 gap-2">
-                        <input type="text" name="title" value="${courseTitle.textContent}" class="form-control" placeholder="Enter course title" required>
-                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
-                    </form>
-                `;
-        
-            });
-        });
-    </script>
+    <script src="/js/editCourse.js"></script> 
 <%- include('partials/_footer') %>

@@ -94,3 +94,7 @@ svg {
     overflow: auto;
     scrollbar-width: none;
 }
+
+.error-message{
+    font-size: 12px !important;
+}

@@ -11,7 +11,10 @@ class Course {
         return rows[0];
     }
 
-
+    static async getTotalQuizzes(id) {
+        const [rows] = await db.query('SELECT total_quizzes FROM courses WHERE id = ?', [id]);
+        return rows.length ? rows[0].total_quizzes : 0; // Ensure it returns a number
+    }   
 
     static async findByUserId(userId) {
         const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
@@ -27,6 +30,11 @@ class Course {
 
     static async update(id, title) {
         const [result] = await db.query('UPDATE courses SET title = ? WHERE id = ?', [title, id]);
+        return result.affectedRows;
+    }
+
+    static async updateTotalQuizzes(id, totalQuizzes) {
+        const [result] = await db.query('UPDATE courses SET total_quizzes = ? WHERE id = ?', [totalQuizzes, id]);
         return result.affectedRows;
     }
 

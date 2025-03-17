@@ -32,6 +32,7 @@ class Question {
         const [result] = await db.query('UPDATE questions SET question_text = ? WHERE id = ?', [question_text, id]);
         return result.affectedRows;
     }
+
 }
 
 module.exports = Question;

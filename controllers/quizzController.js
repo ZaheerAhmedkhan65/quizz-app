@@ -3,7 +3,7 @@ const Course = require('../model/Course');
 const Question = require('../model/Question');
 const Option = require('../model/Option');
 const QuizResult = require('../model/QuizResult');
-let user = null;
+const UserCourse = require('../model/UserCourse');
 
 const getAll = async (req, res) => {
     try {
@@ -19,13 +19,8 @@ const showQuizz = async (req, res) => {
         const quizz = await Quizz.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
 
-        console.log("quiz id", req.params.id);
-        console.log("course id", req.params.course_id);
-
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
         const quizResults = await QuizResult.findByQuizId(req.params.id);
-
-        console.log(quizResults);
 
         let questions = [];
         let answers = [];
@@ -33,19 +28,14 @@ const showQuizz = async (req, res) => {
 
         if (quizResults && quizResults.length > 0) {
             for (const result of quizResults) {
-                console.log("Processing result:", result);
 
                 for (const questionId in result.answers) {
-                    console.log("Fetching question for ID:", questionId);
                     
                     let questionText = await Question.findById(questionId);
                     let answerText = await Option.findById(result.answers[questionId]);
 
                     questions.push(questionText);
                     answers.push(answerText);
-
-                    console.log("Question:", questionText);
-                    console.log("Answer:", answerText);
                 }
             }
 
@@ -54,13 +44,10 @@ const showQuizz = async (req, res) => {
                            quizResults.reduce((sum, res) => sum + res.total_marks, 0)) * 100).toFixed(2);
         }
 
-        console.log("Final Questions:", questions);
-        console.log("Final Answers:", answers);
-
         res.status(200).render('quizz', { 
             quizz, 
             title: quizz.title, 
-            quizData, 
+            quizData,
             quizResults, 
             course, 
             user: req.user, 
@@ -76,9 +63,9 @@ const showQuizz = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        console.log(req.params.course_id);
-        console.log(req.body.title);
-        const quizz = await Quizz.create(req.body.title, req.params.course_id);
+        await Quizz.create(req.body.title, req.params.course_id);
+        const quizzes = await Quizz.findByCourseId(req.params.course_id);
+        await Course.updateTotalQuizzes(req.params.course_id, quizzes.length);
         res.status(201).redirect('/api/courses/' + req.params.course_id);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -87,7 +74,7 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const quizz = await Quizz.update(req.params.id, req.body.title);
+        await Quizz.update(req.params.id, req.body.title);
         res.status(200).redirect("/api/courses/"+req.params.course_id);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -106,9 +93,20 @@ const deleteQuizz = async (req, res) => {
 const createQuestion = async (req, res) => {
     try{
         await Question.create(req.body.question_text, req.params.id);
+        const questions = await Question.findByQuizzId(req.params.id);
+        await Quizz.updateQuizzTotalQuestions(req.params.id, questions.length);
         res.status(201).redirect("/api/courses/" + req.params.course_id + "/quizzes/" + req.params.id);
-    } catch(err){
+    } catch (err){
         res.status(500).json({ message: err.message });
+    }
+}
+
+const updateQuestion =  async (req, res) => {
+    try{
+        await Question.update(req.body.question_id, req.body.question_text);
+        res.status(201).redirect("/api/courses/" + req.params.course_id + "/quizzes/" + req.params.quiz_id)
+    } catch (err){
+        res.status(500).json({message: err.message});
     }
 }
 
@@ -126,7 +124,7 @@ const takeQuizz = async (req, res) => {
         const quizz = await Quizz.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-        console.log("user",req.user);
+        
         res.status(200).render('takeQuizz', { quizz, title: quizz.title,quizData,course,user:req.user });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -137,21 +135,42 @@ const saveResults = async (req, res) => {
     try {
         const { user_id, course_id, quiz_id, total_marks, score, answers } = req.body;
 
-        // Log the received data for debugging
-        console.log("Received quiz results:", req.body);
+        console.log("Incoming request:", req.body);
 
-        // Save the results to the database
+        // Save the quiz result
         const quizResult = await QuizResult.create(user_id, course_id, quiz_id, total_marks, score, answers);
+        if (!quizResult) throw new Error("Failed to save quiz result.");
 
-        // Send a success response
-        res.status(200).json({
+        // Fetch total quizzes
+        const totalQuizzes = await Course.getTotalQuizzes(course_id);
+        if (!totalQuizzes) {
+            return res.status(400).json({ message: "No quizzes available for this course." });
+        }
+
+        // Fetch quizzes attempted
+        const quizzesAttempted = await QuizResult.quizzesAttempted(user_id, course_id);
+        console.log("Quizzes Attempted:", quizzesAttempted);
+        console.log("Total Quizzes:", totalQuizzes);
+
+        // Calculate progress
+        let courseProgress = (quizzesAttempted / totalQuizzes) * 100;
+        courseProgress = Math.min(courseProgress, 100.00); // Prevent exceeding 100%
+
+        console.log("Course Progress:", courseProgress);
+
+        // Update progress in `user_courses`
+        await UserCourse.updateProgress(user_id, course_id, courseProgress);
+
+        return res.status(200).json({
             success: true,
             message: "Quiz results saved successfully",
             data: quizResult
         });
+
     } catch (err) {
         console.error("Error saving quiz results:", err);
         res.status(500).json({ success: false, message: err.message });
     }
 };
-module.exports = { getAll, showQuizz, create, update, deleteQuizz, createQuestion, createOption, takeQuizz, saveResults };
+
+module.exports = { getAll, showQuizz, create, update, deleteQuizz, createQuestion, updateQuestion, createOption, takeQuizz, saveResults };

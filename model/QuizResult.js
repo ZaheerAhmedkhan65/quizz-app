@@ -14,6 +14,14 @@ class QuizResult {
         const [quiz_result] = await db.query("SELECT * FROM quiz_results WHERE quiz_id = ?", [quizzId]);
         return quiz_result;
     }
+
+    static async quizzesAttempted(userId, courseId) {
+        const [rows] = await db.query(
+            "SELECT COUNT(DISTINCT quiz_id) AS quizzes_attempted FROM quiz_results WHERE user_id = ? AND course_id = ?",
+            [userId, courseId]
+        );
+        return rows.length ? rows[0].quizzes_attempted : 0; // Ensure it returns an integer
+    }   
 }
 
 module.exports = QuizResult;

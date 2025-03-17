@@ -32,6 +32,11 @@ class Quizz {
         const [rows] = await db.query('SELECT * FROM quizzes WHERE course_id = ?', [courseId]);
         return rows;
     }
+   
+    static async updateQuizzTotalQuestions(quizzId, totalQuestions) {
+        const [result] = await db.query('UPDATE quizzes SET total_questions = ? WHERE id = ?', [totalQuestions, quizzId]);
+        return result.affectedRows;
+    }
 
     static async getQuestionsAndOptions(quizzId) {
         const [rows] = await db.query(`

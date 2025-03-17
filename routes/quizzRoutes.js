@@ -14,6 +14,7 @@ router.get('/:course_id/quizzes/:id/take',authenticate,quizzController.takeQuizz
 router.post('/:course_id/quizzes/:id/quiz_results',authenticate,quizzController.saveResults);
 
 router.post('/:course_id/quizzes/:id/questions',authenticate,quizzController.createQuestion);
+router.post('/:course_id/quizzes/:quiz_id/questions/:id',authenticate,quizzController.updateQuestion)
 //http://localhost:3000/api/quizzes/1/questions
 router.post('/:course_id/quizzes/:id/questions/:question_id/options',authenticate,quizzController.createOption);
 

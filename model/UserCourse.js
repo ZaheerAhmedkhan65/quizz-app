@@ -23,7 +23,7 @@ class UserCourse {
         return result.insertId;
     }
 
-    static async update(userId, courseId, courseProgress) {
+    static async updateProgress(userId, courseId, courseProgress) {
         const [result] = await db.query('UPDATE user_courses SET course_progress = ? WHERE user_id = ? AND course_id = ?', [courseProgress, userId, courseId]);
         return result.affectedRows;
     }
