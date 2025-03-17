@@ -9,6 +9,9 @@
                         </a>
                     <% } %>                    
                 </div>
+                <div class="progress-bar-container mb-2">
+                    <div class="progress-bar-fill" data-progress="<%= quizz.quizz_progress %>"></div>
+                </div>
                 <form action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="d-flex align-items-center gap-1">
                     <input type="text" id="question-text" name="question_text" class="form-control" placeholder="Enter Question text" required>
                     <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
@@ -141,6 +144,7 @@
                 resultsContainer.style.height = `calc(80vh - ${resultsTable.offsetHeight}px)`;
                 });
         </script>
+        <script src="/js/courseProgressBar.js"></script>
         <script src="/js/notifications.js"></script>
         <script src="/js/checkForDuplicate.js"></script>
         <script type="application/json" id="quizz-data">

@@ -21,7 +21,7 @@ const showQuizz = async (req, res) => {
 
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
         const quizResults = await QuizResult.findByQuizId(req.params.id);
-
+        console.log(quizz);
         let questions = [];
         let answers = [];
         let percentage = 0;
@@ -75,14 +75,10 @@ const create = async (req, res) => {
 
         // Fetch quizzes attempted
         const quizzesAttempted = await QuizResult.quizzesAttempted(req.user.userId, req.params.course_id);
-        console.log("Quizzes Attempted:", quizzesAttempted);
-        console.log("Total Quizzes:", totalQuizzes);
 
         // Calculate progress
         let courseProgress = (quizzesAttempted / totalQuizzes) * 100;
         courseProgress = Math.min(courseProgress, 100.00); // Prevent exceeding 100%
-
-        console.log("Course Progress:", courseProgress);
 
         // Update progress in `user_courses`
         await UserCourse.updateProgress(req.user.userId, req.params.course_id, courseProgress);
@@ -156,8 +152,6 @@ const saveResults = async (req, res) => {
     try {
         const { user_id, course_id, quiz_id, total_marks, score, answers } = req.body;
 
-        console.log("Incoming request:", req.body);
-
         // Save the quiz result
         const quizResult = await QuizResult.create(user_id, course_id, quiz_id, total_marks, score, answers);
         if (!quizResult) throw new Error("Failed to save quiz result.");
@@ -170,14 +164,11 @@ const saveResults = async (req, res) => {
 
         // Fetch quizzes attempted
         const quizzesAttempted = await QuizResult.quizzesAttempted(user_id, course_id);
-        console.log("Quizzes Attempted:", quizzesAttempted);
-        console.log("Total Quizzes:", totalQuizzes);
+       
 
         // Calculate progress
         let courseProgress = (quizzesAttempted / totalQuizzes) * 100;
         courseProgress = Math.min(courseProgress, 100.00); // Prevent exceeding 100%
-
-        console.log("Course Progress:", courseProgress);
 
         // Update progress in `user_courses`
         await UserCourse.updateProgress(user_id, course_id, courseProgress);
