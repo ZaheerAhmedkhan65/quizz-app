@@ -98,3 +98,11 @@ svg {
 .error-message{
     font-size: 12px !important;
 }
+
+#graph{
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

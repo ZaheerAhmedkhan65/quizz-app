@@ -16,6 +16,10 @@
                     <input type="text" id="question-text" name="question_text" class="form-control" placeholder="Enter Question text" required>
                     <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
                 </form>
+                <% if(quizData.length > 0) { %>
+                <h3>Quizz Attempt Stats</h3>
+                <div id="graph"></div>
+                <% } %>
         </div>
         <%if(quizData.length > 0){%>
         <div class="col-lg-6" style="height: 90vh; overflow: hidden;">
@@ -132,7 +136,19 @@
         </div>
         <%}%>
         
+        <script src="/js/courseProgressBar.js"></script>
+        <script src="/js/notifications.js"></script>
+        <script src="/js/checkForDuplicate.js"></script>
+        <script type="application/json" id="quizz-data">
+            <%- JSON.stringify(quizData) %>
+        </script>
 
+        <script type="application/json" id="quizz-results-data">
+            <%- JSON.stringify(quizResults) %>
+        </script>
+    
+        
+        <% if(quizData.length > 0) { %>
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 let questionsContainer = document.getElementById("questions-container");
@@ -142,19 +158,9 @@
                 let resultsTable = document.getElementById("results-table");
 
                 resultsContainer.style.height = `calc(80vh - ${resultsTable.offsetHeight}px)`;
-                });
-        </script>
-        <script src="/js/courseProgressBar.js"></script>
-        <script src="/js/notifications.js"></script>
-        <script src="/js/checkForDuplicate.js"></script>
-        <script type="application/json" id="quizz-data">
-            <%- JSON.stringify(quizData) %>
-        </script>
-    
-        <script>
-            let quizData = JSON.parse(document.getElementById("quizz-data").textContent);;
             
-            document.addEventListener('DOMContentLoaded', () => {
+                let quizData = JSON.parse(document.getElementById("quizz-data").textContent);
+                
                 checkForDuplicate(quizData, document.getElementById('question-text'), "question text", 'question_text', document.getElementById('createBtn'), "Question");
             
                 document.querySelectorAll('form[action*="/options"]').forEach(form => {
@@ -174,26 +180,6 @@
                 });
             });
         </script>
-        <script>
-            // document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
-            //     editBtn.addEventListener('click', () => {
-            //         let id = editBtn.getAttribute('data-id');
-            //         let questionContainer = document.getElementById(`question_${id}`);
-            //         let questionText = questionContainer.querySelector('strong[data-text="question-text"]');
-
-            //         console.log(questionContainer)
-            //         questionContainer.innerHTML = `
-            //         <form action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions/${id}" method="post" class="d-flex flex-column w-100">
-            //     <div class="d-flex align-items-center gap-1 justify-content-between w-100">
-            //         <input type="hidden" name="question_id" value="${id}">
-            //         <input type="text" name="question_text" value="${questionText.textContent}" class="form-control" placeholder="Enter course title" required id="editTitle">
-            //         <button type="submit" class="btn btn-sm btn-primary">Update</button>
-            //         <button type="button" class="btn btn-sm btn-danger" id="cancelBtn_${id}"><i class="bi bi-x-lg"></i></button>
-            //     </div>
-            //     <div id="error-message" class="text-danger mt-1 error-message"></div>
-            // </form>
-            //         `
-            //     });
-            // });
-        </script>
+        <script src="/js/graph.js"></script>
+        <%}%>
     <%- include('partials/_footer') %>

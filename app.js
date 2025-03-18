@@ -20,6 +20,7 @@ const userRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const quizzRoutes = require('./routes/quizzRoutes');
 const authenticate = require('./middleware/authenticate');
+const { title } = require('process');
 
 app.use("/auth",authRoutes);
 app.use("/api",userRoutes);
@@ -29,6 +30,7 @@ app.use("/api/courses",quizzRoutes);
 app.get('/',authenticate,(req,res) => { 
     res.redirect('/api/dashboard'); 
 });
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -32,12 +32,19 @@
 <script type="application/json" id="quiz-data">
     <%- JSON.stringify(quizData) %>
 </script>
+<script type="application/json" id="current-quiz">
+    <%- JSON.stringify(quizz) %>
+</script>
 <script>
     let courseId = "<%= course.id %>";
     let quizzId = "<%= quizz.id %>";
     let userId = "<%= user.userId %>";
-    let quizz = "<%= quizz %>";
+    let quizz = JSON.parse(document.getElementById("current-quiz").textContent);
+    let quizData = JSON.parse(document.getElementById("quiz-data").textContent);
 </script>
 <script src="/js/notifications.js"></script>
+<script src="/js/validateTakeQuizz.js"></script>
+<% if(quizData.length > 0){%>
 <script src="/js/takeQuizz.js"></script>
+<%}%>
 <%- include('partials/_footer') -%>

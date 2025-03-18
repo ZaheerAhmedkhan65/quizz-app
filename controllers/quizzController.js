@@ -44,6 +44,8 @@ const showQuizz = async (req, res) => {
                            quizResults.reduce((sum, res) => sum + res.total_marks, 0)) * 100).toFixed(2);
         }
 
+        console.log(percentage)
+
         res.status(200).render('quizz', { 
             quizz, 
             title: quizz.title, 
@@ -141,7 +143,7 @@ const takeQuizz = async (req, res) => {
         const quizz = await Quizz.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-        
+        console.log("quizz in take quizzz: ",quizz)
         res.status(200).render('takeQuizz', { quizz, title: quizz.title,quizData,course,user:req.user });
     } catch (err) {
         res.status(500).json({ message: err.message });
