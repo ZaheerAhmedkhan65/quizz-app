@@ -143,6 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
             radioInput.name = "question_" + question.id;
             radioInput.id = "option_" + option.id;
             radioInput.value = option.id;
+            radioInput.classList.add("form-check-input");
     
             if (selectedAnswers[question.id] == option.id) {
                 radioInput.checked = true;

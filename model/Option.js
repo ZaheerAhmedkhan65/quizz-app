@@ -3,7 +3,8 @@ const db = require('../config/db');
 class Option {
     static async create(option_text, question_id, is_correct) {
         const [result] = await db.query('INSERT INTO options (option_text, question_id, is_correct) VALUES (?, ?, ?)', [option_text, question_id, is_correct]);
-        return result.insertId;
+        const [option] = await db.query('SELECT * FROM options WHERE id = ?', [result.insertId]); // Get full option
+        return option[0];
     }
 
     static async delete(id) {

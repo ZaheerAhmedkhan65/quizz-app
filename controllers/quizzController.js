@@ -110,15 +110,24 @@ const deleteQuizz = async (req, res) => {
 }
 
 const createQuestion = async (req, res) => {
-    try{
-        await Question.create(req.body.question_text, req.params.id);
+    try {
+        const question = await Question.create(req.body.question_text, req.params.id);
         const questions = await Question.findByQuizzId(req.params.id);
         await Quizz.updateQuizzTotalQuestions(req.params.id, questions.length);
-        res.status(201).redirect("/api/courses/" + req.params.course_id + "/quizzes/" + req.params.id);
-    } catch (err){
+        const questionIndex = questions.findIndex(q => q.id === question.id) + 1;
+
+        res.status(201).json({
+            success: true,
+            question: { id: question.id, index:questionIndex, question_text: question.question_text },
+            courseId: req.params.course_id,
+            quizzId: req.params.id
+            
+        });
+    } catch (err) {
         res.status(500).json({ message: err.message });
     }
-}
+};
+
 
 const updateQuestion =  async (req, res) => {
     try{
@@ -129,14 +138,39 @@ const updateQuestion =  async (req, res) => {
     }
 }
 
+// const createOption = async (req, res) => {
+//     try {
+//         await Option.create(req.body.option_text,req.params.question_id, req.body.is_correct);
+//         res.status(201).redirect("/api/courses/" + req.params.course_id + "/quizzes/" + req.params.quiz_id);
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+// }
+
 const createOption = async (req, res) => {
     try {
-        await Option.create(req.body.option_text,req.params.question_id, req.body.is_correct);
-        res.status(201).redirect("/api/courses/" + req.params.course_id + "/quizzes/" + req.params.id);
+
+        console.log("create option",req.body);
+        console.log("question id",req.params.question_id);
+        const option = await Option.create(
+            req.body.option_text,
+            req.params.question_id,
+            req.body.is_correct
+        );
+
+        res.status(201).json({
+            success: true,
+            option: {
+                id: option.id,
+                option_text: option.option_text,
+                is_correct: option.is_correct,
+                question_id: option.question_id
+            }
+        });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ success: false, message: err.message });
     }
-}
+};
 
 const takeQuizz = async (req, res) => {
     try {
