@@ -93,17 +93,22 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
+        console.log("updateing quizz")
+        console.log(req.params.id);
+        console.log(req.body.title);
         await Quizz.update(req.params.id, req.body.title);
-        res.status(200).redirect("/api/courses/"+req.params.course_id);
+        res.status(200).json({ message: "Quizz updated successfully", title: req.body.title });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 }
 
+
 const deleteQuizz = async (req, res) => {
     try {
-        const quizz = await Quizz.delete(req.params.id);
-        res.status(200).json(quizz);
+        await Quizz.delete(req.params.id);
+        await Question.deleteByQuizzId(req.params.id);
+        res.status(200).json({ message: "Quizz deleted successfully" });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -137,15 +142,6 @@ const updateQuestion =  async (req, res) => {
         res.status(500).json({message: err.message});
     }
 }
-
-// const createOption = async (req, res) => {
-//     try {
-//         await Option.create(req.body.option_text,req.params.question_id, req.body.is_correct);
-//         res.status(201).redirect("/api/courses/" + req.params.course_id + "/quizzes/" + req.params.quiz_id);
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-// }
 
 const deleteQuestion = async (req, res) => {
     try {

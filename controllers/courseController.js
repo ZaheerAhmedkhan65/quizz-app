@@ -1,6 +1,7 @@
 const Course = require('../model/Course');
 const UserCourse = require('../model/UserCourse');
 const Quizz = require('../model/Quizz');
+const Question = require('../model/Question');
 const User = require('../model/User');
 
 const { render } = require('ejs');
@@ -52,8 +53,15 @@ const update = async (req, res) => {
 
 const deleteCourse = async (req, res) => {
     try {
-        const course = await Course.delete(req.params.id);
-        res.status(200).redirect('/api/dashboard');
+        const quizzes = await Quizz.findByCourseId(req.params.id);
+        if (quizzes.length > 0) {
+            quizzes.forEach(async (quizz) => {
+                await Question.deleteByQuizzId(quizz.id);
+            })
+        }
+        await Course.delete(req.params.id);
+        await Quizz.deleteByCourseId(req.params.id);
+        res.status(200).json({message:"course deleted successfully"});
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

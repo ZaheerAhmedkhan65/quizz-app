@@ -9,6 +9,7 @@ router.get('/:course_id/quizzes',authenticate,quizzController.getAll);
 router.post('/:course_id/quizzes',authenticate,quizzController.create);
 router.get('/:course_id/quizzes/:id',authenticate,quizzController.showQuizz);
 router.post('/:course_id/quizzes/:id',authenticate,quizzController.update);
+router.delete('/:course_id/quizzes/:id/delete',authenticate,quizzController.deleteQuizz);
 // router.delete('/:id',authenticate,quizzController.deleteQuizz);
 
 router.get('/:course_id/quizzes/:id/take',authenticate,quizzController.takeQuizz);

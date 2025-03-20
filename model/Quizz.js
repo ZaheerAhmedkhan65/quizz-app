@@ -33,6 +33,11 @@ class Quizz {
         return rows;
     }
 
+    static async deleteByCourseId(courseId) {
+        const [result] = await db.query('DELETE FROM quizzes WHERE course_id = ?', [courseId]);
+        return result.affectedRows;
+    }
+
     static async getQuizAttemptCount(quizzId) {
         const [rows] = await db.query(
             "SELECT COUNT(*) AS attempt_count FROM quiz_results WHERE quiz_id = ?",

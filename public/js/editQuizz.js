@@ -1,10 +1,10 @@
-document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
+document.querySelectorAll('.edit-quizz-btn').forEach(editBtn => {
     editBtn.addEventListener('click', () => {
         let id = editBtn.getAttribute('data-id');
-        let quizzContainer = document.getElementById(`quizz_${id}`);
+        let quizzContainer = document.getElementById(`quizz_${id}_`);
         let quizzTitle = quizzContainer.querySelector('strong[data-title="quizz-title"]');
         let courseId = quizzContainer.getAttribute('course-id');
-
+        console.log(courseId);    
         // Prevent duplicate form insertion
         if (quizzContainer.querySelector('form')) return;
 
@@ -38,17 +38,74 @@ document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
         });
 
         // Prevent form submission if duplicate exists
-        form.addEventListener('submit', (event) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
             let newTitle = titleInput.value.trim().toLowerCase();
+            const actionUrl = form.getAttribute('action');
+        
             if (existingTitles.includes(newTitle) && newTitle !== quizzTitle.textContent.trim().toLowerCase()) {
-                event.preventDefault();
                 errorMessage.textContent = "A quiz with this title already exists!";
+                return; // Stop execution
+            }
+        
+            errorMessage.textContent = "";
+            
+            try {
+                const response = await fetch(actionUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title: newTitle })
+                });
+        
+                if (response.ok) {
+                    console.log("Quizz updated successfully");
+                    quizzContainer.innerHTML = `
+                        <a href="${actionUrl}" class="text-decoration-none text-dark">
+                            <strong data-title="quizz-title" style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${newTitle}</strong>
+                        </a>
+                    `;
+                } else {
+                    const result = await response.json();
+                    alert("Error: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error updating quizz:", error);
             }
         });
-
+        
         // Handle cancel button click
         document.getElementById(`cancelBtn_${id}`).addEventListener('click', () => {
             window.location.reload();
         });
     });
 });
+
+
+
+document.querySelectorAll(".delete-quizz-btn").forEach(form => {
+    form.addEventListener("submit",async function(event){
+        event.preventDefault();
+
+
+        const isConfirmed = confirm("Are you sure to delete this quizz?");
+        if (!isConfirmed) return;
+
+        const quizzId = this.getAttribute("data-quizz-id");
+        const actionUrl = this.getAttribute("action"); // Get API endpoint
+        console.log(actionUrl);
+        const response = await fetch(actionUrl, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: quizzId })
+        });
+        
+        if (response.ok) {
+            console.log("Quizz deleted successfully");
+            document.getElementById(`quizz_${quizzId}`).closest("li").remove(); // Correct selector
+        } else {
+            const result = await response.json();
+            alert("Error: " + result.message); // Show error if deletion fails
+        }
+
+    })
+})

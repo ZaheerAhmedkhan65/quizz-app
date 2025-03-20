@@ -1,9 +1,8 @@
 document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
     editBtn.addEventListener('click', () => {
         let id = editBtn.getAttribute('data-id');
-        let courseContainer = document.getElementById(`course_${id}`);
+        let courseContainer = document.getElementById(`course_${id}_`);
         let courseTitle = courseContainer.querySelector('strong[data-title="course-title"]');
-
         // Prevent duplicate form insertion
         if (courseContainer.querySelector('form')) return;
 
@@ -47,8 +46,40 @@ document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
 
         // Handle cancel button click
         document.getElementById(`cancelBtn_${id}`).addEventListener('click', () => {
-            window.location.reload();
+            courseContainer.innerHTML = `
+                    <a href="/api/courses/${id}" class="text-decoration-none text-dark">
+                        <strong style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-title ="course-title">${courseTitle.textContent}</strong>
+                    </a>
+            `;
         });
 
+    });
+});
+
+
+document.querySelectorAll('.delete-course-btn').forEach(form => {
+    form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const isConfirmed = confirm("Are you sure to delete this course?");
+            if (!isConfirmed) return; // Stop execution if user cancels
+
+            const courseId = this.getAttribute("data-course-id");
+            const actionUrl = this.getAttribute("action"); // Get API endpoint
+            console.log(actionUrl);
+            console.log(courseId)
+            const response = await fetch(actionUrl, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: courseId })
+            });
+        
+            if (response.ok) {
+                console.log("Course deleted successfully");
+                document.getElementById(`course_${courseId}`).closest("li").remove(); // Correct selector
+            } else {
+                const result = await response.json();
+                alert("Error: " + result.message); // Show error if deletion fails
+            }
     });
 });

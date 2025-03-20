@@ -13,10 +13,12 @@
                 <% if(quizzs.length > 0) {%>
                 <ul class="list-group mt-3">
                     <% quizzs.forEach(quizz => { %>
-                        <li id="quizz_<%= quizz.id %>" course-id="<%= course.id %>" class="list-group-item bg-primary-subtle rounded-0 mb-1 d-flex align-items-center justify-content-between">
-                            <a href="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>" class="text-decoration-none text-dark">
-                               <strong style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-title = "quizz-title"> <%= quizz.title %> </strong>
-                            </a>
+                        <li id="quizz_<%= quizz.id %>"  class="list-group-item bg-primary-subtle rounded-0 mb-1 d-flex align-items-center justify-content-between">
+                            <span id="quizz_<%= quizz.id %>_" class="w-100" course-id="<%= course.id %>">
+                                <a href="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>" class="text-decoration-none text-dark">
+                                   <strong style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-title = "quizz-title"> <%= quizz.title %> </strong>
+                                </a>
+                            </span>
                             <div class="d-flex align-items-center gap-1">
                             <div class="progress-container">
                                 <svg width="30" height="30">
@@ -30,7 +32,12 @@
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                  <li class="dropdown-item" data-id="<%= quizz.id %>">edit</li>
+                                  <li class="dropdown-item edit-quizz-btn" data-id="<%= quizz.id %>">edit</li>
+                                  <li class="dropdown-item">
+                                    <form class="delete-quizz-btn" data-quizz-id="<%= quizz.id %>" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/delete" method="delete">
+                                        <button type="submit" class="text-danger bg-transparent border-0 p-0">Delete</button>
+                                    </form>
+                                  </li>
                                 </ul>
                             </div>
                             </div>

@@ -28,6 +28,11 @@ class Question {
         return result.affectedRows;
     }
 
+    static async deleteByQuizzId(quizzId) {
+        const [result] = await db.query('DELETE FROM questions WHERE quiz_id = ?', [quizzId]);
+        return result.affectedRows;
+    }
+
     static async update(id, question_text) {
         const [result] = await db.query('UPDATE questions SET question_text = ? WHERE id = ?', [question_text, id]);
         return result.affectedRows;
