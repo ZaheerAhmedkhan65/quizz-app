@@ -29,8 +29,28 @@
                 <% quizData.forEach((question, index) => { %>
                     <li class="list-group-item bg-primary-subtle rounded-0 mb-2">
                         <div id="question_<%= question.id %>" class="border border-1 border-dark p-3 d-flex align-items-center justify-content-between">
-                            <strong  data-text = "question-text" ><%=index+1%> : <%= question.question_text %></strong>
-                        </div>
+                            <strong class="w-100 d-flex align-items-center gap-1">
+                                <span id="question-index-container-<%= question.id %>">
+                                    <%=index+1%> :
+                                </span>
+                                <span data-text="question-text" id="question-text-<%= question.id %>">
+                                     <%= question.question_text %>
+                                </span>
+                            </strong>
+                            <div class="btn-group dropup">
+                                <button type="button" class="bg-transparent border-0" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item edit-question-btn" data-question-id="<%= question.id %>">Edit</li>
+                                    <li class="dropdown-item text-danger">
+                                        <form class="delete-question" data-question-id="<%= question.id %>" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions/<%= question.id %>/delete" method="post">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </li>                                    
+                                </ul>
+                            </div>
+                        </div>                    
                         <h5 class="mt-3">Options</h5>
                         <ul class="list-group" id="options-container-<%= question.id %>">
                             <% question.options.forEach(option => { %>
@@ -131,6 +151,7 @@
         <script src="/js/courseProgressBar.js"></script>
         <script src="/js/notifications.js"></script>
         <script src="/js/checkForDuplicate.js"></script>
+        <script src="/js/editAndDeleteQuestion.js"></script>
         <script type="application/json" id="quizz-data">
             <%- JSON.stringify(quizData) %>
         </script>

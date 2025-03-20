@@ -132,7 +132,7 @@ const createQuestion = async (req, res) => {
 const updateQuestion =  async (req, res) => {
     try{
         await Question.update(req.body.question_id, req.body.question_text);
-        res.status(201).redirect("/api/courses/" + req.params.course_id + "/quizzes/" + req.params.quiz_id)
+        res.status(201).json({newText: req.body.question_text})
     } catch (err){
         res.status(500).json({message: err.message});
     }
@@ -146,6 +146,19 @@ const updateQuestion =  async (req, res) => {
 //         res.status(500).json({ message: err.message });
 //     }
 // }
+
+const deleteQuestion = async (req, res) => {
+    try {
+        console.log("callled delete question");
+        console.log(req.body.id);
+        await Question.delete(req.body.id);
+        await Option.deleteByQuestionId(req.body.id);
+        res.status(200).json({ success: true, message: "Question deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
 
 const createOption = async (req, res) => {
     try {
@@ -223,4 +236,4 @@ const saveResults = async (req, res) => {
     }
 };
 
-module.exports = { getAll, showQuizz, create, update, deleteQuizz, createQuestion, updateQuestion, createOption, takeQuizz, saveResults };
+module.exports = { getAll, showQuizz, create, update, deleteQuizz, createQuestion, updateQuestion,deleteQuestion, createOption, takeQuizz, saveResults };
