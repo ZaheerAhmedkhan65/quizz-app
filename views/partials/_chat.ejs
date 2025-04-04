@@ -1,0 +1,325 @@
+<div class="ask-ai-chat-modal d-flex flex-column">
+    <div class="d-flex flex-column">
+        <div class="ask-ai-chat-header d-flex">
+            <div class="d-flex align-items-center">
+                <h3 class="m-0">AI Chat</h3>
+            </div>
+            <div class="d-flex">
+                <button type="button" role="button" class="clear-chat-btn bg-transparent popconfirm-toggle d-flex"
+                    aria-label="Clear Chat" title="Clear Chat" fdprocessedid="37sycb">
+                    <svg style="width:20px; transform: rotate(360deg); height:20px; fill:#8e8e8e;" viewBox="0 0 512 512"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z">
+                        </path>
+                    </svg>
+                </button>
+
+                <button type="button" role="button" class="shrink-chat-btn bg-transparent d-flex d-none"
+                    aria-label="Shrink Chat" title="Shrink Chat">
+                    <svg style="width:18px; height:18px; fill:#8e8e8e;" viewBox="0 0 512 512"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M439 7c9.4-9.4 24.6-9.4 33.9 0l32 32c9.4 9.4 9.4 24.6 0 33.9l-87 87 39 39c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8H296c-13.3 0-24-10.7-24-24V72c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2l39 39L439 7zM72 272H216c13.3 0 24 10.7 24 24V440c0 9.7-5.8 18.5-14.8 22.2s-19.3 1.7-26.2-5.2l-39-39L73 505c-9.4 9.4-24.6 9.4-33.9 0L7 473c-9.4-9.4-9.4-24.6 0-33.9l87-87L55 313c-6.9-6.9-8.9-17.2-5.2-26.2s12.5-14.8 22.2-14.8z">
+                        </path>
+                    </svg>
+                </button>
+
+                <button type="button" role="button" class="expand-chat-btn bg-transparent d-flex"
+                    aria-label="Expand Chat" title="Expand Chat" fdprocessedid="bdwmcl">
+                    <svg style="width:18px; height:18px; fill:#8e8e8e;" viewBox="0 0 512 512"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+                        <path
+                            d="M344 0H488c13.3 0 24 10.7 24 24V168c0 9.7-5.8 18.5-14.8 22.2s-19.3 1.7-26.2-5.2l-39-39-87 87c-9.4 9.4-24.6 9.4-33.9 0l-32-32c-9.4-9.4-9.4-24.6 0-33.9l87-87L327 41c-6.9-6.9-8.9-17.2-5.2-26.2S334.3 0 344 0zM168 512H24c-13.3 0-24-10.7-24-24V344c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2l39 39 87-87c9.4-9.4 24.6-9.4 33.9 0l32 32c9.4 9.4 9.4 24.6 0 33.9l-87 87 39 39c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8z">
+                        </path>
+                    </svg>
+                </button>
+
+                <button type="button" role="button" class="close-chat-btn border-0 bg-transparent d-flex" aria-label="Close Chat"
+                    title="Close Chat" fdprocessedid="glk1su">
+                    <svg style="width:24px; height:24px; fill:#8b8989;" viewBox="0 0 384 512"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="general-chat-window tab-pane active show-chat-window tab-pane position-relative" id="ai-chat-tabs-2" role="tabpanel"
+        aria-labelledby="ai-chat-tab-technical">
+
+
+        <div class="flex-column chat-messages">
+            <div class="ai-message-wrapper position-relative d-flex flex-column">
+                <div data-message-id="null" class="d-flex chat-message ai-message">
+                    <div class="chat-message-text"><br> Hello, <br><br>
+                        I will do my best to help you with creating questions related to:<br>
+                        📝 Your pdf content.<br><br>
+                        Make sure to choose the correct question related to your content!<br><br>
+                        Let's get started!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="chat-input-form" class="chat-form-outline form-outline d-flex ps-2" data-mdb-input-init="" data-mdb-input-initialized="true"
+    data-gtm-form-interact-id="0">
+
+    <input type="file" id="file-input" accept=".pdf" style="display: none;">
+    <button type="button" id="file-upload-button" class="btn">
+      <i class="bi bi-paperclip"></i>
+    </button>
+    <textarea class="chat-input form-control placeholder-active" type="text" placeholder="Type message..." rows="1"
+        aria-label="AI Chat Input" title="AI Chat Input" data-gtm-form-interact-field-id="0"
+        style="height: auto;">
+    </textarea>
+    
+    <button class="chat-send-btn me-2 d-block" fdprocessedid="777gt8">
+        <i class="bi bi-send"></i>
+    </button>
+    <button type="button" class="chat-stop-btn me-2 d-none" fdprocessedid="0jup7q">
+        <i class="bi bi-stop-fill"></i>
+    </button>
+    <div class="form-notch">
+        <div class="form-notch-leading" style="width: 9px;"></div>
+        <div class="form-notch-middle" style="width: 0px;"></div>
+        <div class="form-notch-trailing"></div>
+    </div>
+</form>
+<p class="text-center text-muted" style="font-size: 10px;">This can make mistakes.Check important info!</p>
+
+
+</div>
+
+<div class="open-chat-btn-wrapper" aria-label="Open AI Chat" title="Open AI Chat">
+    <div>AI Chat</div>
+    <button class="open-chat-btn btn-floating d-flex align-items-center justify-content-center"
+        aria-label="Open AI Chat" title="Open AI Chat" fdprocessedid="4qvser">
+        <i class="bi bi-chat-dots-fill"></i>
+    </button>
+</div>
+
+<script>
+    let chatModal = document.querySelector(".ask-ai-chat-modal");
+    let openChatBtn = document.querySelector(".open-chat-btn");
+    let closeChatBtn = document.querySelector(".close-chat-btn");
+    let chatHeader = document.querySelector(".ask-ai-chat-header");
+    let chatBody = document.querySelector(".ask-ai-chat-body");
+    let chatFooter = document.querySelector(".ask-ai-chat-footer");
+    let chatInput = document.querySelector(".chat-input");
+    let chatSendBtn = document.querySelector(".chat-send-btn");
+    let chatStopBtn = document.querySelector(".chat-stop-btn");
+    let expandChatBtn = document.querySelector(".expand-chat-btn");
+    let shrinkChatBtn = document.querySelector(".shrink-chat-btn");
+    let clearChatBtn = document.querySelector(".clear-chat-btn");
+    let chatMessages = document.querySelector(".chat-messages");
+    let chatInputForm = document.querySelector("#chat-input-form");
+    const fileInput = document.getElementById("file-input");
+    const fileUploadButton = document.getElementById("file-upload-button");
+    fileUploadButton.addEventListener("click", () => {
+      fileInput.click();
+    });
+    
+    chatInput.addEventListener("keydown", async (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            let message = chatInput.value;
+            const file = fileInput.files[0];
+            // If a file is selected, upload it and get the image URL
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const uploadResponse = await fetch("/api/gemini/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const {id} = await uploadResponse.json();
+        } catch (error) {
+          console.error("Error uploading pdf:", error);
+          alert("Failed to upload pdf. Please try again.");
+          return;
+        }
+      }
+            if (message) {
+                sendMessage(message);
+                chatInput.value = "";
+            }
+        }
+    });
+
+    chatSendBtn.addEventListener("click", () => {
+        event.preventDefault();
+        let message = chatInput.value;
+        if (message) {
+            sendMessage(message);
+            chatInput.value = "";
+        } else {
+            alert("Please enter a message");
+        }
+    });
+
+    chatStopBtn.addEventListener("click", () => {
+        stopMessage();
+    });
+
+    clearChatBtn.addEventListener("click", () => {
+        clearChat();
+    });
+
+    expandChatBtn.addEventListener("click", () => {
+        expandChat();
+    });
+
+    shrinkChatBtn.addEventListener("click", () => {
+        shrinkChat();
+    });
+
+
+    openChatBtn.addEventListener("click", () => {
+        chatModal.style.transform = "translateX(0px) scale(1)";
+        chatModal.style.opacity = "1";
+        chatModal.style.width = "400px";
+        chatModal.style.transition = "transform ease-in-out 300ms, opacity ease-in-out 300ms, width ease-in-out 300ms";
+        chatModal.style.margin = "1.5rem";
+        chatModal.style.marginTop = "1.5rem !important";
+    });
+
+    closeChatBtn.addEventListener("click", () => {
+        chatModal.style.transform = "translateX(calc(400px + 3rem)) scale(0.9)";
+        chatModal.style.transition = "transform ease-in-out 300ms, opacity ease-in-out 300ms, width ease-in-out 300ms";
+        chatModal.style.margin = "1.5rem";
+        chatModal.style.marginTop = "1.5rem !important";
+    });
+
+    function sendMessage(message) {
+        message = message.trim();
+        if (message) {
+            let messageElement = document.createElement("div");
+            messageElement.classList.add("message", "sent");
+            messageElement.innerHTML = `<div class="message-content">${message}</div>`;
+            chatMessages.appendChild(messageElement);
+            
+            // Simulate AI response
+            setTimeout(() => {
+                fetchGeminiResponse(message);
+            }, 1000);
+        }
+        
+    }
+
+
+    function stopMessage() {
+        // stop message to AI
+    }
+
+    function clearChat() {
+        // clear chat
+        chatMessages.innerHTML = "";
+    }
+
+    function expandChat() {
+        // expand chat
+        chatModal.classList.add("expanded");
+    }
+
+    function shrinkChat() {
+        // shrink chat
+    }
+</script>
+
+<script>
+
+  async function fetchGeminiResponse(prompt) {
+    const res = await fetch("/api/gemini/generate-response", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    });
+
+    const data = await res.json();
+    const aiMessage = document.createElement('div');
+    aiMessage.classList.add('message', 'ai-message');
+    console.log("data",data)
+    const formattedResponse = generateFormattedResponse(data.response);
+    addMessageToChat(formattedResponse,aiMessage);
+
+    chatMessages.appendChild(aiMessage);
+  }
+
+
+  function addMessageToChat(message,aiMessage) {
+    
+    // Create a new div for the message
+    const messageContent = document.createElement('div');
+    messageContent.classList.add('message-content');
+
+    // Check if the message contains a code block
+    if (message.includes('<code>')) {
+        messageContent.innerHTML = `<div class="code-block">${message}</div>`;
+    }
+    // Check if the message contains questions and answers
+    else if (message.includes('<ul>')) {
+        messageContent.innerHTML = `<div class="quiz-question">${message}</div>`;
+    }
+    // Else, treat it as a normal message (text or link)
+    else {
+        messageContent.innerHTML = `<p>${message}</p>`;
+    }
+
+    // Append the message to the chat container
+    aiMessage.appendChild(messageContent);
+
+    // Scroll to the bottom to show the latest message
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function generateFormattedResponse(response) {
+  const questionRegex = /(\d+\.\s.*?)(?=(?:\d+\.\s)|$)/gs;
+
+  let formattedResponse = "";
+  const questions = response.match(questionRegex);
+
+  if (questions) {
+    questions.forEach((qBlock) => {
+      const lines = qBlock.trim().split("\n").filter(line => line.trim() !== '');
+
+      const questionText = lines[0].trim();
+      const optionsText = lines.slice(1).join(' '); // Join remaining lines
+      const options = optionsText.match(/\([a-d]\)\s[^()]+/g) || []; // Match each option separately
+
+      formattedResponse += `<p><strong>${questionText}</strong></p>\n<ul>`;
+      options.forEach(option => {
+        formattedResponse += `<li>${option.trim()}</li>`;
+      });
+      formattedResponse += `</ul>\n`;
+    });
+  } else {
+    formattedResponse = `<p>${response}</p>`;
+  }
+
+  // Highlight code blocks
+  formattedResponse = formattedResponse.replace(/`(.*?)`/g, (match, code) => {
+    return `<pre><code>${code}</code></pre>`;
+  });
+
+  // Convert links to anchor tags
+  formattedResponse = formattedResponse.replace(/(https?:\/\/[^\s]+)/g, (url) => {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+  });
+
+  return formattedResponse;
+}
+
+
+
+
+  
+</script>

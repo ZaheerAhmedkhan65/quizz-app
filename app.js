@@ -20,6 +20,8 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const quizzRoutes = require('./routes/quizzRoutes');
+const geminiRoutes = require("./routes/geminiRoute");
+
 const authenticate = require('./middleware/authenticate');
 const { title } = require('process');
 
@@ -27,6 +29,7 @@ app.use("/auth",authRoutes);
 app.use("/api",userRoutes);
 app.use("/api/courses",courseRoutes);
 app.use("/api/courses",quizzRoutes);
+app.use("/api/gemini", geminiRoutes);
 
 app.get('/',authenticate,(req,res) => { 
     res.redirect('/api/dashboard'); 
