@@ -72,10 +72,10 @@
     data-gtm-form-interact-id="0">
 
     <input type="file" id="file-input" accept=".pdf" style="display: none;">
-    <button type="button" id="file-upload-button" class="btn">
+    <button type="button" id="file-upload-button" class="btn border-0 bg-transparent outline-none">
       <i class="bi bi-paperclip"></i>
     </button>
-    <textarea class="chat-input form-control placeholder-active" type="text" placeholder="Type message..." rows="1"
+    <textarea class="chat-input form-control placeholder-active" type="text" placeholder="Ask anything" rows="1"
         aria-label="AI Chat Input" title="AI Chat Input" data-gtm-form-interact-field-id="0"
         style="height: auto;">
     </textarea>
@@ -92,7 +92,7 @@
         <div class="form-notch-trailing"></div>
     </div>
 </form>
-<p class="text-center text-muted" style="font-size: 10px;">This can make mistakes.Check important info!</p>
+<p class="text-center text-muted" style="font-size: 10px;padding: 5px 0px;">This can make mistakes.Check important info!</p>
 
 
 </div>
@@ -217,7 +217,7 @@
 
 
     function stopMessage() {
-        // stop message to AI
+        // stop message
     }
 
     function clearChat() {
@@ -288,29 +288,35 @@ function generateFormattedResponse(response) {
   const questions = response.match(questionRegex);
 
   if (questions) {
-    questions.forEach((qBlock) => {
+    questions.forEach((qBlock, index) => {
       const lines = qBlock.trim().split("\n").filter(line => line.trim() !== '');
-
       const questionText = lines[0].trim();
-      const optionsText = lines.slice(1).join(' '); // Join remaining lines
-      const options = optionsText.match(/\([a-d]\)\s[^()]+/g) || []; // Match each option separately
+      const optionsText = lines.slice(1).join(' ');
+      const options = optionsText.match(/\([a-d]\)\s[^()]+/g) || [];
 
-      formattedResponse += `<p><strong>${questionText}</strong></p>\n<ul>`;
-      options.forEach(option => {
-        formattedResponse += `<li>${option.trim()}</li>`;
-      });
-      formattedResponse += `</ul>\n`;
+      // Create a unique ID for this question block
+      const copyId = `question-block-${index}`;
+
+      formattedResponse += `
+        <div class="question-block" id="${copyId}">
+          <p><strong>${questionText}</strong></p>
+          <ul>
+            ${options.map(option => `<li>${option.trim()}</li>`).join("")}
+          </ul>
+          <button onclick="copyToClipboard('${copyId}')" class="copy-btn">Copy</button>
+        </div>
+      `;
     });
   } else {
     formattedResponse = `<p>${response}</p>`;
   }
 
-  // Highlight code blocks
+  // Code block formatting
   formattedResponse = formattedResponse.replace(/`(.*?)`/g, (match, code) => {
     return `<pre><code>${code}</code></pre>`;
   });
 
-  // Convert links to anchor tags
+  // Link formatting
   formattedResponse = formattedResponse.replace(/(https?:\/\/[^\s]+)/g, (url) => {
     return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
   });
@@ -320,6 +326,19 @@ function generateFormattedResponse(response) {
 
 
 
+
+function copyToClipboard(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  const textToCopy = el.innerText || el.textContent;
+
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    alert("Copied!");
+  }).catch(err => {
+    console.error("Failed to copy: ", err);
+  });
+}
 
   
 </script>

@@ -195,7 +195,7 @@ svg {
     background-color: #fff;
     bottom: 0;
     border-top: 2px solid #f2f2f2;
-    padding: 8px 8px 4px;
+    padding: 4px 8px 4px;
     align-items: center;
     justify-content: space-between;
     padding-left: 0;
@@ -362,6 +362,49 @@ a:hover {
     text-decoration: underline;
 }
 
+.chat-input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+    background-color: #f2f2f2;
+    color: black;
+    box-shadow: 0 0 12px 1px rgba(0, 0, 0, .1);
+    transition: all .2s linear;
+    font-size: 16px;
+    margin-bottom: 8px;
+    resize: none;
+    overflow: auto;
+    height: auto;
+    min-height: 40px;
+    margin-bottom: 0;
+    max-height: 200px;
+    outline: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.chat-input:hover {
+    box-shadow: 0 0 12px 1px rgba(0, 0, 0, .2);
+}
+
+.copy-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+.copy-btn:hover {
+  background-color: #0056b3;
+}
+.question-block {
+  margin-bottom: 1.5rem;
+}
+
 
 @media (max-width: 768px) {
     .open-chat-btn-wrapper div {
@@ -369,7 +412,6 @@ a:hover {
     }
     .ask-ai-chat-modal{
         width: 100% !important;
-        transform: translateX(0) scale(1) !important;
         margin: 0 !important;
         margin-top: 1.5rem !important;
     }
