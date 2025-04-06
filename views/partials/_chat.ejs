@@ -55,13 +55,41 @@
 
 
         <div class="flex-column chat-messages">
-            <div class="ai-message-wrapper position-relative d-flex flex-column">
-                <div data-message-id="null" class="d-flex chat-message ai-message">
-                    <div class="chat-message-text"><br> Hello, <br><br>
-                        I will do my best to help you with creating questions related to:<br>
-                        📝 Your pdf content.<br><br>
-                        Make sure to choose the correct question related to your content!<br><br>
-                        Let's get started!
+            <div class="ai-guidance-message">
+                <div data-message-id="welcome-message" class="ai-message welcome-message">
+                    <div class="chat-message-text">
+                        <div class="welcome-header">
+                            <div class="welcome-icon">👋</div>
+                            <h3 class="welcome-title">Welcome to AI Assistant!</h3>
+                        </div>
+                        
+                        <div class="welcome-content">
+                            <p class="welcome-text">I'm here to help you with:</p>
+                            
+                            <div class="feature-list">
+                                <div class="feature-item">
+                                    <span class="feature-icon">📝</span>
+                                    <span class="feature-text">PDF content analysis</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">❓</span>
+                                    <span class="feature-text">Question generation</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">💡</span>
+                                    <span class="feature-text">Learning assistance</span>
+                                </div>
+                            </div>
+                            
+                            <div class="welcome-tip">
+                                <div class="tip-icon">💡</div>
+                                <p class="tip-text">Pro Tip: Upload a PDF first for the most accurate help with your specific content!</p>
+                            </div>
+                            
+                            <div class="welcome-action">
+                                <p>Ready when you are! Ask me anything or upload a file to get started.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -183,27 +211,27 @@
     });
 
 
-    openChatBtn.addEventListener("click", () => {
-        chatModal.style.transform = "translateX(0px) scale(1)";
-        chatModal.style.opacity = "1";
-        chatModal.style.width = "400px";
-        chatModal.style.transition = "transform ease-in-out 300ms, opacity ease-in-out 300ms, width ease-in-out 300ms";
-        chatModal.style.margin = "1.5rem";
-        chatModal.style.marginTop = "1.5rem !important";
-    });
 
-    closeChatBtn.addEventListener("click", () => {
-        chatModal.style.transform = "translateX(calc(400px + 3rem)) scale(0.9)";
-        chatModal.style.transition = "transform ease-in-out 300ms, opacity ease-in-out 300ms, width ease-in-out 300ms";
-        chatModal.style.margin = "1.5rem";
-        chatModal.style.marginTop = "1.5rem !important";
-    });
+    openChatBtn.addEventListener("click", () => {
+    chatModal.classList.add("open");
+    chatModal.style.transform = "translateX(0)";
+    chatModal.style.opacity = "1";
+    chatModal.style.visibility = "visible";
+});
+
+closeChatBtn.addEventListener("click", () => {
+    chatModal.classList.remove("open");
+    chatModal.style.transform = `translateX(calc(${chatModal.offsetWidth}px + 3rem))`;
+    chatModal.style.opacity = "0";
+    chatModal.style.visibility = "hidden";
+});
+
 
     function sendMessage(message) {
         message = message.trim();
         if (message) {
             let messageElement = document.createElement("div");
-            messageElement.classList.add("message", "sent");
+            messageElement.classList.add("sent");
             messageElement.innerHTML = `<div class="message-content">${message}</div>`;
             chatMessages.appendChild(messageElement);
             
@@ -246,8 +274,12 @@
 
     const data = await res.json();
     const aiMessage = document.createElement('div');
-    aiMessage.classList.add('message', 'ai-message');
-    console.log("data",data)
+    if(!data.response) {
+        aiMessage.classList.add("ai-message");
+        aiMessage.innerHTML = `<div class="message-content">No response generated. Please try again.</div>`;
+        chatMessages.appendChild(aiMessage);
+        return;
+    }
     const formattedResponse = generateFormattedResponse(data.response);
     addMessageToChat(formattedResponse,aiMessage);
 
@@ -255,73 +287,168 @@
   }
 
 
-  function addMessageToChat(message,aiMessage) {
+  function addMessageToChat(message, aiMessage) {
+    // Set the appropriate classes for the AI message
+    aiMessage.classList.add('ai-message');
     
-    // Create a new div for the message
+    // Create message wrapper and content elements
+    const messageWrapper = document.createElement('div');
+    messageWrapper.classList.add('ai-message-wrapper');
+    
     const messageContent = document.createElement('div');
-    messageContent.classList.add('message-content');
-
-    // Check if the message contains a code block
-    if (message.includes('<code>')) {
-        messageContent.innerHTML = `<div class="code-block">${message}</div>`;
-    }
-    // Check if the message contains questions and answers
-    else if (message.includes('<ul>')) {
-        messageContent.innerHTML = `<div class="quiz-question">${message}</div>`;
-    }
-    // Else, treat it as a normal message (text or link)
-    else {
-        messageContent.innerHTML = `<p>${message}</p>`;
-    }
-
-    // Append the message to the chat container
-    aiMessage.appendChild(messageContent);
-
-    // Scroll to the bottom to show the latest message
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    messageContent.classList.add('chat-message-text');
+    
+    // Directly use the formatted HTML from generateFormattedResponse
+    messageContent.innerHTML = message;
+    
+    // Append elements to build the proper structure
+    messageWrapper.appendChild(messageContent);
+    aiMessage.appendChild(messageWrapper);
+    
+    // Add the message to the chat container
+    chatMessages.appendChild(aiMessage);
+    
+    // Scroll to the bottom smoothly
+    scrollToBottom();
 }
 
-function generateFormattedResponse(response) {
-  const questionRegex = /(\d+\.\s.*?)(?=(?:\d+\.\s)|$)/gs;
+function scrollToBottom() {
+    chatMessages.scrollTo({
+        top: chatMessages.scrollHeight,
+        behavior: 'smooth'
+    });
+}
 
-  let formattedResponse = "";
-  const questions = response.match(questionRegex);
+
+function generateFormattedResponse(response) {
+  // If response is empty or undefined
+  if (!response) return '<p>No response received</p>';
+
+  // First, handle code blocks to prevent them from being modified by other formatting
+  let formattedResponse = response.replace(/```([\s\S]*?)```/g, (match, code) => {
+    return `<pre><code>${code.trim()}</code></pre>`;
+  }).replace(/`([^`]+)`/g, (match, code) => {
+    return `<code>${code}</code>`;
+  });
+
+  // Handle links
+  formattedResponse = formattedResponse.replace(/(https?:\/\/[^\s]+)/g, (url) => {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+  });
+
+  // Handle different types of content
+  if (isMCQResponse(formattedResponse)) {
+    formattedResponse = formatMCQResponse(formattedResponse);
+  } else if (isNumberedList(formattedResponse)) {
+    formattedResponse = formatNumberedList(formattedResponse);
+  } else if (isBulletList(formattedResponse)) {
+    formattedResponse = formatBulletList(formattedResponse);
+  } else {
+    // Default formatting for plain text
+    formattedResponse = formatPlainText(formattedResponse);
+  }
+
+  return formattedResponse;
+}
+
+// Helper functions for different content types
+function isMCQResponse(text) {
+  // Checks for question patterns like "1. Question text" followed by options (a), (b) etc.
+  return /\d+\.\s.+?\n(\([a-d]\)\s.+?\n)+/g.test(text);
+}
+
+function formatMCQResponse(text) {
+  const questionRegex = /(\d+\.\s.*?)(?=(?:\d+\.\s)|$)/gs;
+  const questions = text.match(questionRegex);
+  let result = '';
 
   if (questions) {
     questions.forEach((qBlock, index) => {
-      const lines = qBlock.trim().split("\n").filter(line => line.trim() !== '');
-      const questionText = lines[0].trim();
-      const optionsText = lines.slice(1).join(' ');
-      const options = optionsText.match(/\([a-d]\)\s[^()]+/g) || [];
-
-      // Create a unique ID for this question block
+      const lines = qBlock.trim().split('\n').filter(line => line.trim() !== '');
+      const questionText = lines[0].replace(/\d+\.\s/, '').trim();
+      const optionsText = lines.slice(1).join('\n');
+      
+      // Extract options, handling (correct) marker
+      const options = optionsText.match(/\([a-d]\)\s[^()]+(\(correct\))?/g) || [];
+      
       const copyId = `question-block-${index}`;
-
-      formattedResponse += `
+      
+      result += `
         <div class="question-block" id="${copyId}">
-          <p><strong>${questionText}</strong></p>
-          <ul>
-            ${options.map(option => `<li>${option.trim()}</li>`).join("")}
+          <p><strong>${index + 1}. ${cleanFormatting(questionText)}</strong></p>
+          <ul class="mcq-options">
+            ${options.map(option => {
+              const isCorrect = option.includes('(correct)');
+              const cleanOption = cleanFormatting(option.replace('(correct)', '').trim());
+              return `<li class="${isCorrect ? 'correct-option' : ''}">${cleanOption}</li>`;
+            }).join('')}
           </ul>
           <button onclick="copyToClipboard('${copyId}')" class="copy-btn">Copy</button>
         </div>
       `;
     });
-  } else {
-    formattedResponse = `<p>${response}</p>`;
   }
+  
+  return result || `<div class="question-block">${text}</div>`;
+}
 
-  // Code block formatting
-  formattedResponse = formattedResponse.replace(/`(.*?)`/g, (match, code) => {
-    return `<pre><code>${code}</code></pre>`;
+function isNumberedList(text) {
+  // Checks for numbered items (1., 2., etc.) with more than 1 item
+  return (text.match(/\d+\.\s/g) || []).length > 1;
+}
+
+function formatNumberedList(text) {
+  const items = text.split(/\d+\.\s/).filter(item => item.trim() !== '');
+  let result = '';
+  
+  items.forEach((item, index) => {
+    const content = item.trim();
+    const [heading, ...details] = content.split('\n');
+    const copyId = `numbered-item-${index}`;
+    
+    result += `
+      <div class="numbered-item" id="${copyId}">
+        <p><strong>${index + 1}. ${cleanFormatting(heading)}</strong></p>
+        ${details.filter(d => d.trim()).map(d => `<p>${cleanFormatting(d)}</p>`).join('')}
+        <button onclick="copyToClipboard('${copyId}')" class="copy-btn">Copy</button>
+      </div>
+    `;
   });
+  
+  return result;
+}
 
-  // Link formatting
-  formattedResponse = formattedResponse.replace(/(https?:\/\/[^\s]+)/g, (url) => {
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+function isBulletList(text) {
+  // Checks for bullet points (-, *, •)
+  return /^(\s*[-*•]\s+.+(\n|$))+/gm.test(text);
+}
+
+function formatBulletList(text) {
+  const items = text.split(/^[-*•]\s+/gm).filter(item => item.trim() !== '');
+  let result = '<ul class="bullet-list">';
+  
+  items.forEach(item => {
+    result += `<li>${cleanFormatting(item.trim())}</li>`;
   });
+  
+  result += '</ul>';
+  return result;
+}
 
-  return formattedResponse;
+function formatPlainText(text) {
+  // Handle paragraphs separated by double newlines
+  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim() !== '');
+  return paragraphs.map(p => `<p>${cleanFormatting(p)}</p>`).join('');
+}
+
+function cleanFormatting(text) {
+  // Clean markdown-style formatting
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')                // *italic*
+    .replace(/_(.*?)_/g, '<em>$1</em>')                  // _italic_
+    .replace(/~~(.*?)~~/g, '<del>$1</del>')              // ~~strikethrough~~
+    .replace(/`(.*?)`/g, '<code>$1</code>');             // `code`
 }
 
 
@@ -334,7 +461,7 @@ function copyToClipboard(elementId) {
   const textToCopy = el.innerText || el.textContent;
 
   navigator.clipboard.writeText(textToCopy).then(() => {
-    alert("Copied!");
+    console.log("Copied to clipboard: ", textToCopy);
   }).catch(err => {
     console.error("Failed to copy: ", err);
   });

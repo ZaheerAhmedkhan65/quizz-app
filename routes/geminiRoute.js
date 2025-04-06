@@ -44,10 +44,6 @@ router.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
-/**
- * Route: POST /generate-response
- * Description: Combines user prompt with uploaded PDF text (if ID provided), and gets response from Gemini
- */
 router.post("/generate-response", async (req, res) => {
   const { prompt, id } = req.body;
 
