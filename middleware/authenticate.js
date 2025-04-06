@@ -3,12 +3,12 @@ const JWT_SECRET = '2a991f724f33ef14aacc3529a2a8e5747215370b96ca9b77478d76d5733f
 function authenticate(req, res, next) {
     const token = req.cookies.token;
     if (!token) {
-        return res.status(401).redirect('/auth/signin');
+        return res.status(401).redirect('/auth/login');
     }
 
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
         if (err) {
-            return res.status(401).redirect('/auth/signin');
+            return res.status(401).redirect('/auth/login');
         }
         req.user = decoded;
         next();

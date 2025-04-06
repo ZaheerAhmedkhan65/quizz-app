@@ -2,8 +2,8 @@
     <div class="row">
             <div class="col-lg-6 d-flex justify-content-center">
                 <div class="col-lg-6 mt-5">
-                    <h4>Sign in</h4>
-                    <form action="/auth/signin" method="post">
+                    <h4>Log in</h4>
+                    <form action="/auth/login" method="post">
                         <div class="form-group  mb-2">
                             <label for="username" class="form-label m-0">Username</label>
                             <input type="text" id="username" name="username" placeholder="Username" class="form-control" required>
@@ -16,10 +16,10 @@
                                 <label class="m-0 text-muted" style="font-size: 14px;" for="show-password-checkbox">Show password</label>
                             </div>
                         </div>
-                        <input type="submit" class="btn btn-sm btn-primary" value="Sign in">
-                        <a class="mt-3 text-decoration-none text-dark d-block" href="/auth/signup">
+                        <input type="submit" class="btn btn-sm btn-primary" value="Log in">
+                        <a class="mt-3 text-decoration-none text-dark d-block" href="/auth/create-account">
                             Don't have an account?
-                            <span class="text-primary">Sign up</span>
+                            <span class="text-primary">Create one</span>
                         </a>
                     </form>
                 </div>
