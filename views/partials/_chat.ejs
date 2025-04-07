@@ -1,4 +1,4 @@
-<div class="ask-ai-chat-modal d-flex flex-column">
+<div class="ask-ai-chat-modal bg-primary-subtle">
     <div class="d-flex flex-column">
         <div class="ask-ai-chat-header d-flex">
             <div class="d-flex align-items-center">
@@ -96,29 +96,32 @@
         </div>
     </div>
 
-    <form id="chat-input-form" class="chat-form-outline form-outline d-flex ps-2" data-mdb-input-init="" data-mdb-input-initialized="true"
+    <form id="chat-input-form" class="chat-form-outline form-outline" data-mdb-input-init="" data-mdb-input-initialized="true"
     data-gtm-form-interact-id="0">
-
-    <input type="file" id="file-input" accept=".pdf" style="display: none;">
-    <button type="button" id="file-upload-button" class="btn border-0 bg-transparent outline-none">
-      <i class="bi bi-paperclip"></i>
-    </button>
-    <textarea class="chat-input form-control placeholder-active" type="text" placeholder="Ask anything" rows="1"
-        aria-label="AI Chat Input" title="AI Chat Input" data-gtm-form-interact-field-id="0"
-        style="height: auto;">
-    </textarea>
-    
-    <button class="chat-send-btn me-2 d-block" fdprocessedid="777gt8">
-        <i class="bi bi-send"></i>
-    </button>
-    <button type="button" class="chat-stop-btn me-2 d-none" fdprocessedid="0jup7q">
-        <i class="bi bi-stop-fill"></i>
-    </button>
-    <div class="form-notch">
-        <div class="form-notch-leading" style="width: 9px;"></div>
-        <div class="form-notch-middle" style="width: 0px;"></div>
-        <div class="form-notch-trailing"></div>
+    <div class="w-100" style="padding: 10px 10px 0px;">
+      <textarea id="chat-input" class="chat-input placeholder-active" type="text" placeholder="Ask anything" rows="1"
+      aria-label="AI Chat Input" title="AI Chat Input" data-gtm-form-interact-field-id="0"
+      style="height: auto;">
+      </textarea>
     </div>
+    
+    <div class="d-flex align-items-center justify-content-between w-100" style="padding: 0px 10px 10px;">
+      <div class="d-flex">
+        <input type="file" id="file-input" accept=".pdf" style="display: none;">
+         <button type="button" id="file-upload-button" style="border: 1px solid antiquewhite;font-weight: bold;" class="rounded-circle bg-transparent outline-none">
+           <i class="bi bi-plus-lg fw-bold" style="color: antiquewhite;"></i>
+         </button>
+      </div>
+      <div class="d-flex align-items-center">
+        <button class="chat-send-btn rounded-circle me-2 d-block" fdprocessedid="777gt8">
+          <i class="bi bi-send fw-bold"></i>
+        </button>
+        <button type="button" class="chat-stop-btn me-2 d-none" fdprocessedid="0jup7q">
+            <i class="bi bi-stop-fill"></i>
+        </button>
+      </div>
+    </div>
+    
 </form>
 <p class="text-center text-muted" style="font-size: 10px;padding: 5px 0px;">This can make mistakes.Check important info!</p>
 
@@ -140,7 +143,7 @@
     let chatHeader = document.querySelector(".ask-ai-chat-header");
     let chatBody = document.querySelector(".ask-ai-chat-body");
     let chatFooter = document.querySelector(".ask-ai-chat-footer");
-    let chatInput = document.querySelector(".chat-input");
+    let chatInput = document.querySelector("#chat-input");
     let chatSendBtn = document.querySelector(".chat-send-btn");
     let chatStopBtn = document.querySelector(".chat-stop-btn");
     let expandChatBtn = document.querySelector(".expand-chat-btn");
@@ -148,11 +151,17 @@
     let clearChatBtn = document.querySelector(".clear-chat-btn");
     let chatMessages = document.querySelector(".chat-messages");
     let chatInputForm = document.querySelector("#chat-input-form");
+    let gettingResponse = document.createElement('div');
+
     const fileInput = document.getElementById("file-input");
     const fileUploadButton = document.getElementById("file-upload-button");
     fileUploadButton.addEventListener("click", () => {
       fileInput.click();
     });
+
+    document.addEventListener("DOMContentLoaded", (event) => {
+      chatInput.value = "";
+    })
     
     chatInput.addEventListener("keydown", async (event) => {
         if (event.key === "Enter") {
@@ -234,11 +243,19 @@ closeChatBtn.addEventListener("click", () => {
             messageElement.classList.add("sent");
             messageElement.innerHTML = `<div class="message-content">${message}</div>`;
             chatMessages.appendChild(messageElement);
-            
+            scrollToBottom();
             // Simulate AI response
             setTimeout(() => {
+                gettingResponse.innerHTML = `
+                  <div class="getting-response">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                  </div>
+                `;
+                chatMessages.appendChild(gettingResponse);
                 fetchGeminiResponse(message);
-            }, 1000);
+            }, 100);
         }
         
     }
@@ -276,14 +293,18 @@ closeChatBtn.addEventListener("click", () => {
     const aiMessage = document.createElement('div');
     if(!data.response) {
         aiMessage.classList.add("ai-message");
+        gettingResponse.remove();
         aiMessage.innerHTML = `<div class="message-content">No response generated. Please try again.</div>`;
         chatMessages.appendChild(aiMessage);
         return;
     }
-    const formattedResponse = generateFormattedResponse(data.response);
-    addMessageToChat(formattedResponse,aiMessage);
 
-    chatMessages.appendChild(aiMessage);
+    setTimeout(() => {
+      gettingResponse.remove();
+      const formattedResponse = generateFormattedResponse(data.response);
+      addMessageToChat(formattedResponse,aiMessage);
+      chatMessages.appendChild(aiMessage);
+    }, 3000);
   }
 
 

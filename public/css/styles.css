@@ -153,8 +153,6 @@ svg {
     border-radius: 10px;
     max-width: 100%;
     z-index: 1046;
-    background-color: #fff;
-    box-shadow: 0 0 12px 1px rgba(0, 0, 0, .1);
     transform: translateX(calc(100% + 3rem)); /* Changed from specific width to 100% */
     opacity: 0; /* Ensure it's completely hidden */
     visibility: hidden; /* Hide from screen readers and DOM flow */
@@ -203,20 +201,16 @@ svg {
     position: sticky;
     background-color: #fff;
     bottom: 0;
-    border-top: 2px solid #f2f2f2;
     padding: 4px 8px 4px;
     align-items: center;
     justify-content: space-between;
     padding-left: 0;
     padding-right: 0;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+    border-radius: 10px;
 }
 
 .form-outline .form-control {
     min-height: auto;
-    padding-top: .32rem;
-    padding-bottom: .32rem;
     padding-left: .75rem;
     padding-right: .75rem;
     border: 0;
@@ -238,24 +232,39 @@ svg {
 }
 
 .chat-form-outline .chat-send-btn {
-    background-color: rgba(0, 0, 0, 0);
-    height: 100%;
-    border: none;
-    margin-right: 6px;
+    background-color: antiquewhite;
     cursor: pointer;
+    border: 1px solid antiquewhite;
+    padding: 4px 8px;
+}
+
+#chat-input-form{
+    border: 1px solid #ccc;
+    border-radius: .6rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #9ab3d9e6;
 }
 
 .chat-messages {
     overflow-y: scroll;
-    height: 73vh;
+    height: 66vh;
     overflow-x: hidden;
     padding: 10px;
     scrollbar-width: none;
-    background-color: #f2f2f2;
-    border-radius: 10px;
-    border: 1px solid #f2f2f2;
-    box-shadow: 0 0 12px 1px rgba(0, 0, 0, .1);
+    -ms-overflow-style: none;
     transition: all .2s linear;
+    padding-bottom: 50px;
+}
+
+.chat-message-text p{
+    margin: 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
 }
 
 .ai-message-wrapper {
@@ -270,9 +279,71 @@ svg {
     align-items: flex-start;
     justify-content: flex-start;
     background-color: #f2f2f2;
-    border: 1px solid #f2f2f2;
-    box-shadow: 0 0 12px 1px rgba(0, 0, 0, .2);
 }
+
+.getting-response{
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background-color: #f2f2f2;
+    position: relative;
+    font-weight: bold;
+    width: fit-content;
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: flex-end;
+    height: 30px;
+}
+
+.getting-response::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -10px;
+    width: 20px;
+    height: 15px;
+    background-color: #f2f2f2;
+    border-radius: 0px 0px 0px 25px;
+}
+
+.getting-response .dot{
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background-color: #333;
+    border-radius: 50%;
+    margin: 0 2px;
+    transition: all .2s linear;
+}
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+    background-color: #555;
+    border-radius: 50%;
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  
+  .dot:nth-child(1) {
+    animation-delay: 0s;
+  }
+  .dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  
+  @keyframes bounce {
+    0%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-10px);
+    }
+  }
+
 
 .sent {
     position: relative;
@@ -288,7 +359,6 @@ svg {
     border-radius: 10px;
     background-color: #3b72ca;
     border: 1px solid #3b72ca;
-    box-shadow: 0 0 12px 1px rgba(0, 0, 0, .1);
     transition: all .2s linear;
     width: fit-content;
     max-width:75%;
@@ -318,28 +388,20 @@ svg {
 }
 
 .chat-input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 5px;
-    border: none;
-    background-color: #f2f2f2;
-    color: black;
-    box-shadow: 0 0 12px 1px rgba(0, 0, 0, .1);
-    transition: all .2s linear;
-    font-size: 16px;
-    margin-bottom: 8px;
+    color: antiquewhite;
     resize: none;
     overflow: auto;
-    height: auto;
-    min-height: 40px;
-    margin-bottom: 0;
     max-height: 200px;
     outline: none;
-    cursor: pointer;
+    padding: 0px 10px;
+    line-height: 1.5;
+    background-color: transparent;
+    font-size: 20px;
 }
 
-.chat-input:hover {
-    box-shadow: 0 0 12px 1px rgba(0, 0, 0, .2);
+.chat-input::placeholder {
+    color: antiquewhite;
+    font-size: 20px;
 }
 
 .question-block {
@@ -515,7 +577,8 @@ svg {
         width: 100% !important;
         transform: translateX(100%); /* Full width off-screen */
         margin: 0 !important;
-        margin-top: 1.5rem !important;
+        height: 100vh;
+        border-radius: 0;
     }
     
     .ask-ai-chat-modal.open {
@@ -528,6 +591,10 @@ svg {
     
     .open-chat-btn-wrapper {
         background-color: #3b72ca;
+    }
+
+    .chat-messages{
+        height: 73vh;
     }
 }
 
