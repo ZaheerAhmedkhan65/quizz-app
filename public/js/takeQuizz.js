@@ -134,8 +134,16 @@ document.addEventListener("DOMContentLoaded", function () {
         questionIndexContainer.innerText = "Question " + (currentQuestionIndex + 1) + " of " + quizData.length;
     
         backBtn.disabled = currentQuestionIndex === 0;
-        nextBtn.textContent = currentQuestionIndex < quizData.length - 1 ? "Next" : "Submit";
-    
+
+        // Update next/submit button based on whether all questions are answered
+        if (currentQuestionIndex < quizData.length - 1) {
+            nextBtn.textContent = "Next";
+            nextBtn.disabled = false;
+        } else {
+            nextBtn.textContent = "Submit";
+            nextBtn.disabled = !allQuestionsAnswered();
+        }
+
         question.options.forEach(option => {
             let listItem = document.createElement("li");
             listItem.classList.add("list-group-item", "p-3", "rounded-0", "d-flex", "align-items-center", "gap-1");
@@ -154,6 +162,15 @@ document.addEventListener("DOMContentLoaded", function () {
             radioInput.addEventListener("change", () => {
                 selectedAnswers[question.id] = option.id;
                 updateQuestionNavigation(); // Update navigation buttons when an answer is selected
+
+                // Check if all questions are answered whenever an answer is selected
+                if (allQuestionsAnswered()) {
+                    nextBtn.disabled = false;
+                }
+                // Enable submit button if this was the last question and all are now answered
+                if (currentQuestionIndex === quizData.length - 1) {
+                    nextBtn.disabled = !allQuestionsAnswered();
+                }
             });
     
             let label = document.createElement("label");
@@ -174,11 +191,15 @@ document.addEventListener("DOMContentLoaded", function () {
             currentQuestionIndex++;
             loadQuestion();
         } else {
-            if (confirm("Are you sure you want to submit the quiz?")) {
+            if (allQuestionsAnswered() && confirm("Are you sure you want to submit the quiz?")) {
                 submitQuiz();
             };
         }
     });
+
+    function allQuestionsAnswered() {
+        return quizData.every(question => selectedAnswers[question.id]);
+    }
 
     backBtn.addEventListener("click", () => {
         if (currentQuestionIndex > 0) {

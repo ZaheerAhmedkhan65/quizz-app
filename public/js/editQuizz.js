@@ -29,8 +29,8 @@ document.querySelectorAll('.edit-quizz-btn').forEach(editBtn => {
 
         // Check for duplicate titles on input change
         titleInput.addEventListener('input', () => {
-            let newTitle = titleInput.value.trim().toLowerCase();
-            if (existingTitles.includes(newTitle) && newTitle !== quizzTitle.textContent.trim().toLowerCase()) {
+            let newTitle = titleInput.value.trim();
+            if (existingTitles.includes(newTitle) && newTitle !== quizzTitle.textContent.trim()) {
                 errorMessage.textContent = "A quiz with this title already exists!";
             } else {
                 errorMessage.textContent = "";
@@ -40,10 +40,10 @@ document.querySelectorAll('.edit-quizz-btn').forEach(editBtn => {
         // Prevent form submission if duplicate exists
         form.addEventListener('submit', async (event) => {
             event.preventDefault(); // Prevent default form submission
-            let newTitle = titleInput.value.trim().toLowerCase();
+            let newTitle = titleInput.value.trim();
             const actionUrl = form.getAttribute('action');
         
-            if (existingTitles.includes(newTitle) && newTitle !== quizzTitle.textContent.trim().toLowerCase()) {
+            if (existingTitles.includes(newTitle) && newTitle !== quizzTitle.textContent.trim()) {
                 errorMessage.textContent = "A quiz with this title already exists!";
                 return; // Stop execution
             }

@@ -27,8 +27,8 @@ document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
 
         // Check for duplicate titles on input change
         titleInput.addEventListener('input', () => {
-            let newTitle = titleInput.value.trim().toLowerCase();
-            if (existingTitles.includes(newTitle) && newTitle !== courseTitle.textContent.trim().toLowerCase()) {
+            let newTitle = titleInput.value.trim();
+            if (existingTitles.includes(newTitle) && newTitle !== courseTitle.textContent.trim()) {
                 errorMessage.textContent = "A course with this title already exists!";
             } else {
                 errorMessage.textContent = "";
@@ -37,8 +37,8 @@ document.querySelectorAll('.dropdown-item[data-id]').forEach(editBtn => {
 
         // Prevent form submission if duplicate exists
         form.addEventListener('submit', (event) => {
-            let newTitle = titleInput.value.trim().toLowerCase();
-            if (existingTitles.includes(newTitle) && newTitle !== courseTitle.textContent.trim().toLowerCase()) {
+            let newTitle = titleInput.value.trim();
+            if (existingTitles.includes(newTitle) && newTitle !== courseTitle.textContent.trim()) {
                 event.preventDefault();
                 errorMessage.textContent = "A course with this title already exists!";
             }

@@ -5,7 +5,8 @@
                 <div class="progress-bar-container">
                     <div class="progress-bar-fill" data-progress="<%= progress.course_progress %>"></div>
                 </div>
-                <form action="/api/courses/<%= course.id %>/quizzes" method="post" class="d-flex align-items-center gap-1 mt-3">
+                <h4 class="mt-2 mb-0">Create new quizz</h4>
+                <form action="/api/courses/<%= course.id %>/quizzes" method="post" class="d-flex align-items-center gap-1">
                     <input type="text" name="title" id="title" class="form-control" placeholder="Enter quizz title" required>
                     <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
                 </form>

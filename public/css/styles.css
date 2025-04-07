@@ -86,8 +86,8 @@ svg {
     justify-content: center;
     font-weight: bold;
     font-size: 10px;
-    position: absolute;
-    left: 50%;
+    /* position: absolute;
+    left: 50%; */
 }
 
 #results-container{
