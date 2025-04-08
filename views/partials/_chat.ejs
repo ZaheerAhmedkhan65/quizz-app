@@ -57,10 +57,10 @@
         <div class="flex-column chat-messages">
             <div class="ai-guidance-message">
                 <div data-message-id="welcome-message" class="ai-message welcome-message">
-                    <div class="chat-message-text">
+                    <div class="welcome-message-content">
                         <div class="welcome-header">
                             <div class="welcome-icon">👋</div>
-                            <h3 class="welcome-title">Welcome to AI Assistant!</h3>
+                            <h3 class="welcome-title">Welcome <span class="welcome-username"><%= user.username %></span>!</h3>
                         </div>
                         
                         <div class="welcome-content">
@@ -68,8 +68,12 @@
                             
                             <div class="feature-list">
                                 <div class="feature-item">
-                                    <span class="feature-icon">📝</span>
-                                    <span class="feature-text">PDF content analysis</span>
+                                    <span class="feature-icon">🎯</span>
+                                    <span class="feature-text">Goal setting</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">📋</span>
+                                    <span class="feature-text">Task planning</span>
                                 </div>
                                 <div class="feature-item">
                                     <span class="feature-icon">❓</span>
@@ -79,15 +83,17 @@
                                     <span class="feature-icon">💡</span>
                                     <span class="feature-text">Learning assistance</span>
                                 </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">📚</span>
+                                    <span class="feature-text">General knowledge</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">📝</span>
+                                    <span class="feature-text">PDF content analysis</span>
+                                </div>
                             </div>
-                            
-                            <div class="welcome-tip">
-                                <div class="tip-icon">💡</div>
-                                <p class="tip-text">Pro Tip: Upload a PDF first for the most accurate help with your specific content!</p>
-                            </div>
-                            
                             <div class="welcome-action">
-                                <p>Ready when you are! Ask me anything or upload a file to get started.</p>
+                                <p>To get started, just ask me anything.</p>
                             </div>
                         </div>
                     </div>
@@ -98,32 +104,31 @@
 
     <form id="chat-input-form" class="chat-form-outline form-outline" data-mdb-input-init="" data-mdb-input-initialized="true"
     data-gtm-form-interact-id="0">
-    <div class="w-100" style="padding: 10px 10px 0px;">
+    <div class="chat-input-wrapper w-100">
       <textarea id="chat-input" class="chat-input placeholder-active" type="text" placeholder="Ask anything" rows="1"
-      aria-label="AI Chat Input" title="AI Chat Input" data-gtm-form-interact-field-id="0"
-      style="height: auto;">
+      aria-label="AI Chat Input" title="AI Chat Input" data-gtm-form-interact-field-id="0">
       </textarea>
     </div>
     
-    <div class="d-flex align-items-center justify-content-between w-100" style="padding: 0px 10px 10px;">
+    <div class="chat-input-actions d-flex align-items-center justify-content-between w-100">
       <div class="d-flex">
         <input type="file" id="file-input" accept=".pdf" style="display: none;">
-         <button type="button" id="file-upload-button" style="border: 1px solid antiquewhite;font-weight: bold;" class="rounded-circle bg-transparent outline-none">
-           <i class="bi bi-plus-lg fw-bold" style="color: antiquewhite;"></i>
+         <button type="button" id="file-upload-button" class="rounded-circle bg-transparent outline-none">
+           <i class="bi bi-plus-lg fw-bold"></i>
          </button>
       </div>
       <div class="d-flex align-items-center">
         <button class="chat-send-btn rounded-circle me-2 d-block" fdprocessedid="777gt8">
           <i class="bi bi-send fw-bold"></i>
         </button>
-        <button type="button" class="chat-stop-btn me-2 d-none" fdprocessedid="0jup7q">
+        <button type="button" class="chat-stop-btn rounded-circle me-2 d-none" fdprocessedid="0jup7q">
             <i class="bi bi-stop-fill"></i>
         </button>
       </div>
     </div>
     
 </form>
-<p class="text-center text-muted" style="font-size: 10px;padding: 5px 0px;">This can make mistakes.Check important info!</p>
+<p class="chat-footer text-center text-muted">This can make mistakes.Check important info!</p>
 
 
 </div>
@@ -152,6 +157,7 @@
     let chatMessages = document.querySelector(".chat-messages");
     let chatInputForm = document.querySelector("#chat-input-form");
     let gettingResponse = document.createElement('div');
+    let abortController = null;
 
     const fileInput = document.getElementById("file-input");
     const fileUploadButton = document.getElementById("file-upload-button");
@@ -161,35 +167,44 @@
 
     document.addEventListener("DOMContentLoaded", (event) => {
       chatInput.value = "";
+      chatSendBtn.disabled = true;
+    })
+
+    chatInput.addEventListener("input", () => {
+      if (chatInput.value) {
+        chatSendBtn.disabled = false;
+      } else {
+        chatSendBtn.disabled = true;
+      }
     })
     
     chatInput.addEventListener("keydown", async (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            let message = chatInput.value;
-            const file = fileInput.files[0];
-            // If a file is selected, upload it and get the image URL
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-          const uploadResponse = await fetch("/api/gemini/upload", {
-            method: "POST",
-            body: formData,
-          });
-          const {id} = await uploadResponse.json();
-        } catch (error) {
-          console.error("Error uploading pdf:", error);
-          alert("Failed to upload pdf. Please try again.");
-          return;
-        }
-      }
-            if (message) {
-                sendMessage(message);
-                chatInput.value = "";
+      if (event.key === "Enter") {
+          event.preventDefault();
+          let message = chatInput.value;
+          const file = fileInput.files[0];
+          // If a file is selected, upload it and get the image URL
+          if (file) {
+            const formData = new FormData();
+            formData.append("file", file);
+            try {
+              const uploadResponse = await fetch("/api/gemini/upload", {
+                method: "POST",
+                body: formData
+              });
+              const {id} = await uploadResponse.json();
+            } catch (error) {
+              console.error("Error uploading pdf:", error);
+              return;
             }
-        }
+          }
+          if (message) {
+              sendMessage(message);
+              chatInput.value = "";
+          } else {
+              return
+          }
+      }
     });
 
     chatSendBtn.addEventListener("click", () => {
@@ -199,7 +214,7 @@
             sendMessage(message);
             chatInput.value = "";
         } else {
-            alert("Please enter a message");
+            return;
         }
     });
 
@@ -236,34 +251,53 @@ closeChatBtn.addEventListener("click", () => {
 });
 
 
-    function sendMessage(message) {
-        message = message.trim();
-        if (message) {
-            let messageElement = document.createElement("div");
-            messageElement.classList.add("sent");
-            messageElement.innerHTML = `<div class="message-content">${message}</div>`;
-            chatMessages.appendChild(messageElement);
-            scrollToBottom();
-            // Simulate AI response
-            setTimeout(() => {
-                gettingResponse.innerHTML = `
-                  <div class="getting-response">
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                  </div>
-                `;
-                chatMessages.appendChild(gettingResponse);
-                fetchGeminiResponse(message);
-            }, 100);
-        }
+function sendMessage(message) {
+    message = message.trim();
+    if (message) {
+        // Show stop button and hide send button
+        chatSendBtn.classList.add('d-none');
+        chatStopBtn.classList.remove('d-none');
         
+        let messageElement = document.createElement("div");
+        messageElement.classList.add("sent");
+        messageElement.innerHTML = `<div class="message-content">${message}</div>`;
+        chatMessages.appendChild(messageElement);
+        scrollToBottom();
+        
+        // Create a new AbortController for this request
+        abortController = new AbortController();
+        
+        setTimeout(() => {
+            gettingResponse.innerHTML = `
+              <div class="getting-response">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+            `;
+            chatMessages.appendChild(gettingResponse);
+            fetchGeminiResponse(message, abortController);
+        }, 100);
     }
+}
 
 
-    function stopMessage() {
-        // stop message
+function stopMessage() {
+    // Hide stop button and show send button
+    chatSendBtn.classList.remove('d-none');
+    chatStopBtn.classList.add('d-none');
+    
+    // Abort the fetch request if it exists
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
     }
+    
+    // Remove the "getting response" indicator
+    if (gettingResponse.parentNode) {
+        gettingResponse.remove();
+    }
+}
 
     function clearChat() {
         // clear chat
@@ -282,30 +316,73 @@ closeChatBtn.addEventListener("click", () => {
 
 <script>
 
-  async function fetchGeminiResponse(prompt) {
-    const res = await fetch("/api/gemini/generate-response", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    });
+// Modify the fetchGeminiResponse function
+async function fetchGeminiResponse(prompt, controller) {
+    try {
+        const res = await fetch("/api/gemini/generate-response", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({ prompt }),
+        });
 
-    const data = await res.json();
-    const aiMessage = document.createElement('div');
-    if(!data.response) {
-        aiMessage.classList.add("ai-message");
-        gettingResponse.remove();
-        aiMessage.innerHTML = `<div class="message-content">No response generated. Please try again.</div>`;
-        chatMessages.appendChild(aiMessage);
-        return;
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || 'API request failed');
+        }
+
+        const data = await res.json();
+        const aiMessage = document.createElement('div');
+        
+        // Hide stop button and show send button when done
+        chatSendBtn.classList.remove('d-none');
+        chatStopBtn.classList.add('d-none');
+        
+        if(!data.response) {
+            aiMessage.classList.add("ai-message");
+            gettingResponse.remove();
+            aiMessage.innerHTML = `<div class="message-content">Server is busy. Please try again later.</div>`;
+            chatMessages.appendChild(aiMessage);
+            return;
+        }
+
+        setTimeout(() => {
+            gettingResponse.remove();
+            const formattedResponse = generateFormattedResponse(data.response);
+            addMessageToChat(formattedResponse, aiMessage);
+            chatMessages.appendChild(aiMessage);
+        }, 3000);
+    } catch (error) {
+        // Hide stop button and show send button on error
+        chatSendBtn.classList.remove('d-none');
+        chatStopBtn.classList.add('d-none');
+        
+        if (error.name === 'AbortError') {
+            console.log('Fetch aborted by user');
+            return;
+        }
+        
+        // Show error message to user
+        let errorMessage = document.createElement('div');
+        errorMessage.classList.add('ai-message');
+        
+        let errorText = error.message;
+        if (errorText.includes('rate limit') || errorText.includes('quota')) {
+            errorText = "⚠️ " + errorText + "<br><br>Please try again later or consider upgrading your API plan.";
+        }
+        
+        errorMessage.innerHTML = `<div class="message-content error-message">${errorText}</div>`;
+        chatMessages.appendChild(errorMessage);
+        scrollToBottom();
+        
+        // Remove the "getting response" indicator
+        if (gettingResponse.parentNode) {
+            gettingResponse.remove();
+        }
+    } finally {
+        abortController = null;
     }
-
-    setTimeout(() => {
-      gettingResponse.remove();
-      const formattedResponse = generateFormattedResponse(data.response);
-      addMessageToChat(formattedResponse,aiMessage);
-      chatMessages.appendChild(aiMessage);
-    }, 3000);
-  }
+}
 
 
   function addMessageToChat(message, aiMessage) {
@@ -343,7 +420,7 @@ function scrollToBottom() {
 
 function generateFormattedResponse(response) {
   // If response is empty or undefined
-  if (!response) return '<p>No response received</p>';
+  if (!response) return;
 
   // First, handle code blocks to prevent them from being modified by other formatting
   let formattedResponse = response.replace(/```([\s\S]*?)```/g, (match, code) => {
@@ -392,10 +469,8 @@ function formatMCQResponse(text) {
       // Extract options, handling (correct) marker
       const options = optionsText.match(/\([a-d]\)\s[^()]+(\(correct\))?/g) || [];
       
-      const copyId = `question-block-${index}`;
-      
       result += `
-        <div class="question-block" id="${copyId}">
+        <div class="question-block"">
           <p><strong>${index + 1}. ${cleanFormatting(questionText)}</strong></p>
           <ul class="mcq-options">
             ${options.map(option => {
@@ -404,7 +479,6 @@ function formatMCQResponse(text) {
               return `<li class="${isCorrect ? 'correct-option' : ''}">${cleanOption}</li>`;
             }).join('')}
           </ul>
-          <button onclick="copyToClipboard('${copyId}')" class="copy-btn">Copy</button>
         </div>
       `;
     });
@@ -425,13 +499,11 @@ function formatNumberedList(text) {
   items.forEach((item, index) => {
     const content = item.trim();
     const [heading, ...details] = content.split('\n');
-    const copyId = `numbered-item-${index}`;
     
     result += `
-      <div class="numbered-item" id="${copyId}">
+      <div class="numbered-item">
         <p><strong>${index + 1}. ${cleanFormatting(heading)}</strong></p>
         ${details.filter(d => d.trim()).map(d => `<p>${cleanFormatting(d)}</p>`).join('')}
-        <button onclick="copyToClipboard('${copyId}')" class="copy-btn">Copy</button>
       </div>
     `;
   });
@@ -470,22 +542,6 @@ function cleanFormatting(text) {
     .replace(/_(.*?)_/g, '<em>$1</em>')                  // _italic_
     .replace(/~~(.*?)~~/g, '<del>$1</del>')              // ~~strikethrough~~
     .replace(/`(.*?)`/g, '<code>$1</code>');             // `code`
-}
-
-
-
-
-function copyToClipboard(elementId) {
-  const el = document.getElementById(elementId);
-  if (!el) return;
-
-  const textToCopy = el.innerText || el.textContent;
-
-  navigator.clipboard.writeText(textToCopy).then(() => {
-    console.log("Copied to clipboard: ", textToCopy);
-  }).catch(err => {
-    console.error("Failed to copy: ", err);
-  });
 }
 
   
