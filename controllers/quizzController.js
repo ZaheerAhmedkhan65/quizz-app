@@ -4,6 +4,8 @@ const Question = require('../model/Question');
 const Option = require('../model/Option');
 const QuizResult = require('../model/QuizResult');
 const UserCourse = require('../model/UserCourse');
+const ChatHistory = require("../model/ChatHistory");
+
 
 const getAll = async (req, res) => {
     try {
@@ -46,6 +48,10 @@ const showQuizz = async (req, res) => {
 
         console.log(percentage)
 
+        let sessionId = req.cookies.sessionId;
+
+        let chatHistory = await ChatHistory.getUserChatHistory(req.user.userId);
+
         res.status(200).render('quizz', { 
             quizz, 
             title: quizz.title, 
@@ -55,7 +61,9 @@ const showQuizz = async (req, res) => {
             user: req.user, 
             questions, 
             answers, 
-            percentage 
+            percentage,
+            sessionId,
+            chatHistory
         });
 
     } catch (err) {

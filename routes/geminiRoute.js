@@ -4,6 +4,7 @@ const router = express.Router();
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
 const { v4: uuidv4 } = require("uuid");
+const ChatHistory = require("../model/ChatHistory");
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
@@ -45,27 +46,43 @@ router.post("/upload", upload.single("file"), async (req, res) => {
 });
 
 router.post("/generate-response", async (req, res) => {
-  const { prompt, id } = req.body;
+  const { prompt, userId,currentPdfId, sessionId } = req.body;
 
   try {
     let userPrompt = prompt;
+    let isPdfBased = false;
 
-    // If ID is provided and exists in cache, append PDF text
-    if (id && pdfCache.has(id)) {
-      const pdfText = pdfCache.get(id);
+
+    if (currentPdfId && pdfCache.has(currentPdfId)) {
+      const pdfText = pdfCache.get(currentPdfId);
       userPrompt = `${prompt}\n\n${pdfText}`;
-      // Optional: Remove from cache after use to free memory
-      pdfCache.delete(id);
+      isPdfBased = true;
+      pdfCache.delete(currentPdfId);
     }
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     const result = await model.generateContent([userPrompt]);
     const response = result.response.text();
 
+    // Save chat history
+    await ChatHistory.saveChatHistory({ userId, sessionId, prompt, response, isPdfBased, pdfId: isPdfBased ? currentPdfId : null });
+
     res.json({ response });
   } catch (err) {
     console.error("Error generating response:", err);
     res.status(500).json({ error: "Failed to generate response" });
+  }
+});
+
+
+// URL: /api/gemini/get-chat?id=123
+router.get("/get-chat", async (req, res) => {
+  try {
+    const chat = await ChatHistory.findById(req.query.id); // not req.params
+    res.json({ chat });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

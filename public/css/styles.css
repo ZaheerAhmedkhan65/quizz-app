@@ -165,6 +165,7 @@ svg {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow: hidden;
 }
 
 .ask-ai-chat-modal.open {
@@ -181,7 +182,7 @@ svg {
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    padding: 24px;
+    padding: 15px 5px;;
     margin-bottom: 0px;
 }
 
@@ -579,6 +580,32 @@ svg {
     white-space: nowrap;
 }
 
+#side-bar{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: calc(100vh - 3rem);
+    width: 250px;
+    background-color: #f5f7fa;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(-100%);
+    z-index: 1046;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+#side-bar.open{
+    transform: translateX(0);
+}
+
+#side-bar .side-bar-menu-btn{
+    padding: 18px 23px;;
+}
+
+#side-bar-body{
+    padding: 0px 18px;
+}
+
 /* Animation */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -617,6 +644,10 @@ svg {
 
     .chat-footer{
         padding: 2px 0px;
+    }
+    
+    #side-bar{
+        height: 100vh;
     }
 }
 

@@ -1,6 +1,9 @@
 <div class="ask-ai-chat-modal bg-primary-subtle">
     <div class="d-flex flex-column">
         <div class="ask-ai-chat-header d-flex">
+            <button class="side-bar-menu-btn border-0 outline-none bg-transparent">
+              <svg width="24" height="24" style="transform: rotate(0deg);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-lg text-token-text-secondary mx-2"><path fill-rule="evenodd" clip-rule="evenodd" d="M3 8C3 7.44772 3.44772 7 4 7H20C20.5523 7 21 7.44772 21 8C21 8.55228 20.5523 9 20 9H4C3.44772 9 3 8.55228 3 8ZM3 16C3 15.4477 3.44772 15 4 15H14C14.5523 15 15 15.4477 15 16C15 16.5523 14.5523 17 14 17H4C3.44772 17 3 16.5523 3 16Z" fill="currentColor"></path></svg>
+            </button>
             <div class="d-flex align-items-center">
                 <h3 class="m-0">AI Chat</h3>
             </div>
@@ -129,8 +132,30 @@
     
 </form>
 <p class="chat-footer text-center text-muted">This can make mistakes.Check important info!</p>
-
-
+<div id="side-bar" class="bg-primary-subtle">
+  <button class="side-bar-menu-btn border-0 outline-none bg-transparent">
+    <svg width="24" height="24" style="transform: rotate(0deg);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-lg text-token-text-secondary mx-2"><path fill-rule="evenodd" clip-rule="evenodd" d="M3 8C3 7.44772 3.44772 7 4 7H20C20.5523 7 21 7.44772 21 8C21 8.55228 20.5523 9 20 9H4C3.44772 9 3 8.55228 3 8ZM3 16C3 15.4477 3.44772 15 4 15H14C14.5523 15 15 15.4477 15 16C15 16.5523 14.5523 17 14 17H4C3.44772 17 3 16.5523 3 16Z" fill="currentColor"></path></svg>
+  </button>
+  <div id="side-bar-body">
+    <h3 class="m-0">chat history</h3>
+    <ul class="chat-history-container list-group">
+      <% chatHistory.forEach(chat => { %>
+        <li 
+          data-id="<%= chat.id %>"
+          class="list-group-item list-group-item-primary list-group-item-action border-0 mb-1 rounded p-2 chat-history-item d-flex align-items-center justify-content-between"
+        >
+          <div style="width: 90%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;border: 1px solid transparent;" >
+            <%= chat.prompt %>
+          </div>
+          <div class="">
+            <i class="bi bi-three-dots"></i>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+  
+</div>
 </div>
 
 <div class="open-chat-btn-wrapper" aria-label="Open AI Chat" title="Open AI Chat">
@@ -158,6 +183,7 @@
     let chatInputForm = document.querySelector("#chat-input-form");
     let gettingResponse = document.createElement('div');
     let abortController = null;
+    let currentPdfId = null;
 
     const fileInput = document.getElementById("file-input");
     const fileUploadButton = document.getElementById("file-upload-button");
@@ -193,6 +219,7 @@
                 body: formData
               });
               const {id} = await uploadResponse.json();
+              currentPdfId=id;
             } catch (error) {
               console.error("Error uploading pdf:", error);
               return;
@@ -315,7 +342,8 @@ function stopMessage() {
 </script>
 
 <script>
-
+let sessionId = "<%= sessionId %>";
+let userId = "<%= user.userId %>"
 // Modify the fetchGeminiResponse function
 async function fetchGeminiResponse(prompt, controller) {
     try {
@@ -323,7 +351,12 @@ async function fetchGeminiResponse(prompt, controller) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             signal: controller.signal,
-            body: JSON.stringify({ prompt }),
+            body: JSON.stringify({ 
+              prompt, 
+              userId,
+              currentPdfId,
+              sessionId 
+            }),
         });
 
         if (!res.ok) {
@@ -345,7 +378,6 @@ async function fetchGeminiResponse(prompt, controller) {
             chatMessages.appendChild(aiMessage);
             return;
         }
-
         setTimeout(() => {
             gettingResponse.remove();
             const formattedResponse = generateFormattedResponse(data.response);
@@ -545,4 +577,48 @@ function cleanFormatting(text) {
 }
 
   
+</script>
+
+
+<script>
+  let sideBarMenuBtn = document.querySelectorAll(".side-bar-menu-btn");
+  sideBarMenuBtn.forEach((btn)=>{
+    btn.addEventListener("click", () => {
+    let sideBar = document.querySelector("#side-bar");
+    sideBar.classList.toggle("open");
+  })
+  })
+
+  let chatHistoryContainer = document.querySelector(".chat-history-container");
+
+let chatItems = chatHistoryContainer.querySelectorAll(".chat-history-item");
+chatItems.forEach(item => {
+  item.addEventListener("click", async () => {
+    let chatId = item.getAttribute("data-id");
+    
+    try {
+      console.log("Clicked chat with session ID:", chatId);
+
+      const response = await fetch(`/api/gemini/get-chat?id=${encodeURIComponent(chatId)}`, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      if (!response.ok) throw new Error("Network response was not ok");
+
+      const data = await response.json();
+      // const aiMessage = document.createElement('div');
+      // const formattedResponse = generateFormattedResponse(data.chat.response);
+      // addMessageToChat(formattedResponse, aiMessage);
+      // chatMessages.appendChild(aiMessage);
+
+      // You can now render this data in your chat view
+    } catch (err) {
+      console.error("Fetch error:", err);
+    }
+  });
+});
+
 </script>

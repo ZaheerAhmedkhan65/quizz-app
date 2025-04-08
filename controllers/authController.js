@@ -35,15 +35,20 @@ const login = async (req, res) => {
     }
     // Generate JWT
     const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
-
+    
+    const sessionId = Date.now().toString();
+    new Date().getTime()
+   console.log(sessionId);
+    // Set the session ID in a cookie
+    res.cookie('sessionId', sessionId, { httpOnly: true, secure: true, sameSite: 'strict' });
     // Set the token in a cookie
-    res.cookie('token', token, { httpOnly: true });
+    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
     res.redirect('/api/dashboard');
 }
 
 const logout = (req, res) => {
     res.clearCookie('token');
-    res.redirect('/auth/signin');
+    res.redirect('/auth/login');
 }
 
 module.exports = { signup, login, logout };
