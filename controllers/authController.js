@@ -18,7 +18,7 @@ const signup = async (req, res) => {
     // Create the user
     await User.create(username, email,hashedPassword);
 
-    res.status(201).redirect('/auth/signin');
+    res.status(201).redirect('/auth/login');
 }
 const login = async (req, res) => {
     const { username, password } = req.body;
