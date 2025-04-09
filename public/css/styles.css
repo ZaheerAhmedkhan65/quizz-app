@@ -612,6 +612,41 @@ svg {
     to { opacity: 1; transform: translateY(0); }
 }
 
+
+.file-info-container {
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    margin: 5px 0px;
+    border-radius: 10px;
+    width: 85%;
+  }
+  
+  .file-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  
+  .file-name {
+    font-weight: 500;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .file-size {
+    color: #6c757d;
+    font-size: 12px;
+  }
+  
+  .remove-file-btn {
+    margin-left: auto;
+    cursor: pointer;
+    padding: 4px;
+  }
+
 .welcome-message {
     animation: fadeIn 0.5s ease-out forwards;
 }
@@ -650,6 +685,7 @@ svg {
         height: 100vh;
     }
 }
+
 
 @media (min-width: 769px) {
     .ask-ai-chat-modal {

@@ -34,7 +34,7 @@ const login = async (req, res) => {
         return res.status(400).json({ message: 'Invalid credentials' });
     }
     // Generate JWT
-    const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '7d' });
     
     const sessionId = Date.now().toString();
     new Date().getTime()
@@ -42,8 +42,36 @@ const login = async (req, res) => {
     // Set the session ID in a cookie
     res.cookie('sessionId', sessionId, { httpOnly: true, secure: true, sameSite: 'strict' });
     // Set the token in a cookie
-    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
+    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict',maxAge: 7 * 24 * 60 * 60 * 1000 });
     res.redirect('/api/dashboard');
+}
+
+const refreshToken = async (req, res) => {
+    const token = req.cookies.token;
+    
+    if (!token) {
+        return res.status(401).json({ message: 'No token provided' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true });
+        // Issue a new token with renewed expiration
+        const newToken = jwt.sign(
+            { userId: decoded.userId, username: decoded.username }, 
+            JWT_SECRET, 
+            { expiresIn: '1h' }
+        );
+        
+        res.cookie('token', newToken, { 
+            httpOnly: true, 
+            secure: true, 
+            sameSite: 'strict' 
+        });
+        console.log("token newed :",newToken)
+        res.json({ success: true });
+    } catch (err) {
+        return res.status(401).json({ message: 'Invalid token' });
+    }
 }
 
 const logout = (req, res) => {
@@ -51,4 +79,4 @@ const logout = (req, res) => {
     res.redirect('/auth/login');
 }
 
-module.exports = { signup, login, logout };
+module.exports = { signup, login, logout, refreshToken };

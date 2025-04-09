@@ -12,6 +12,7 @@ router.get('/login', (req, res) => {
 })
 router.post('/create-account', authController.signup);
 router.post('/login', authController.login);
+router.post('/refresh-token', authController.refreshToken);
 router.get('/logout', authController.logout);
 
 module.exports = router;
