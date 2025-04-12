@@ -63,7 +63,7 @@ router.post("/generate-response", async (req, res) => {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     const result = await model.generateContent([userPrompt]);
     const response = result.response.text();
-
+    console.log("user id: ", userId)
     // Save chat history
     await ChatHistory.saveChatHistory({ userId, sessionId, prompt, response, isPdfBased, pdfId: isPdfBased ? currentPdfId : null });
 

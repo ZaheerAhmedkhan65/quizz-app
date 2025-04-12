@@ -106,11 +106,14 @@
         </div>
     </div>
 
-
+    <div class="chat-input-wrapper">
     <div class="file-info-container d-none">
       <div class="file-info">
-        <span class="file-name"></span>
-        <span class="file-size"></span>
+        <i class="bi bi-file-earmark-text file-pdf-icon"></i>
+        <div class="d-flex flex-column">
+          <span class="file-name"></span>
+          <span class="file-size"></span>
+        </div>
         <button class="remove-file-btn bg-transparent border-0">
           <svg style="width:16px; height:16px; fill:#8e8e8e;" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
             <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
@@ -144,6 +147,7 @@
     </div>
     
 </form>
+</div>
 <p class="chat-footer text-center text-muted">This can make mistakes.Check important info!</p>
 <div id="side-bar" class="bg-primary-subtle">
   <button class="side-bar-menu-btn border-0 outline-none bg-transparent">
@@ -180,4 +184,8 @@
         <i class="bi bi-chat-dots-fill"></i>
     </button>
 </div>
+<script>
+  let sessionId = "<%= sessionId %>";
+  let userId = "<%= user.userId %>"
+</script>
 <script src="/js/aiChat.js"></script>

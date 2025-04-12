@@ -151,11 +151,9 @@ function sendMessage(message) {
         chatSendBtn.classList.add('d-none');
         chatStopBtn.classList.remove('d-none');
 
-        let messageElement = document.createElement("div");
-        messageElement.classList.add("sent");
-        messageElement.innerHTML = `<div class="message-content">${message}</div>`;
-        chatMessages.appendChild(messageElement);
+        writeUserMessage(message);
         scrollToBottom();
+      
 
         // Create a new AbortController for this request
         abortController = new AbortController();
@@ -174,6 +172,12 @@ function sendMessage(message) {
     }
 }
 
+function writeUserMessage(message){
+    let messageElement = document.createElement("div");
+    messageElement.classList.add("sent");
+    messageElement.innerHTML = `<div class="message-content">${message}</div>`;
+    chatMessages.appendChild(messageElement);
+}
 
 function stopMessage() {
     // Hide stop button and show send button
@@ -206,8 +210,6 @@ function shrinkChat() {
     // shrink chat
 }
 
-let sessionId = "<%= sessionId %>";
-let userId = "<%= user.userId %>"
 // Modify the fetchGeminiResponse function
 async function fetchGeminiResponse(prompt, controller) {
     try {
@@ -470,10 +472,11 @@ chatItems.forEach(item => {
             if (!response.ok) throw new Error("Network response was not ok");
 
             const data = await response.json();
-            // const aiMessage = document.createElement('div');
-            // const formattedResponse = generateFormattedResponse(data.chat.response);
-            // addMessageToChat(formattedResponse, aiMessage);
-            // chatMessages.appendChild(aiMessage);
+            const aiMessage = document.createElement('div');
+            writeUserMessage(data.chat.prompt)
+            const formattedResponse = generateFormattedResponse(data.chat.response);
+            addMessageToChat(formattedResponse, aiMessage);
+            chatMessages.appendChild(aiMessage);
 
             // You can now render this data in your chat view
         } catch (err) {
