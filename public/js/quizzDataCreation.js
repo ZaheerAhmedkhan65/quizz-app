@@ -75,16 +75,15 @@ function displayJsonQuestions() {
     document.querySelectorAll('.create-question-btn').forEach(button => {
         button.addEventListener('click', async function() {
             const questionData = questionDataMap.get(this.id);
-            await createQuestionWithOptions(questionData);
+            await createQuestionWithOptions(questionData, this.id);
         });
     });
 }
 
-async function createQuestionWithOptions(questionData) {
+async function createQuestionWithOptions(questionData, buttonId) {
     try {
         // Get courseId and quizzId from the existing question form
         const questionForm = document.getElementById("question-form");
-        const formActionParts = questionForm.action.split('/');
 
         // 1. Create the question
         const questionResponse = await fetch(questionForm.action, {
@@ -99,6 +98,13 @@ async function createQuestionWithOptions(questionData) {
         const questionResult = await questionResponse.json();
         
         if (questionResult.success && questionResult.question) {
+            const buttonElement = document.getElementById(buttonId);
+            if (buttonElement) {
+                const cardElement = buttonElement.closest('.card');
+                if (cardElement) {
+                    cardElement.remove();
+                }
+            }
             // 2. Create the question UI element
             let li = document.createElement("li");
             li.classList.add("list-group-item", "bg-primary-subtle", "rounded-0", "mb-2");

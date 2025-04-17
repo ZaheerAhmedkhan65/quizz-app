@@ -1,79 +1,93 @@
 <%- include('partials/_header') %>
-    
-        <div class="col-lg-3">
-            <div class="d-flex align-items-center justify-content-between">
-                <h2 style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="m-0 p-0"><%= quizz.title %></h2>
-                <% if (quizData.length > 0 && quizResults.length < 5) { %>
-                    <a class="btn btn-sm btn-success my-3" href="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/take">
-                        <%= quizResults.length > 0 ? 'Retake Quiz' : 'Take Quiz' %>
-                    </a>
-                <% } %>
-            </div>
-            <div class="progress-bar-container mb-2">
-                <div class="progress-bar-fill" data-progress="<%= quizz.quizz_progress %>"></div>
-            </div>
-                <% if(quizData.length > 0 && quizResults.length > 0) { %>
-                <strong class="mt-3">Progress Garph</strong>
-                <div id="graph"></div>
-                <% } %>
-                
-<div class="mt-2">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-        import data
-      </button>
+
+<div class="col-lg-3">
+    <div class="d-flex align-items-center justify-content-between">
+        <h2 style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="m-0 p-0">
+            <%= quizz.title %>
+        </h2>
+        <% if (quizData.length> 0 && quizResults.length < 5) { %>
+            <a class="btn btn-sm btn-success my-3"
+                href="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/take">
+                <%= quizResults.length> 0 ? 'Retake Quiz' : 'Take Quiz' %>
+            </a>
+        <% } %>
+    </div>
+    <div class="progress-bar-container mb-2">
+        <div class="progress-bar-fill" data-progress="<%= quizz.quizz_progress %>"></div>
+    </div>
+    <% if(quizData.length> 0 && quizResults.length > 0) { %>
+        <strong class="mt-3">Progress Graph</strong>
+        <div id="graph"></div>
+    <% } %>
+
+    <div class="mt-2">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Import data
+        </button>
+    </div>
 </div>
-        </div>
-        <%if(quizData.length > 0){%>
-        <div class="col-lg-6" style="height: 90vh; overflow: hidden;">
-            <h3 class="mt-2 mb-0">New question</h3>
-            <form id="question-form" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="d-flex align-items-center gap-1">
-                <input type="text" id="question-text" name="question_text" class="form-control" placeholder="Write Question text" required>
-                <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
-            </form>
-            <h4 class="m-0 p-0 my-2">Questions</h4>
-            <% if(quizData.length > 0) { %>
-            <ul id="questions-container" class="list-group overflow-auto rounded-0" style="height: 100%; padding-bottom: 130px;">
-                <% quizData.forEach((question, index) => { %>
-                    <li class="list-group-item bg-primary-subtle rounded-0 mb-2">
-                        <div id="question_<%= question.id %>" class="border border-1 border-dark p-3 d-flex align-items-center justify-content-between">
-                            <strong class="w-100 d-flex align-items-center gap-1">
-                                <span id="question-index-container-<%= question.id %>">
-                                    <%=index+1%> :
-                                </span>
-                                <span data-text="question-text" id="question-text-<%= question.id %>">
-                                     <%= question.question_text %>
-                                </span>
-                            </strong>
-                            <div class="btn-group dropup">
-                                <button type="button" class="bg-transparent border-0" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li class="dropdown-item edit-question-btn" data-question-id="<%= question.id %>">Edit</li>
-                                    <li class="dropdown-item text-danger">
-                                        <form class="delete-question" data-question-id="<%= question.id %>" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions/<%= question.id %>/delete" method="post">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </li>                                    
-                                </ul>
-                            </div>
-                        </div>                    
-                        <h5 class="mt-3">Options</h5>
-                        <ul class="list-group" id="options-container-<%= question.id %>">
-                            <% question.options.forEach(option => { %>
-                                <li class="list-group-item rounded-0 d-flex align-items-center gap-1">
-                                    <!-- Ensure each question has its own radio group by using question.id -->
-                                    <input type="radio" name="question_<%= question.id %>" 
-                                           id="option_<%= option.id %>" 
-                                           value="<%= option.option_text %>" class="form-check-input">
-                                    <label for="option_<%= option.id %>"><%= option.option_text %> <%= option.is_correct ? '(Correct)' : '' %></label>
+
+<div class="col-lg-6" style="height: 90vh; overflow: hidden;">
+    <h3 class="mt-2 mb-0">New question</h3>
+    <form id="question-form" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post"
+        class="d-flex align-items-center gap-1">
+        <input type="text" id="question-text" name="question_text" class="form-control"
+            placeholder="Write Question text" required>
+        <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
+    </form>
+    <h4 class="m-0 p-0 my-2">Questions</h4>
+    <% if(quizData.length> 0) { %>
+        <ul id="questions-container" class="list-group overflow-auto rounded-0"
+            style="height: 100%; padding-bottom: 130px;">
+            <% quizData.forEach((question, index)=> { %>
+                <li class="list-group-item bg-primary-subtle rounded-0 mb-2">
+                    <div id="question_<%= question.id %>"
+                        class="border border-1 border-dark p-3 d-flex align-items-center justify-content-between">
+                        <strong class="w-100 d-flex align-items-center gap-1">
+                            <span id="question-index-container-<%= question.id %>">
+                                <%=index+1%> :
+                            </span>
+                            <span data-text="question-text" id="question-text-<%= question.id %>">
+                                <%= question.question_text %>
+                            </span>
+                        </strong>
+                        <div class="btn-group dropup">
+                            <button type="button" class="bg-transparent border-0" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item edit-question-btn" data-question-id="<%= question.id %>">
+                                    Edit</li>
+                                <li class="dropdown-item text-danger">
+                                    <form class="delete-question" data-question-id="<%= question.id %>"
+                                        action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions/<%= question.id %>/delete"
+                                        method="post">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
                                 </li>
-                            <% }) %>
-                        </ul>
-                        <% if (question.options.length <= 3) { %>
-                        <!-- Form to create an option -->
-                        <form class ="option-form" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions/<%= question.id %>/options" method="post">
-                            <input type="text" name="option_text" class="form-control mt-3" placeholder="Enter Option text" required>
+                            </ul>
+                        </div>
+                    </div>
+                    <h5 class="mt-3">Options</h5>
+                    <ul class="list-group" id="options-container-<%= question.id %>">
+                        <% question.options.forEach(option=> { %>
+                            <li class="list-group-item rounded-0 d-flex align-items-center gap-1">
+                                <input type="radio" name="question_<%= question.id %>" id="option_<%= option.id %>"
+                                    value="<%= option.option_text %>" class="form-check-input">
+                                <label for="option_<%= option.id %>">
+                                    <%= option.option_text %>
+                                    <%= option.is_correct ? '(Correct)' : '' %>
+                                </label>
+                            </li>
+                        <% }) %>
+                    </ul>
+                    <% if (question.options.length <=3) { %>
+                        <form class="option-form"
+                            action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions/<%= question.id %>/options"
+                            method="post">
+                            <input type="text" name="option_text" class="form-control mt-3"
+                                placeholder="Enter Option text" required>
                             <select name="is_correct" class="form-select mt-3">
                                 <option value="0">Incorrect</option>
                                 <option value="1">Correct</option>
@@ -82,176 +96,166 @@
                                 <button type="submit" class="btn btn-sm btn-primary mt-3">Add Option</button>
                             </div>
                         </form>
+                    <% } %>
+                </li>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <p>No questions have been created for this quiz.</p>
+        <ul id="questions-container" class="list-group overflow-auto rounded-0"  style="height: 100%; padding-bottom: 130px;"></ul>
+    <% } %>
+</div>
+
+<% if(quizResults.length> 0) {%>
+    <div class="col-lg-3">
+        <h1 class="m-0 p-0">Quiz Results</h1>
+        <table id="results-table" class="table m-0">
+            <thead class="table-dark">
+                <tr>
+                    <th class="py-0">Total Marks</th>
+                    <th class="py-0">Obtained Marks</th>
+                    <th class="py-0">Percentage (%)</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                <% quizResults.forEach((result)=> { %>
+                    <tr>
+                        <td class="py-0">
+                            <%= result.total_marks %>
+                        </td>
+                        <td class="py-0">
+                            <%= result.score %>
+                        </td>
+                        <td class="py-0">
+                            <%= ((result.score / result.total_marks) * 100).toFixed(2) %>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <h3 class="m-0">Results :</h3>
+        <ul id="results-container" class="list-group">
+            <% quizResults.forEach((result, attemptIndex)=> { %>
+                <h5 class="mt-3">Attempt <%= attemptIndex + 1 %></h5>
+                <% Object.entries(result.answers).forEach(([questionId, answerId], index)=> {
+                    const questionObj = questions.find(q => q.id == questionId);
+                    const answerObj = answers.find(a => a.id == answerId);
+                    %>
+                    <li class="list-group-item bg-transparent">
+                        <strong>#<%= index + 1 %> : <%= questionObj ? questionObj.question_text
+                                    : "Question not found" %></strong><br>
+
+                        <% if (answerObj) { %>
+                            <strong>Answer:</strong>
+                            <span class="<%= answerObj.is_correct ? 'text-success' : 'text-danger' %>">
+                                <%= answerObj.option_text %>
+                            </span>
+                        <% } else { %>
+                            <strong>Selected Answer:</strong> Not Answered
                         <% } %>
                     </li>
-                <% }) %>
-            </ul>
-            <% } else { %>
-            <p>No questions have been created for this quiz.</p>
-            <% } %>
-        </div>
-        <% if(quizResults.length > 0) {%>
-            <div class="col-lg-3">
-                <h1 class="m-0 p-0">Quiz Results</h1>
-                <table id="results-table" class="table m-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="py-0">Total Marks</th>
-                            <th class="py-0">Obtained Marks</th>
-                            <th class="py-0">Percentage (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-group-divider">
-                        <% quizResults.forEach((result) => { %>
-                            <tr>
-                                <td class="py-0"><%= result.total_marks %></td>
-                                <td class="py-0"><%= result.score %></td>
-                                <td class="py-0"><%= ((result.score / result.total_marks) * 100).toFixed(2) %></td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
-            
-                <h3 class="m-0">Results :</h3>
-                <ul id="results-container" class="list-group">
-                    <% quizResults.forEach((result, attemptIndex) => { %>
-                        <h5 class="mt-3">Attempt <%= attemptIndex + 1 %></h5>
-                        <% Object.entries(result.answers).forEach(([questionId, answerId], index) => { 
-                            const questionObj = questions.find(q => q.id == questionId);
-                            const answerObj = answers.find(a => a.id == answerId);
-                        %>
-                            <li class="list-group-item bg-transparent">
-                                <strong>#<%= index + 1 %> : <%= questionObj ? questionObj.question_text : "Question not found" %></strong><br>
-            
-                                <% if (answerObj) { %>
-                                    <strong>Answer:</strong> 
-                                    <span class="<%= answerObj.is_correct ? 'text-success' : 'text-danger' %>">
-                                        <%= answerObj.option_text %>
-                                    </span>
-                                <% } else { %>
-                                    <strong>Selected Answer:</strong> Not Answered
-                                <% } %>
-                            </li>
-                            <hr>
-                        <% }); %>
-                    <% }); %>
-                </ul>
-            </div>
-        <%}%>
-       <%}else{%>
-        <div class="col-lg-9">
-            <div class="row mt-3">
-                <div class="col-lg-8">
-                    <h3 class="mt-2 mb-0">New question</h3>
-                    <form id="question-form" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="d-flex align-items-center gap-1">
-                        <input type="text" id="question-text" name="question_text" class="form-control" placeholder="Write Question text" required>
-                        <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
-                    </form>
-                    <h4>Quizz Question Creation Video</h4>
-                    <div class="card rounded-0">
-                            <video src="/videos/question creation video.mp4" controls autoplay="true" loop class="mt-2" style="width: 100%; height: auto;"></video>
-                    </div>
-                    <p class="mt-2">Watch the video to learn how to create a quizz question and options for it.  </p>
-                </div>
-                <div class="col-lg-4">
-                    <ul id="questions-container" class="list-group overflow-auto rounded-0" style="height: 100%; padding-bottom: 80px;"></ul>
-                </div>
-            </div>      
-        </div>
-        <%}%>
-  
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Import Questions</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div id="predefined-questions-container">
-                <textarea class="form-control" style="height: 70vh;" id="predefined-questions" placeholder='Enter questions data in JSON format, e.g.:
-            [
-                {
-                    "question_text": "Sample question",
-                    "options": [
-                        {"option_text": "Option 1", "is_correct": false},
-                        {"option_text": "Option 2", "is_correct": true}
-                    ]
-                }
-            ]'></textarea>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="predefined-questions-button" class="btn btn-primary">Submit</button>
-                </div>
-            </div>
-            <div id="json-questions-container" class="mt-3"></div>
-        </div>
-      </div>
+                    <hr>
+                <% }); %>
+            <% }); %>
+        </ul>
     </div>
-  </div>
+<% } %>
 
-        <%- include('partials/_chat') %>
-        
-        <script src="/js/courseProgressBar.js"></script>
-        <script src="/js/notifications.js"></script>
-        <script src="/js/checkForDuplicate.js"></script>
-        <script src="/js/editAndDeleteQuestion.js"></script>
-        <script src="/js/quizzDataCreation.js"></script>
-        <script src="/js/refreshToken.js"></script>
-        <script type="application/json" id="quizz-data">
-            <%- JSON.stringify(quizData) %>
-        </script>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Import Questions</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="predefined-questions-container">
+                    <textarea class="form-control" style="height: 70vh;" id="predefined-questions"
+                        placeholder='Enter questions data in JSON format, e.g.:
+[
+    {
+        "question_text": "Sample question",
+        "options": [
+            {"option_text": "Option 1", "is_correct": false},
+            {"option_text": "Option 2", "is_correct": true}
+        ]
+    }
+]'></textarea>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Close</button>
+                        <button id="predefined-questions-button" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+                <div id="json-questions-container" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        <script type="application/json" id="quizz-results-data">
-            <%- JSON.stringify(quizResults) %>
-        </script>
-       <script>
-          const courseId = "<%= courseId %>"
-          const quizzId = "<%= quizzId %>";
-       </script>
-        
-        <% if(quizData.length > 0) { %>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                let questionsContainer = document.getElementById("questions-container");
-                questionsContainer.scrollTop = questionsContainer.scrollHeight;
-                const quizResults = JSON.parse(document.getElementById("quizz-results-data").textContent);
+<%- include('partials/_chat') %>
 
-                if(quizResults.length > 0) {
-                    let resultsContainer = document.getElementById("results-container");
+<script src="/js/courseProgressBar.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/checkForDuplicate.js"></script>
+<script src="/js/editAndDeleteQuestion.js"></script>
+<script src="/js/quizzDataCreation.js"></script>
+<script src="/js/refreshToken.js"></script>
+<script type="application/json" id="quizz-data">
+    <%- JSON.stringify(quizData) %>
+</script>
+
+<script type="application/json" id="quizz-results-data">
+    <%- JSON.stringify(quizResults) %>
+</script>
+<script>
+    const courseId = "<%= courseId %>"
+    const quizzId = "<%= quizzId %>";
+</script>
+
+<% if(quizData.length> 0) { %>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let questionsContainer = document.getElementById("questions-container");
+            questionsContainer.scrollTop = questionsContainer.scrollHeight;
+            const quizResults = JSON.parse(document.getElementById("quizz-results-data").textContent);
+
+            if (quizResults.length > 0) {
+                let resultsContainer = document.getElementById("results-container");
                 let resultsTable = document.getElementById("results-table");
 
                 resultsContainer.style.height = `calc(80vh - ${resultsTable.offsetHeight}px)`;
+            }
+
+            let quizData = JSON.parse(document.getElementById("quizz-data").textContent);
+
+            checkForDuplicate(quizData, document.getElementById('question-text'), "question text", 'question_text', document.getElementById('createBtn'), "Question");
+
+            document.querySelectorAll('form[action*="/options"]').forEach(form => {
+                let optionInput = form.querySelector('input[name="option_text"]');
+                let submitButton = form.querySelector('button[type="submit"]');
+
+                if (optionInput) {
+                    optionInput.addEventListener('input', () => {
+                        const questionId = form.action.split('/').slice(-2, -1)[0]; // Extract question ID
+                        const question = quizData.find(q => q.id == questionId);
+
+                        if (question) {
+                            checkForDuplicate(question.options, optionInput, "option text", 'option_text', submitButton, "Option");
+                        }
+                    });
                 }
-                
-            
-                let quizData = JSON.parse(document.getElementById("quizz-data").textContent);
-                
-                checkForDuplicate(quizData, document.getElementById('question-text'), "question text", 'question_text', document.getElementById('createBtn'), "Question");
-            
-                document.querySelectorAll('form[action*="/options"]').forEach(form => {
-                    let optionInput = form.querySelector('input[name="option_text"]');
-                    let submitButton = form.querySelector('button[type="submit"]');
-                    
-                    if (optionInput) {
-                        optionInput.addEventListener('input', () => {
-                            const questionId = form.action.split('/').slice(-2, -1)[0]; // Extract question ID
-                            const question = quizData.find(q => q.id == questionId);
-                            
-                            if (question) {
-                                checkForDuplicate(question.options, optionInput, "option text" ,'option_text', submitButton, "Option");
-                            }
-                        });
-                    }
-                });
             });
-        </script>
-         <% if(quizResults.length > 0){%>
-         <script src="/js/graph.js"></script>
-         <% } %>
-        <%}%>
+        });
+    </script>
+    <% if(quizResults.length> 0){ %>
+        <script src="/js/graph.js"></script>
+    <% } %>
+<% } %>
 
-        <script src="/js/createQuestionAndOptions.js"></script>
+<script src="/js/createQuestionAndOptions.js"></script>
 
-    <%- include('partials/_footer') %>
+<%- include('partials/_footer') %>
