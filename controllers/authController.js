@@ -27,7 +27,7 @@ const login = async (req, res) => {
     if (!user) {
         return res.status(400).json({ message: 'Invalid credentials' });
     }
-
+    
     // Compare passwords
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -38,7 +38,6 @@ const login = async (req, res) => {
     
     const sessionId = Date.now().toString();
     new Date().getTime()
-   console.log(sessionId);
     // Set the session ID in a cookie
     res.cookie('sessionId', sessionId, { httpOnly: true, secure: true, sameSite: 'strict' });
     // Set the token in a cookie
@@ -67,7 +66,6 @@ const refreshToken = async (req, res) => {
             secure: true, 
             sameSite: 'strict' 
         });
-        console.log("token newed :",newToken)
         res.json({ success: true });
     } catch (err) {
         return res.status(401).json({ message: 'Invalid token' });

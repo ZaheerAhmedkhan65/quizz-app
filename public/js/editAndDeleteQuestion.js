@@ -4,7 +4,7 @@ document.querySelectorAll(".delete-question").forEach(form => {
 
         const questionId = this.getAttribute("data-question-id");
         const actionUrl = this.getAttribute("action"); // Get API endpoint
-        console.log(actionUrl);
+        
         const response = await fetch(actionUrl, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -12,7 +12,6 @@ document.querySelectorAll(".delete-question").forEach(form => {
         });
 
         if (response.ok) {
-            console.log("Question deleted successfully");
             document.getElementById(`question_${questionId}`).closest("li").remove(); // Correct selector
         } else {
             const result = await response.json();

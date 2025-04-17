@@ -11,7 +11,11 @@ require("dotenv").config();
 
 // Configure multer for file upload (memory storage)
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+});
+
 
 // Google Gemini setup
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -29,6 +33,11 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
+    const MAX_SIZE = 2 * 1024 * 1024;
+    if (req.file.size > MAX_SIZE) {
+      return res.status(400).json({ message: "File size exceeds 2MB limit" });
+    }
+
     // Extract PDF content
     const dataBuffer = req.file.buffer;
     const pdfData = await pdfParse(dataBuffer);
@@ -36,8 +45,6 @@ router.post("/upload", upload.single("file"), async (req, res) => {
     // Generate a unique ID for this session
     const id = uuidv4();
     pdfCache.set(id, pdfData.text);
-
-    console.log("PDF uploaded. ID:", id);
     res.json({ id });
   } catch (err) {
     console.error("Error during upload:", err);
@@ -63,7 +70,7 @@ router.post("/generate-response", async (req, res) => {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     const result = await model.generateContent([userPrompt]);
     const response = result.response.text();
-    console.log("user id: ", userId)
+    
     // Save chat history
     await ChatHistory.saveChatHistory({ userId, sessionId, prompt, response, isPdfBased, pdfId: isPdfBased ? currentPdfId : null });
 
@@ -85,5 +92,16 @@ router.get("/get-chat", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+router.delete("/delete-chat", async (req, res) => {
+  try {
+    await ChatHistory.deleteChatById(req.query.id); // not req.params
+    res.json({ message:"chat deleted successfully." });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 module.exports = router;

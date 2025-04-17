@@ -1,0 +1,102 @@
+[
+  {
+    "id": 240001,
+    "question_text": "Why is the study of data structures important?",
+    "options": [
+      { "option_text": "It helps in learning programming languages", "is_correct": 0 },
+      { "option_text": "It improves the efficiency of algorithms", "is_correct": 1 },
+      { "option_text": "It increases the CPU speed", "is_correct": 0 },
+      { "option_text": "It reduces disk space", "is_correct": 0 }
+    ]
+  },
+  {
+    "id": 240002,
+    "question_text": "What is the primary focus of the Data Structures course?",
+    "options": [
+      { "option_text": "Learning programming languages", "is_correct": 0 },
+      { "option_text": "Understanding database management", "is_correct": 0 },
+      { "option_text": "Organizing and structuring data efficiently", "is_correct": 1 },
+      { "option_text": "Operating system development", "is_correct": 0 }
+    ]
+  },
+  {
+    "id": 240003,
+    "question_text": "Which of the following is NOT a commonly used data structure?",
+    "options": [
+      { "option_text": "Arrays", "is_correct": 0 },
+      { "option_text": "Linked lists", "is_correct": 0 },
+      { "option_text": "Compilers", "is_correct": 1 },
+      { "option_text": "Graphs", "is_correct": 0 }
+    ]
+  },
+  {
+    "id": 240004,
+    "question_text": "What is the main consideration when selecting a data structure?",
+    "options": [
+      { "option_text": "The programming language being used", "is_correct": 0 },
+      { "option_text": "The size of the data", "is_correct": 0 },
+      { "option_text": "The operations required on the data", "is_correct": 0 },
+      { "option_text": "Both b and c", "is_correct": 1 }
+    ]
+  },
+  {
+    "id": 240005,
+    "question_text": "What does 'organizing the data' mean in terms of data structures?",
+    "options": [
+      { "option_text": "Sorting data in ascending order", "is_correct": 0 },
+      { "option_text": "Arranging data in a way that is easily accessible", "is_correct": 1 },
+      { "option_text": "Storing data on external hard drives", "is_correct": 0 },
+      { "option_text": "Compressing data files", "is_correct": 0 }
+    ]
+  },
+  {
+    "id": 240006,
+    "question_text": "Which of the following data structures allows random access to its elements?",
+    "options": [
+      { "option_text": "Array", "is_correct": 1 },
+      { "option_text": "Linked List", "is_correct": 0 },
+      { "option_text": "Stack", "is_correct": 0 },
+      { "option_text": "Queue", "is_correct": 0 }
+    ]
+  },
+  {
+    "id": 240007,
+    "question_text": "Which statement is TRUE about an efficient data structure?",
+    "options": [
+      { "option_text": "It always requires more memory", "is_correct": 0 },
+      { "option_text": "It minimizes the execution time of operations", "is_correct": 1 },
+      { "option_text": "It is only useful for small datasets", "is_correct": 0 },
+      { "option_text": "It can replace the need for algorithms", "is_correct": 0 }
+    ]
+  },
+  {
+    "id": 240008,
+    "question_text": "Which of the following factors is considered when choosing a data structure?",
+    "options": [
+      { "option_text": "Space required for storage", "is_correct": 0 },
+      { "option_text": "Time required to perform operations", "is_correct": 0 },
+      { "option_text": "Programming effort required", "is_correct": 0 },
+      { "option_text": "All of the above", "is_correct": 1 }
+    ]
+  },
+  {
+    "id": 240009,
+    "question_text": "What is the role of an array in data structures?",
+    "options": [
+      { "option_text": "To store a collection of elements of the same type", "is_correct": 1 },
+      { "option_text": "To process data in a random order", "is_correct": 0 },
+      { "option_text": "To hold data in non-contiguous memory locations", "is_correct": 0 },
+      { "option_text": "To store only integers", "is_correct": 0 }
+    ]
+  },
+  {
+    "id": 240010,
+    "question_text": "Which data structure is best suited for dynamic memory allocation?",
+    "options": [
+      { "option_text": "Arrays", "is_correct": 0 },
+      { "option_text": "Linked Lists", "is_correct": 1 },
+      { "option_text": "Stacks", "is_correct": 0 },
+      { "option_text": "Queues", "is_correct": 0 }
+    ]
+  }
+]

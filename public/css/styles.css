@@ -317,7 +317,8 @@ svg {
 
 .chat-history-container{
     height: 70vh;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .getting-response {

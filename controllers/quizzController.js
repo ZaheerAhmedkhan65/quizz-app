@@ -23,7 +23,6 @@ const showQuizz = async (req, res) => {
 
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
         const quizResults = await QuizResult.findByQuizId(req.params.id);
-        console.log(quizz);
         let questions = [];
         let answers = [];
         let percentage = 0;
@@ -46,7 +45,7 @@ const showQuizz = async (req, res) => {
                            quizResults.reduce((sum, res) => sum + res.total_marks, 0)) * 100).toFixed(2);
         }
 
-        console.log(percentage)
+
 
         let sessionId = req.cookies.sessionId;
 
@@ -63,7 +62,9 @@ const showQuizz = async (req, res) => {
             answers, 
             percentage,
             sessionId,
-            chatHistory
+            chatHistory,
+            courseId: req.params.course_id,
+            quizzId: req.params.id
         });
 
     } catch (err) {
@@ -101,9 +102,6 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        console.log("updateing quizz")
-        console.log(req.params.id);
-        console.log(req.body.title);
         await Quizz.update(req.params.id, req.body.title);
         res.status(200).json({ message: "Quizz updated successfully", title: req.body.title });
     } catch (err) {
@@ -153,8 +151,6 @@ const updateQuestion =  async (req, res) => {
 
 const deleteQuestion = async (req, res) => {
     try {
-        console.log("callled delete question");
-        console.log(req.body.id);
         await Question.delete(req.body.id);
         await Option.deleteByQuestionId(req.body.id);
         res.status(200).json({ success: true, message: "Question deleted successfully" });
@@ -166,9 +162,6 @@ const deleteQuestion = async (req, res) => {
 
 const createOption = async (req, res) => {
     try {
-
-        console.log("create option",req.body);
-        console.log("question id",req.params.question_id);
         const option = await Option.create(
             req.body.option_text,
             req.params.question_id,
@@ -194,7 +187,6 @@ const takeQuizz = async (req, res) => {
         const quizz = await Quizz.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-        console.log("quizz in take quizzz: ",quizz)
         res.status(200).render('takeQuizz', { quizz, title: quizz.title,quizData,course,user:req.user });
     } catch (err) {
         res.status(500).json({ message: err.message });

@@ -7,9 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let questionsNavigationContainer = document.querySelector("#questions-navigation-container");
     let totalTime = quizData.length * 60;
     let timerInterval;
-    console.log(courseId);
-    console.log(quizzId);
-    console.log(userId);
+   
     function calculateTime() {
         let minutes = Math.floor(totalTime / 60);
         let seconds = totalTime % 60;

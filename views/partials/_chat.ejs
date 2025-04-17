@@ -160,14 +160,20 @@
     <ul class="chat-history-container list-group">
       <% chatHistory.forEach(chat => { %>
         <li 
-          data-id="<%= chat.id %>"
-          class="list-group-item list-group-item-primary list-group-item-action border-0 mb-1 rounded p-2 chat-history-item d-flex align-items-center justify-content-between"
-        >
-          <div style="width: 90%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;border: 1px solid transparent;" >
+          class="list-group-item list-group-item-primary list-group-item-action border-0 mb-1 rounded p-2 d-flex align-items-center justify-content-between"
+        >  
+        <div data-id="<%= chat.id %>" style="width: 85%;" class="chat-history-item">
+          <div style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;border: 1px solid transparent;" >
             <%= chat.prompt %>
           </div>
-          <div class="">
-            <i class="bi bi-three-dots"></i>
+        </div>
+          <div class="btn-group dropend">
+            <button type="button" class="dropdown-item" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu">
+                <li class="dropdown-item delete-chat-btn" data-id="<%= chat.id %>" id="delete_chat_btn_<%= chat.id %>">Delete</li>
+            </ul>
           </div>
         </li>
       <% }) %>

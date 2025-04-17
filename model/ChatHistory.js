@@ -25,6 +25,11 @@ class ChatHistory {
         return rows;
     }
 
+    static async deleteChatById(id){
+        const [rows] = await db.query('DELETE FROM chat_history WHERE id = ?', [id]);
+        return rows;
+    }
+
 }
 
 module.exports = ChatHistory;

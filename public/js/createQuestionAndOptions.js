@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const text = await response.text();
-            console.log("Response Text:", text);
 
             const data = JSON.parse(text);
             if (data.success && data.question) {
@@ -78,7 +77,6 @@ function attachOptionFormListener(form) {
             });
 
             const text = await response.text();
-            console.log("Response Text:", text);
             const data = JSON.parse(text);
 
             if (data.success && data.option) {

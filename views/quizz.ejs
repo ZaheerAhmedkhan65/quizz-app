@@ -1,20 +1,8 @@
 <%- include('partials/_header') %>
     
         <div class="col-lg-3">
-                <h4 class="mt-2 mb-0">Create new question</h4>
-                <form id="question-form" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="d-flex align-items-center gap-1">
-                    <input type="text" id="question-text" name="question_text" class="form-control" placeholder="Enter Question text" required>
-                    <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
-                </form>
-                <% if(quizData.length > 0 && quizResults.length > 0) { %>
-                <h3 class="mt-3">Quizz Attempt Stats</h3>
-                <div id="graph"></div>
-                <% } %>
-        </div>
-        <%if(quizData.length > 0){%>
-        <div class="col-lg-6" style="height: 90vh; overflow: hidden;">
             <div class="d-flex align-items-center justify-content-between">
-                <h1 style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="m-0 p-0"><%= quizz.title %></h1>
+                <h2 style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" class="m-0 p-0"><%= quizz.title %></h2>
                 <% if (quizData.length > 0 && quizResults.length < 5) { %>
                     <a class="btn btn-sm btn-success my-3" href="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/take">
                         <%= quizResults.length > 0 ? 'Retake Quiz' : 'Take Quiz' %>
@@ -24,9 +12,27 @@
             <div class="progress-bar-container mb-2">
                 <div class="progress-bar-fill" data-progress="<%= quizz.quizz_progress %>"></div>
             </div>
-            <h1 class="m-0 p-0 mb-3">Questions</h1>
+                <% if(quizData.length > 0 && quizResults.length > 0) { %>
+                <strong class="mt-3">Progress Garph</strong>
+                <div id="graph"></div>
+                <% } %>
+                
+<div class="mt-2">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        import data
+      </button>
+</div>
+        </div>
+        <%if(quizData.length > 0){%>
+        <div class="col-lg-6" style="height: 90vh; overflow: hidden;">
+            <h3 class="mt-2 mb-0">New question</h3>
+            <form id="question-form" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="d-flex align-items-center gap-1">
+                <input type="text" id="question-text" name="question_text" class="form-control" placeholder="Write Question text" required>
+                <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
+            </form>
+            <h4 class="m-0 p-0 my-2">Questions</h4>
             <% if(quizData.length > 0) { %>
-            <ul id="questions-container" class="list-group overflow-auto rounded-0" style="height: 100%; padding-bottom: 80px;">
+            <ul id="questions-container" class="list-group overflow-auto rounded-0" style="height: 100%; padding-bottom: 130px;">
                 <% quizData.forEach((question, index) => { %>
                     <li class="list-group-item bg-primary-subtle rounded-0 mb-2">
                         <div id="question_<%= question.id %>" class="border border-1 border-dark p-3 d-flex align-items-center justify-content-between">
@@ -136,6 +142,11 @@
         <div class="col-lg-9">
             <div class="row mt-3">
                 <div class="col-lg-8">
+                    <h3 class="mt-2 mb-0">New question</h3>
+                    <form id="question-form" action="/api/courses/<%= course.id %>/quizzes/<%= quizz.id %>/questions" method="post" class="d-flex align-items-center gap-1">
+                        <input type="text" id="question-text" name="question_text" class="form-control" placeholder="Write Question text" required>
+                        <button type="submit" id="createBtn" class="btn btn-sm btn-primary">Create</button>
+                    </form>
                     <h4>Quizz Question Creation Video</h4>
                     <div class="card rounded-0">
                             <video src="/videos/question creation video.mp4" controls autoplay="true" loop class="mt-2" style="width: 100%; height: auto;"></video>
@@ -148,6 +159,37 @@
             </div>      
         </div>
         <%}%>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Import Questions</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div id="predefined-questions-container">
+                <textarea class="form-control" style="height: 70vh;" id="predefined-questions" placeholder='Enter questions data in JSON format, e.g.:
+            [
+                {
+                    "question_text": "Sample question",
+                    "options": [
+                        {"option_text": "Option 1", "is_correct": false},
+                        {"option_text": "Option 2", "is_correct": true}
+                    ]
+                }
+            ]'></textarea>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="predefined-questions-button" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+            <div id="json-questions-container" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
         <%- include('partials/_chat') %>
         
@@ -155,6 +197,7 @@
         <script src="/js/notifications.js"></script>
         <script src="/js/checkForDuplicate.js"></script>
         <script src="/js/editAndDeleteQuestion.js"></script>
+        <script src="/js/quizzDataCreation.js"></script>
         <script src="/js/refreshToken.js"></script>
         <script type="application/json" id="quizz-data">
             <%- JSON.stringify(quizData) %>
@@ -163,7 +206,10 @@
         <script type="application/json" id="quizz-results-data">
             <%- JSON.stringify(quizResults) %>
         </script>
-    
+       <script>
+          const courseId = "<%= courseId %>"
+          const quizzId = "<%= quizzId %>";
+       </script>
         
         <% if(quizData.length > 0) { %>
         <script>

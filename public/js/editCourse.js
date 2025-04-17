@@ -66,8 +66,7 @@ document.querySelectorAll('.delete-course-btn').forEach(form => {
 
             const courseId = this.getAttribute("data-course-id");
             const actionUrl = this.getAttribute("action"); // Get API endpoint
-            console.log(actionUrl);
-            console.log(courseId)
+           
             const response = await fetch(actionUrl, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
@@ -75,7 +74,6 @@ document.querySelectorAll('.delete-course-btn').forEach(form => {
             });
         
             if (response.ok) {
-                console.log("Course deleted successfully");
                 document.getElementById(`course_${courseId}`).closest("li").remove(); // Correct selector
             } else {
                 const result = await response.json();

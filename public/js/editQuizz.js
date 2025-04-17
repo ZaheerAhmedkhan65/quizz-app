@@ -92,7 +92,7 @@ document.querySelectorAll(".delete-quizz-btn").forEach(form => {
 
         const quizzId = this.getAttribute("data-quizz-id");
         const actionUrl = this.getAttribute("action"); // Get API endpoint
-        console.log(actionUrl);
+       
         const response = await fetch(actionUrl, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -100,7 +100,6 @@ document.querySelectorAll(".delete-quizz-btn").forEach(form => {
         });
         
         if (response.ok) {
-            console.log("Quizz deleted successfully");
             document.getElementById(`quizz_${quizzId}`).closest("li").remove(); // Correct selector
         } else {
             const result = await response.json();

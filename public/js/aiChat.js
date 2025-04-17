@@ -460,8 +460,6 @@ chatItems.forEach(item => {
         let chatId = item.getAttribute("data-id");
 
         try {
-            console.log("Clicked chat with session ID:", chatId);
-
             const response = await fetch(`/api/gemini/get-chat?id=${encodeURIComponent(chatId)}`, {
                 method: "GET",
                 headers: {
@@ -484,3 +482,36 @@ chatItems.forEach(item => {
         }
     });
 });
+
+
+
+
+document.querySelectorAll(".delete-chat-btn").forEach(button => {
+    button.addEventListener("click", async (e) => {
+      e.stopPropagation(); // Prevents triggering parent click (like loading chat)
+  
+      const chatId = button.getAttribute("data-id");
+  
+      try {
+        const response = await fetch(`/api/gemini/delete-chat?id=${encodeURIComponent(chatId)}`, {
+          method: "DELETE",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+  
+        if (!response.ok) throw new Error("Network response was not ok");
+  
+        const data = await response.json();
+  
+        // Remove the whole list item (the <li> element)
+            // Now correctly remove the parent chat item
+      const listItem = button.closest(".list-group-item");
+      if (listItem) listItem.remove();
+  
+      } catch (err) {
+        console.error("Delete error:", err);
+      }
+    });
+  });
+  

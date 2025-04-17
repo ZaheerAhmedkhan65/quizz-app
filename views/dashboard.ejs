@@ -1,22 +1,16 @@
 <%- include('partials/_header') %>
     
         <div class="col-lg-3 d-flex flex-column">
-                <h4 class="mt-2 mb-0">Create new course</h4>
-                <form action="/api/courses" method="post" class="d-flex align-items-center gap-1">
-                    <input type="hidden" name="user_id" value="<%= user.userId %>">
-                    <input type="text" id="title" name="title" placeholder="Enter course title" class="form-control" required>
-                    <input type="submit" id="createBtn" class="btn btn-sm btn-primary" value="create">
-                </form>
-                <h4 class="mt-3">Courses</h4>
+                <h4 class="m-0 mt-3">Courses</h4>
                 <% if(courses.length >0){%>
                 <ul class="list-group mt-2">
                     <% courses.forEach(course => { 
                         let courseProgress = progress.find(p => p.course_id === course.id);
                     %>
                         <li id="course_<%= course.id %>" class="list-group-item bg-primary-subtle rounded-0 mb-1 d-flex justify-content-between align-items-center">
-                            <span class="w-100" id="course_<%= course.id %>_">
+                            <span class="w-75" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="course_<%= course.id %>_">
                                 <a href="/api/courses/<%= course.id %>" class="text-decoration-none text-dark">
-                                    <strong style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-title ="course-title"><%= course.title %></strong>
+                                    <strong style="" data-title ="course-title"><%= course.title %></strong>
                                 </a>
                             </span>
                             <% if(courseProgress) { %>
@@ -54,6 +48,12 @@
         <div class="col-lg-9">
             <div class="row mt-3">
                 <div class="col-lg-8">
+                    <h4 class="mt-2 mb-0"> New course</h4>
+                    <form action="/api/courses" method="post" class="d-flex align-items-center gap-1">
+                        <input type="hidden" name="user_id" value="<%= user.userId %>">
+                        <input type="text" id="title" name="title" placeholder="Enter course title" class="form-control" required>
+                        <input type="submit" id="createBtn" class="btn btn-sm btn-primary" value="create">
+                    </form>
                     <% if(courses.length === 0) {%>
                     <h4>Course Creation Video</h4>
                     <div class="card rounded-0">
