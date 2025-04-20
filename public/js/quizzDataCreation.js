@@ -223,3 +223,18 @@ function createToastContainer() {
     document.body.appendChild(container);
     return container;
 }
+
+
+const copyFormateBtn = document.getElementById("copyFormate");
+copyFormateBtn.addEventListener("click",copyToClipboard);
+
+function copyToClipboard() {
+    const text = document.getElementById('predefined-questions-formate').value;
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        showNotification('Text copied to clipboard!')
+      })
+      .catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+  }

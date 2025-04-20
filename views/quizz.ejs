@@ -185,6 +185,19 @@
     }
 ]'></textarea>
                     <div class="modal-footer">
+                        <input type="hidden" id="predefined-questions-formate" value='
+                    [
+                        {
+                            "question_text": "Sample question",
+                            "options": [
+                                {"option_text": "Option 1", "is_correct": false},
+                                {"option_text": "Option 2", "is_correct": true}
+                            ]
+                        }
+                    ]'>
+                        <button id="copyFormate" type="button" class="btn btn-success">
+                            Copy Text Format
+                        </button>
                         <button type="button" class="btn btn-secondary"
                             data-bs-dismiss="modal">Close</button>
                         <button id="predefined-questions-button" class="btn btn-primary">Submit</button>
