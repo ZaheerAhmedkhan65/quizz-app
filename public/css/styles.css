@@ -150,7 +150,7 @@ svg {
 }
 
 .ask-ai-chat-modal.open.expanded {
-    width: calc(100% - 3rem);
+    width: calc(100% - 3rem) !important;
 }
 
 .ask-ai-chat-modal {
@@ -158,7 +158,7 @@ svg {
     position: fixed;
     right: 0;
     top: 0;
-    width: 400px !important;
+    width: 400px;
     border-radius: 10px;
     max-width: 100%;
     z-index: 1046;
@@ -269,6 +269,7 @@ svg {
     display: flex;
     flex-direction: column;
     background-color: #9ab3d9e6;
+    max-width: 600px;
 }
 
 .chat-messages {
@@ -453,6 +454,10 @@ svg {
 
 .chat-input-wrapper {
     padding: 10px 10px 0px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .chat-input-actions {
@@ -534,7 +539,7 @@ code {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 95%;
+    max-width: 400px;
     width: 100%;
 }
 
@@ -651,15 +656,13 @@ code {
     }
 }
 
-.chat-input-wrapper {
-    position: relative;
-}
-
 .file-info-container {
     margin: 5px 0px;
-    width: 60%;
     position: absolute;
     top: -55px;
+    width: 100%;
+    max-width: 600px;
+    padding: 0px 12px;
 }
 
 .file-info {
@@ -671,6 +674,7 @@ code {
     padding: 8px 12px;
     border-radius: 10px;
     position: relative;
+    max-width: 68%;
 }
 
 .file-name {

@@ -121,10 +121,14 @@ clearChatBtn.addEventListener("click", () => {
 
 expandChatBtn.addEventListener("click", () => {
     expandChat();
+    shrinkChatBtn.classList.remove("d-none");
+    expandChatBtn.classList.add("d-none");
 });
 
 shrinkChatBtn.addEventListener("click", () => {
     shrinkChat();
+    expandChatBtn.classList.remove("d-none");
+    shrinkChatBtn.classList.add("d-none");
 });
 
 
@@ -207,7 +211,8 @@ function expandChat() {
 }
 
 function shrinkChat() {
-    // shrink chat
+    // shrink chat  
+    chatModal.classList.remove("expanded");
 }
 
 // Modify the fetchGeminiResponse function
