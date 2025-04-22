@@ -125,7 +125,7 @@ const login = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error logging in' });
-    }
+    }co
 }
 
 const forgotPassword = async (req, res) => {

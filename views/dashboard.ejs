@@ -93,10 +93,10 @@
     try {
         const flashData = JSON.parse(document.getElementById('flash-data').textContent);
         if (flashData.error) {
-            showNotification(flashData.error[0], 'error');
+            showNotification(flashData.error[0] || '', 'error');
         }
         if (flashData.success) {
-            showNotification(flashData.success[0], 'success');
+            showNotification(flashData.success[0] || 'welcome to your dashboard', 'success');
         }
     } catch (e) {
         console.log('No flash messages to display');
