@@ -5,5 +5,13 @@ function showNotification(message, type='success') {
     document.body.appendChild(notification);
     setTimeout(() => {
         notification.remove();
-    }, 5000);
+    }, 3000);
+}
+
+
+const notification = document.querySelector('.notification');
+if (notification) {
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
 }

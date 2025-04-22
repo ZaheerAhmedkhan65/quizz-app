@@ -1,6 +1,7 @@
 <%- include('partials/_header') %>
-    <div class="row">
-            <div class="col-lg-6 d-flex justify-content-center">
+<%- include('partials/_flash') %>
+    <div class="row justify-content-center align-items-center">
+            <div class="col-lg-6">
                 <div class="col-lg-6 mt-5">
                     <h4>Log in</h4>
                     <form action="/auth/login" method="post">
@@ -17,46 +18,17 @@
                             </div>
                         </div>
                         <input type="submit" class="btn btn-sm btn-primary" value="Log in">
-                        <a class="mt-3 text-decoration-none text-dark d-block" href="/auth/create-account">
-                            Don't have an account?
-                            <span class="text-primary">Create one</span>
-                        </a>
                         <a class="mt-3 text-decoration-none text-dark d-block" href="/auth/forgot-password">
                             Forgot password?
                             <span class="text-primary">Reset</span>
                         </a>
+                        <a class="mt-1 text-decoration-none text-dark d-block" href="/auth/create-account">
+                            Don't have an account?
+                            <span class="text-primary">Create one</span>
+                        </a>
                     </form>
                 </div>
             </div>
-            <div class="col-lg-6 d-flex justify-content-start">
-                <div class="col-lg-10 mt-5">
-                    <h4>Instruction Video</h4>
-                    <div class="card rounded-0">
-                        <video src="/videos/quizz attempt video.mp4" controls autoplay="true" loop class="mt-2" style="width: 100%; height: auto;"></video>
-                    </div>
-                </div>
-            </div>
     </div>
-    <script type="application/json" id="flash-data">
-        <%- JSON.stringify({
-            error: messages.error || null,
-            success: messages.success || null
-        }) %>
-    </script>
-    
-    <script>
-        try {
-            const flashData = JSON.parse(document.getElementById('flash-data').textContent);
-            if (flashData.error) {
-                showNotification(flashData.error[0], 'error');
-            }
-            if (flashData.success) {
-                showNotification(flashData.success[0], 'success');
-            }
-        } catch (e) {
-            console.log('No flash messages to display');
-        }
-    </script>
-    <script src="/js/notifications.js"></script>
     <script src="/js/showPassword.js"></script>
 <%- include('partials/_footer') %>

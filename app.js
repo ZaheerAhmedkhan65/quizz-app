@@ -15,26 +15,46 @@ app.use(express.static('views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
     secret: process.env.SECRET_KEY || 'fallback-secret-key-for-development-only',
-    resave: false,
-    saveUninitialized: false, // Changed to false for GDPR compliance
+    resave: true,  // Changed from false to true
+    saveUninitialized: true,  // Changed from false to true
     cookie: { 
-        secure: process.env.NODE_ENV === 'production', // true in production
+        secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000
     },
-    store: process.env.NODE_ENV === 'production' ? new (require('connect-pg-simple')(session))() : null // For production
+    store: process.env.NODE_ENV === 'production' 
+        ? new (require('connect-pg-simple')(session))() 
+        : new (require('memorystore')(session))({
+            checkPeriod: 86400000
+        })
 }));
+
+app.use((req, res, next) => {
+    console.log('Session ID:', req.sessionID);
+    console.log('Session data:', req.session);
+    next();
+});
 
   // Flash middleware
 app.use(flash());
 
 // Make flash messages available to all views
+// Replace your current flash middleware with this:
 app.use((req, res, next) => {
-  res.locals.messages = {
-      error: req.flash('error'),
-      success: req.flash('success')
-  };
-  next();
+    // Store the flash messages before they're consumed
+    const flashMsgs = {
+        success: req.flash('success'),
+        error: req.flash('error')
+    };
+    
+    // Make available to templates
+    res.locals.success_msg = flashMsgs.success;
+    res.locals.error_msg = flashMsgs.error;
+    
+    // Debug output
+    console.log('Flash messages being passed to view:', flashMsgs);
+    
+    next();
 });
 
 app.set('public', path.join(__dirname, 'public'));

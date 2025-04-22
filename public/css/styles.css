@@ -145,6 +145,7 @@ svg {
     color: white;
     border-radius: 4px;
     z-index: 9999;
+    width: fit-content !important;
 }
 
 .notification.success {
