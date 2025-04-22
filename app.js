@@ -50,10 +50,6 @@ app.use((req, res, next) => {
     // Make available to templates
     res.locals.success_msg = flashMsgs.success;
     res.locals.error_msg = flashMsgs.error;
-    
-    // Debug output
-    console.log('Flash messages being passed to view:', flashMsgs);
-    
     next();
 });
 
