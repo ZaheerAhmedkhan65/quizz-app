@@ -6,6 +6,7 @@ const questionDataMap = new Map();
 submitButton.addEventListener("click", () => {
    
     const predefinedQuestionsText = document.getElementById("predefined-questions").value;
+    if(predefinedQuestionsText === '') return showNotification('Please enter some questions data in JSON format.');
     const predefinedQuestionsContainer = document.getElementById("predefined-questions-container");
     predefinedQuestionsContainer.remove();
     try {

@@ -82,6 +82,25 @@
             checkForDuplicate(courses, title,'title','title', createBtn, "Course");
         });
     </script>
+ <script type="application/json" id="flash-data">
+    <%- JSON.stringify({
+        error: messages.error || null,
+        success: messages.success || null
+    }) %>
+</script>
 
+<script>
+    try {
+        const flashData = JSON.parse(document.getElementById('flash-data').textContent);
+        if (flashData.error) {
+            showNotification(flashData.error[0], 'error');
+        }
+        if (flashData.success) {
+            showNotification(flashData.success[0], 'success');
+        }
+    } catch (e) {
+        console.log('No flash messages to display');
+    }
+</script>
     <script src="/js/editCourse.js"></script>
 <%- include('partials/_footer') %>

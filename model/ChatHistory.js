@@ -17,7 +17,8 @@ class ChatHistory {
                                         VALUES (?, ?, ?, ?, ?, ?)`, 
                                         [userId, sessionId, prompt, response, isPdfBased, pdfId]
                                     );
-        return rows[0];
+        const [chatHistory] = await db.query('SELECT * FROM chat_history WHERE id = ?', [rows.insertId]);
+        return chatHistory[0];
     }
 
     static async getUserChatHistory(userId) {
@@ -28,6 +29,16 @@ class ChatHistory {
     static async deleteChatById(id){
         const [rows] = await db.query('DELETE FROM chat_history WHERE id = ?', [id]);
         return rows;
+    }
+
+    static async saveFeedback({ chatHistoryId, liked = 0, disliked = 0 }) {
+        const [result] = await db.query(
+            `UPDATE chat_history 
+             SET liked = ?, disliked = ? 
+             WHERE id = ?`,
+            [liked, disliked, chatHistoryId]
+        );
+        return result;
     }
 
 }

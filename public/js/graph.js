@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (dataPoints.length > 0) {
         ctx.beginPath();
-        ctx.strokeStyle = "rgb(13, 110, 253)";
+        ctx.strokeStyle = "#8338EC";
         for (let i = 0; i < dataPoints.length; i++) {
             let x = 30 + (i + 1) * 35;
             let y = 220 - (dataPoints[i] * 2);

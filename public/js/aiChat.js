@@ -252,7 +252,7 @@ async function fetchGeminiResponse(prompt, controller) {
         setTimeout(() => {
             gettingResponse.remove();
             const formattedResponse = generateFormattedResponse(data.response);
-            addMessageToChat(formattedResponse, aiMessage);
+            addMessageToChat(formattedResponse, aiMessage, data.chatHistory);
             chatMessages.appendChild(aiMessage);
         }, 3000);
     } catch (error) {
@@ -288,9 +288,18 @@ async function fetchGeminiResponse(prompt, controller) {
 }
 
 
-function addMessageToChat(message, aiMessage) {
+function addMessageToChat(message, aiMessage, chatHistory) {
     // Set the appropriate classes for the AI message
     aiMessage.classList.add('ai-message');
+    const feedbackContainer = document.createElement('div');
+    feedbackContainer.innerHTML = `
+        <div class="d-flex align-items-center justify-content-end gap-2">
+            <button data-id="${chatHistory.id}_like" class="${chatHistory.liked ? 'selected' : ''} feedback-btn "><i class="bi bi-hand-thumbs-up"></i></button>
+            <button data-id="${chatHistory.id}_dislike" class="${chatHistory.disliked ? 'selected' : ''} feedback-btn"><i class="bi bi-hand-thumbs-down"></i></button>
+        </div>
+    `;
+    feedbackContainer.classList.add('feedback-container');
+    aiMessage.appendChild(feedbackContainer);
 
     // Create message wrapper and content elements
     const messageWrapper = document.createElement('div');
@@ -478,7 +487,8 @@ chatItems.forEach(item => {
             const aiMessage = document.createElement('div');
             writeUserMessage(data.chat.prompt)
             const formattedResponse = generateFormattedResponse(data.chat.response);
-            addMessageToChat(formattedResponse, aiMessage);
+            
+            addMessageToChat(formattedResponse, aiMessage, data.chat);
             chatMessages.appendChild(aiMessage);
 
             // You can now render this data in your chat view
@@ -488,6 +498,56 @@ chatItems.forEach(item => {
     });
 });
 
+
+document.addEventListener("click", async (event) => {
+    const button = event.target.closest("button");
+    if (!button) return;
+    
+    const dataId = button.getAttribute("data-id");
+    if (!dataId) return; // Skip if no data-id
+    
+    // Only proceed for like/dislike buttons
+    if (!dataId.includes('_like') && !dataId.includes('_dislike')) return;
+
+    const [chatHistoryId, action] = dataId.split("_");
+    const liked = action === "like" ? 1 : 0;
+    const disliked = action === "dislike" ? 1 : 0;
+
+    try {
+        const response = await fetch("/api/gemini/save-feedback", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                chatHistoryId: parseInt(chatHistoryId),
+                liked,
+                disliked
+            }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Visual feedback
+            button.classList.add("active-feedback");
+            setTimeout(() => button.classList.remove("active-feedback"), 1000);
+            
+            // Update UI to show which button is selected
+            const feedbackContainer = button.closest('.feedback-container');
+            if (feedbackContainer) {
+                feedbackContainer.querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                button.classList.add('selected');
+            }
+        } else {
+            console.error(result.error);
+        }
+    } catch (error) {
+        console.error("Failed to send feedback:", error);
+    }
+});
 
 
 

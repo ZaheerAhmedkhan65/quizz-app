@@ -1,14 +1,7 @@
-function showNotification(message) {
+function showNotification(message, type='success') {
     let notification = document.createElement('div');
-    notification.classList.add('notification');
+    notification.classList.add('notification', type);
     notification.innerText = message;
-    notification.style.position = 'absolute';
-    notification.style.top = '65px';
-    notification.style.right = '10px';
-    notification.style.zIndex = '9999';
-    notification.style.padding = '10px';
-    notification.style.backgroundColor = '#4CAF50';
-    notification.style.color = 'white';
     document.body.appendChild(notification);
     setTimeout(() => {
         notification.remove();

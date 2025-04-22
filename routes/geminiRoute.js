@@ -72,9 +72,9 @@ router.post("/generate-response", async (req, res) => {
     const response = result.response.text();
     
     // Save chat history
-    await ChatHistory.saveChatHistory({ userId, sessionId, prompt, response, isPdfBased, pdfId: isPdfBased ? currentPdfId : null });
+    const chatHistory = await ChatHistory.saveChatHistory({ userId, sessionId, prompt, response, isPdfBased, pdfId: isPdfBased ? currentPdfId : null });
 
-    res.json({ response });
+    res.json({ response, chatHistory });
   } catch (err) {
     console.error("Error generating response:", err);
     res.status(500).json({ error: "Failed to generate response" });
@@ -102,6 +102,18 @@ router.delete("/delete-chat", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+router.post("/save-feedback", async (req, res) => {
+  try {
+    await ChatHistory.saveFeedback(req.body);
+    res.json({ message:"Feedback saved successfully." });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 
 
 module.exports = router;
