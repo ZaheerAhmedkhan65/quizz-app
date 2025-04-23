@@ -292,13 +292,19 @@ function addMessageToChat(message, aiMessage, chatHistory) {
     // Set the appropriate classes for the AI message
     aiMessage.classList.add('ai-message');
     const feedbackContainer = document.createElement('div');
+    feedbackContainer.classList.add('feedback-container', 'mt-2');
     feedbackContainer.innerHTML = `
         <div class="d-flex align-items-center justify-content-end gap-2">
-            <button data-id="${chatHistory.id}_like" class="${chatHistory.liked ? 'selected' : ''} feedback-btn "><i class="bi bi-hand-thumbs-up"></i></button>
-            <button data-id="${chatHistory.id}_dislike" class="${chatHistory.disliked ? 'selected' : ''} feedback-btn"><i class="bi bi-hand-thumbs-down"></i></button>
+            <button type="button" data-id="${chatHistory.id}_like" 
+                    class="feedback-btn btn btn-sm ${chatHistory.liked ? 'selected' : ''}">
+                <i class="bi bi-hand-thumbs-up${chatHistory.liked ? '-fill' : ''}"></i>
+            </button>
+            <button type="button" data-id="${chatHistory.id}_dislike" 
+                    class="feedback-btn btn btn-sm ${chatHistory.disliked ? 'selected' : ''}">
+                <i class="bi bi-hand-thumbs-down${chatHistory.disliked ? '-fill' : ''}"></i>
+            </button>
         </div>
     `;
-    feedbackContainer.classList.add('feedback-container');
     aiMessage.appendChild(feedbackContainer);
 
     // Create message wrapper and content elements
@@ -465,118 +471,3 @@ sideBarMenuBtn.forEach((btn) => {
         sideBar.classList.toggle("open");
     })
 })
-
-let chatHistoryContainer = document.querySelector(".chat-history-container");
-
-let chatItems = chatHistoryContainer.querySelectorAll(".chat-history-item");
-chatItems.forEach(item => {
-    item.addEventListener("click", async () => {
-        let chatId = item.getAttribute("data-id");
-
-        try {
-            const response = await fetch(`/api/gemini/get-chat?id=${encodeURIComponent(chatId)}`, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json"
-                }
-            });
-
-            if (!response.ok) throw new Error("Network response was not ok");
-
-            const data = await response.json();
-            const aiMessage = document.createElement('div');
-            writeUserMessage(data.chat.prompt)
-            const formattedResponse = generateFormattedResponse(data.chat.response);
-            
-            addMessageToChat(formattedResponse, aiMessage, data.chat);
-            chatMessages.appendChild(aiMessage);
-
-            // You can now render this data in your chat view
-        } catch (err) {
-            console.error("Fetch error:", err);
-        }
-    });
-});
-
-
-document.addEventListener("click", async (event) => {
-    const button = event.target.closest("button");
-    if (!button) return;
-    
-    const dataId = button.getAttribute("data-id");
-    if (!dataId) return; // Skip if no data-id
-    
-    // Only proceed for like/dislike buttons
-    if (!dataId.includes('_like') && !dataId.includes('_dislike')) return;
-
-    const [chatHistoryId, action] = dataId.split("_");
-    const liked = action === "like" ? 1 : 0;
-    const disliked = action === "dislike" ? 1 : 0;
-
-    try {
-        const response = await fetch("/api/gemini/save-feedback", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                chatHistoryId: parseInt(chatHistoryId),
-                liked,
-                disliked
-            }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            // Visual feedback
-            button.classList.add("active-feedback");
-            setTimeout(() => button.classList.remove("active-feedback"), 1000);
-            
-            // Update UI to show which button is selected
-            const feedbackContainer = button.closest('.feedback-container');
-            if (feedbackContainer) {
-                feedbackContainer.querySelectorAll('button').forEach(btn => {
-                    btn.classList.remove('selected');
-                });
-                button.classList.add('selected');
-            }
-        } else {
-            console.error(result.error);
-        }
-    } catch (error) {
-        console.error("Failed to send feedback:", error);
-    }
-});
-
-
-
-document.querySelectorAll(".delete-chat-btn").forEach(button => {
-    button.addEventListener("click", async (e) => {
-      e.stopPropagation(); // Prevents triggering parent click (like loading chat)
-  
-      const chatId = button.getAttribute("data-id");
-  
-      try {
-        const response = await fetch(`/api/gemini/delete-chat?id=${encodeURIComponent(chatId)}`, {
-          method: "DELETE",
-          headers: {
-            "Accept": "application/json"
-          }
-        });
-  
-        if (!response.ok) throw new Error("Network response was not ok");
-  
-        const data = await response.json();
-  
-        // Remove the whole list item (the <li> element)
-            // Now correctly remove the parent chat item
-      const listItem = button.closest(".list-group-item");
-      if (listItem) listItem.remove();
-  
-      } catch (err) {
-        console.error("Delete error:", err);
-      }
-    });
-  });
-  

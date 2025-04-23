@@ -157,29 +157,8 @@
   </button>
   <div id="side-bar-body">
     <h3 class="m-0">chat history</h3>
-    <ul class="chat-history-container list-group">
-      <% chatHistory.forEach(chat => { %>
-        <li 
-          class="list-group-item list-group-item-secondary list-group-item-action border-0 mb-1 rounded p-2 d-flex align-items-center justify-content-between"
-        >  
-        <div data-id="<%= chat.id %>" style="width: 85%;" class="chat-history-item">
-          <div style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;border: 1px solid transparent;" >
-            <%= chat.prompt %>
-          </div>
-        </div>
-          <div class="btn-group dropend">
-            <button type="button" class="dropdown-item" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-three-dots-vertical"></i>
-            </button>
-            <ul class="dropdown-menu">
-                <li class="dropdown-item delete-chat-btn" data-id="<%= chat.id %>" id="delete_chat_btn_<%= chat.id %>">Delete</li>
-            </ul>
-          </div>
-        </li>
-      <% }) %>
-    </ul>
+    <ul id="chat-history-container" class="chat-history-container list-group"></ul>
   </div>
-  
 </div>
 </div>
 
@@ -195,3 +174,4 @@
   let userId = "<%= user.userId %>"
 </script>
 <script src="/js/aiChat.js"></script>
+<script src="/js/chatHistory.js"></script>

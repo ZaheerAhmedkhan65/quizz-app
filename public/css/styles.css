@@ -54,6 +54,10 @@ svg {
     overflow: hidden;
 }
 
+.z-1000 {
+    z-index: 1000 !important;
+}
+
 .progress-bar-fill {
     position: absolute;
     top: 0;
@@ -75,7 +79,6 @@ svg {
     left: 0px;
     bottom: -30px;
 }
-
 
 /* Feedback buttons */
 .feedback-container div button {
@@ -112,8 +115,6 @@ svg {
     color: #dc3545;
 }
 
-
-
 #questions-container {
     scrollbar-width: none;
     overflow-y: scroll;
@@ -147,7 +148,6 @@ svg {
     z-index: 9999;
     width: fit-content !important;
 }
-
 .notification.success {
     background-color: #4CAF50;
     color: white;
@@ -212,7 +212,14 @@ svg {
 }
 
 .ask-ai-chat-modal.open.expanded {
-    width: calc(100% - 3rem) !important;
+    width: calc(100%) !important;
+    margin: 0 !important;
+    border-radius: 0;
+    height: 100vh;
+}
+
+.ask-ai-chat-modal.expanded #side-bar {
+    height: 100vh !important;
 }
 
 .ask-ai-chat-modal {
@@ -345,6 +352,10 @@ svg {
 }
 
 .welcome-message-content {
+    width: 100%;
+}
+
+.chat-message-text{
     width: 100%;
 }
 

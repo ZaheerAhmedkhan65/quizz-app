@@ -5,6 +5,8 @@ const multer = require("multer");
 const pdfParse = require("pdf-parse");
 const { v4: uuidv4 } = require("uuid");
 const ChatHistory = require("../model/ChatHistory");
+const chatHistoryController = require("../controllers/chatController");
+const authenticate = require("../middleware/authenticate");
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
@@ -113,7 +115,7 @@ router.post("/save-feedback", async (req, res) => {
   }
 });
 
-
+router.get("/get-chat-history",authenticate,chatHistoryController.getUserChatHistory);
 
 
 module.exports = router;

@@ -1,10 +1,11 @@
-document.addEventListener("DOMContentLoaded", () => {
+
+function renderQuizResultsGraph(quizResults) {
     const graphContainer = document.getElementById("graph");
-    const quizResultsData = JSON.parse(document.getElementById("quizz-results-data").textContent);
     let canvas = document.createElement("canvas");
     canvas.width = 240;
     canvas.height = 240;
     canvas.style.backgroundColor = "white";
+    graphContainer.innerHTML = '';
     graphContainer.appendChild(canvas);
     const ctx = canvas.getContext("2d");
 
@@ -75,8 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Data points
     let dataPoints = [];
-    quizResultsData.forEach(result => {
-       dataPoints.push(((result.score /result.total_marks) * 100).toFixed(2));
+    quizResults.forEach(result => {
+        dataPoints.push(((result.score / result.total_marks) * 100).toFixed(2));
     });
 
     if (dataPoints.length > 0) {
@@ -85,10 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let i = 0; i < dataPoints.length; i++) {
             let x = 30 + (i + 1) * 35;
             let y = 220 - (dataPoints[i] * 2);
-            if (i === 0)ctx.moveTo(x, y);
+            if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
             ctx.lineCap = "round";
-            ctx.lineJoin="round";
+            ctx.lineJoin = "round";
         }
 
         // Single point case
@@ -102,13 +103,14 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.stroke();
     }
 
-      // Draw green points at data points
-      ctx.fillStyle = "green";
-      for (let i = 0; i < dataPoints.length; i++) {
-          let x = 30 + (i + 1) * 35;
-          let y = 220 - (dataPoints[i] * 2);
-          ctx.beginPath();
-          ctx.arc(x, y, 3, 0, 2 * Math.PI); // Small circle at data point
-          ctx.fill();
-      }
-});
+    // Draw green points at data points
+    ctx.fillStyle = "green";
+    for (let i = 0; i < dataPoints.length; i++) {
+        let x = 30 + (i + 1) * 35;
+        let y = 220 - (dataPoints[i] * 2);
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, 2 * Math.PI); // Small circle at data point
+        ctx.fill();
+    }
+}
+

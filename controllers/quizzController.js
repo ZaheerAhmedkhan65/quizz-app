@@ -22,6 +22,27 @@ const showQuizz = async (req, res) => {
         const course = await Course.findById(req.params.course_id);
 
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
+
+        let sessionId = req.cookies.sessionId;
+
+        res.status(200).render('quizz', {
+            quizz,
+            title: quizz.title,
+            quizData,
+            course,
+            user: req.user,
+            sessionId,
+            courseId: req.params.course_id,
+            quizzId: req.params.id
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+const getQuizzResults = async (req, res) => {
+    try {
         const quizResults = await QuizResult.findByQuizId(req.params.id);
         let questions = [];
         let answers = [];
@@ -31,7 +52,7 @@ const showQuizz = async (req, res) => {
             for (const result of quizResults) {
 
                 for (const questionId in result.answers) {
-                    
+
                     let questionText = await Question.findById(questionId);
                     let answerText = await Option.findById(result.answers[questionId]);
 
@@ -39,34 +60,9 @@ const showQuizz = async (req, res) => {
                     answers.push(answerText);
                 }
             }
-
-            // Calculate percentage if needed
-            percentage = ((quizResults.reduce((sum, res) => sum + res.score, 0) / 
-                           quizResults.reduce((sum, res) => sum + res.total_marks, 0)) * 100).toFixed(2);
         }
 
-
-
-        let sessionId = req.cookies.sessionId;
-
-        let chatHistory = await ChatHistory.getUserChatHistory(req.user.userId);
-
-        res.status(200).render('quizz', { 
-            quizz, 
-            title: quizz.title, 
-            quizData,
-            quizResults, 
-            course, 
-            user: req.user, 
-            questions, 
-            answers, 
-            percentage,
-            sessionId,
-            chatHistory,
-            courseId: req.params.course_id,
-            quizzId: req.params.id
-        });
-
+        res.status(200).json({ quizResults, questions, answers });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -129,10 +125,10 @@ const createQuestion = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            question: { id: question.id, index:questionIndex, question_text: question.question_text },
+            question: { id: question.id, index: questionIndex, question_text: question.question_text },
             courseId: req.params.course_id,
             quizzId: req.params.id
-            
+
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -140,12 +136,12 @@ const createQuestion = async (req, res) => {
 };
 
 
-const updateQuestion =  async (req, res) => {
-    try{
+const updateQuestion = async (req, res) => {
+    try {
         await Question.update(req.body.question_id, req.body.question_text);
-        res.status(201).json({newText: req.body.question_text})
-    } catch (err){
-        res.status(500).json({message: err.message});
+        res.status(201).json({ newText: req.body.question_text })
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 }
 
@@ -187,7 +183,7 @@ const takeQuizz = async (req, res) => {
         const quizz = await Quizz.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-        res.status(200).render('takeQuizz', { quizz, title: quizz.title,quizData,course,user:req.user });
+        res.status(200).render('takeQuizz', { quizz, title: quizz.title, quizData, course, user: req.user });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -209,7 +205,7 @@ const saveResults = async (req, res) => {
 
         // Fetch quizzes attempted
         const quizzesAttempted = await QuizResult.quizzesAttempted(user_id, course_id);
-       
+
 
         // Calculate progress
         let courseProgress = (quizzesAttempted / totalQuizzes) * 100;
@@ -217,7 +213,7 @@ const saveResults = async (req, res) => {
 
         // Update progress in `user_courses`
         await UserCourse.updateProgress(user_id, course_id, courseProgress);
-        
+
         await Quizz.updateQuizzProgressBasedOnAttempts(quiz_id);
 
         return res.status(200).json({
@@ -232,4 +228,4 @@ const saveResults = async (req, res) => {
     }
 };
 
-module.exports = { getAll, showQuizz, create, update, deleteQuizz, createQuestion, updateQuestion,deleteQuestion, createOption, takeQuizz, saveResults };
+module.exports = { getAll, showQuizz, create, update, deleteQuizz, createQuestion, updateQuestion, deleteQuestion, createOption, takeQuizz, saveResults, getQuizzResults };

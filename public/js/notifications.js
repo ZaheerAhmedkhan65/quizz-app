@@ -9,9 +9,9 @@ function showNotification(message, type='success') {
 }
 
 
-const notification = document.querySelector('.notification');
-if (notification) {
+const notificationContainer = document.querySelector('.notification');
+if (notificationContainer) {
     setTimeout(() => {
-        notification.remove();
+        notificationContainer.remove();
     }, 3000);
 }

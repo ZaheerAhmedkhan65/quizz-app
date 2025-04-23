@@ -21,10 +21,14 @@ class ChatHistory {
         return chatHistory[0];
     }
 
+    // ChatHistory.js
     static async getUserChatHistory(userId) {
-        const [rows] = await db.query('SELECT * FROM chat_history WHERE user_id = ?', [userId]);
+        const [rows] = await db.query(
+            'SELECT * FROM chat_history WHERE user_id = ? ORDER BY created_at DESC', [userId]
+        );
         return rows;
     }
+
 
     static async deleteChatById(id){
         const [rows] = await db.query('DELETE FROM chat_history WHERE id = ?', [id]);
