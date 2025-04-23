@@ -6,10 +6,12 @@ class Question {
         return rows;
     }
 
-    static async findById(id) {
-        const [rows] = await db.query('SELECT * FROM questions WHERE id = ?', [id]);
-        return rows[0];
+    static async findByIds(ids) {
+        if (!ids.length) return [];
+        const [rows] = await db.query(`SELECT * FROM questions WHERE id IN (?)`, [ids]);
+        return rows;
     }
+    
 
     static async findByQuizzId(quizzId) {
         const [rows] = await db.query('SELECT * FROM questions WHERE quiz_id = ?', [quizzId]);

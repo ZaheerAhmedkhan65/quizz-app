@@ -17,10 +17,12 @@ class Option {
         return result.affectedRows;
     }
 
-    static async findById(id) {
-        const [rows] = await db.query('SELECT * FROM options WHERE id = ?', [id]);
-        return rows[0];
+    static async findByIds(ids) {
+        if (!ids.length) return [];
+        const [rows] = await db.query(`SELECT * FROM options WHERE id IN (?)`, [ids]);
+        return rows;
     }
+    
 
     static async findByQuestionId(question_id) {
         const [rows] = await db.query('SELECT * FROM options WHERE question_id = ?', [question_id]);

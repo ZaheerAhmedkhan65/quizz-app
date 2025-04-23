@@ -44,20 +44,39 @@ const showQuizz = async (req, res) => {
 const getQuizzResults = async (req, res) => {
     try {
         const quizResults = await QuizResult.findByQuizId(req.params.id);
+
+        let questionIds = new Set();
+        let optionIds = new Set();
+
+        if (quizResults?.length) {
+            for (const result of quizResults) {
+                for (const questionId in result.answers) {
+                    questionIds.add(questionId);
+                    optionIds.add(result.answers[questionId]);
+                }
+            }
+        }
+
+        // Convert sets to arrays
+        const questionIdArray = Array.from(questionIds);
+        const optionIdArray = Array.from(optionIds);
+
+        // Batch fetch questions and options
+        const questionsList = await Question.findByIds(questionIdArray);
+        const optionsList = await Option.findByIds(optionIdArray);
+
+        // Create maps for quick lookup
+        const questionMap = Object.fromEntries(questionsList.map(q => [q.id, q]));
+        const optionMap = Object.fromEntries(optionsList.map(o => [o.id, o]));
+
         let questions = [];
         let answers = [];
-        let percentage = 0;
 
-        if (quizResults && quizResults.length > 0) {
+        if (quizResults?.length) {
             for (const result of quizResults) {
-
                 for (const questionId in result.answers) {
-
-                    let questionText = await Question.findById(questionId);
-                    let answerText = await Option.findById(result.answers[questionId]);
-
-                    questions.push(questionText);
-                    answers.push(answerText);
+                    questions.push(questionMap[questionId]);
+                    answers.push(optionMap[result.answers[questionId]]);
                 }
             }
         }
@@ -67,6 +86,7 @@ const getQuizzResults = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
 
 const create = async (req, res) => {
     try {
