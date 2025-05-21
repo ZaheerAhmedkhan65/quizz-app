@@ -35,16 +35,41 @@ class ChatHistory {
         return rows;
     }
 
-    static async saveFeedback({ chatHistoryId, liked = 0, disliked = 0 }) {
-        const [result] = await db.query(
-            `UPDATE chat_history 
-             SET liked = ?, disliked = ? 
-             WHERE id = ?`,
-            [liked, disliked, chatHistoryId]
-        );
-        return result;
+    static async getFeedbackSummaryNormalized() {
+        const [rows] = await db.query(`
+            SELECT 
+                SUM(CASE WHEN liked = 1 THEN 1 ELSE 0 END) AS total_likes,
+                SUM(CASE WHEN disliked = 1 THEN 1 ELSE 0 END) AS total_dislikes,
+                SUM(CASE WHEN liked = 0 AND disliked = 0 THEN 1 ELSE 0 END) AS total_no_feedback,
+                COUNT(*) AS total
+            FROM chat_history
+        `);
+    
+        const { total_likes, total_dislikes, total_no_feedback, total } = rows[0];
+    
+        if (total === 0) {
+            return {
+                likes_percent: 0,
+                dislikes_percent: 0,
+                no_feedback_percent: 0,
+                total_likes: 0,
+                total_dislikes: 0,
+                total_no_feedback: 0,
+                total: 0
+            };
+        }
+    
+        return {
+            likes_percent: Math.round((total_likes / total) * 100),
+            dislikes_percent: Math.round((total_dislikes / total) * 100),
+            no_feedback_percent: Math.round((total_no_feedback / total) * 100),
+            total_likes,
+            total_dislikes,
+            total_no_feedback,
+            total
+        };
     }
-
+    
 }
 
 module.exports = ChatHistory;

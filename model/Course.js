@@ -14,7 +14,7 @@ class Course {
     static async getTotalQuizzes(id) {
         const [rows] = await db.query('SELECT total_quizzes FROM courses WHERE id = ?', [id]);
         return rows.length ? rows[0].total_quizzes : 0; // Ensure it returns a number
-    }   
+    }
 
     static async findByUserId(userId) {
         const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
@@ -44,8 +44,25 @@ class Course {
     }
 
     static async findByTitle(userId, title) {
-        const [rows] = await db.query('SELECT * FROM courses WHERE title = ? AND user_id = ?', [title , userId]);
+        const [rows] = await db.query('SELECT * FROM courses WHERE title = ? AND user_id = ?', [title, userId]);
         return rows[0];
+    }
+
+    // Course.js - Add these new methods to your Course class
+
+    static async getCourseCount(userId) {
+        const [rows] = await db.query('SELECT COUNT(*) as count FROM courses WHERE user_id = ?', [userId]);
+        return rows[0].count;
+    }
+
+    static async getCompletedCourseCount(userId) {
+        const [rows] = await db.query(`
+        SELECT COUNT(DISTINCT uc.course_id) as count 
+        FROM user_courses uc
+        JOIN courses c ON uc.course_id = c.id
+        WHERE uc.user_id = ? AND uc.course_progress = 100
+    `, [userId]);
+        return rows[0].count;
     }
 }
 

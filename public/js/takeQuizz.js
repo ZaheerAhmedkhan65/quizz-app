@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function submitQuiz() {
         stopTimer();
         let results = calculateResults();
-        alert(`Quiz Completed!\nCorrect Answers: ${results.correctAnswers}/${results.totalQuestions}\nScore: ${results.score}`);
+        showNotification(`Your quiz has been submitted successfully.`);
         let quizResultsData = {
             user_id: userId,
             course_id: courseId,
@@ -185,6 +185,26 @@ document.addEventListener("DOMContentLoaded", function () {
     
 
     nextBtn.addEventListener("click", () => {
+        loadNextQuestion();
+    });
+
+    function allQuestionsAnswered() {
+        return quizData.every(question => selectedAnswers[question.id]);
+    }
+
+    backBtn.addEventListener("click", () => {
+        loadPreviousQuestion();
+    });
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "ArrowRight") {
+            loadNextQuestion();
+        } else if (event.key === "ArrowLeft") {
+            loadPreviousQuestion();
+        }
+    });
+
+    function loadNextQuestion() {
         if (currentQuestionIndex < quizData.length - 1) {
             currentQuestionIndex++;
             loadQuestion();
@@ -193,18 +213,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 submitQuiz();
             };
         }
-    });
-
-    function allQuestionsAnswered() {
-        return quizData.every(question => selectedAnswers[question.id]);
     }
 
-    backBtn.addEventListener("click", () => {
+    function loadPreviousQuestion() {
         if (currentQuestionIndex > 0) {
             currentQuestionIndex--;
             loadQuestion();
         }
-    });
+    }
 
     loadQuestion();
 

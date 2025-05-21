@@ -30,8 +30,8 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-    console.log('Session ID:', req.sessionID);
-    console.log('Session data:', req.session);
+    // console.log('Session ID:', req.sessionID);
+    // console.log('Session data:', req.session);
     next();
 });
 
@@ -62,6 +62,8 @@ const userRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const quizzRoutes = require('./routes/quizzRoutes');
 const geminiRoutes = require("./routes/geminiRoute");
+const todoRoutes = require("./routes/todoRoutes")
+const notificationRoutes = require("./routes/notificationRoutes")
 
 const authenticate = require('./middleware/authenticate');
 const { title } = require('process');
@@ -71,8 +73,13 @@ app.use("/api",userRoutes);
 app.use("/api/courses",courseRoutes);
 app.use("/api/courses",quizzRoutes);
 app.use("/api/gemini", geminiRoutes);
+app.use("/api/todo",todoRoutes);
+app.use("/api/notifications",notificationRoutes);
 
 app.get('/',authenticate,(req,res) => { 
+    if(req.user.role === 'admin') {
+        res.redirect('/api/admin/dashboard');
+    }
     res.redirect('/api/dashboard'); 
 });
 

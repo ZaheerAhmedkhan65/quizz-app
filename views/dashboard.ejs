@@ -1,85 +1,173 @@
 <%- include('partials/_header') %>
 <%- include('partials/_flash') %>
-        <div class="col-lg-3 d-flex flex-column">
-                <h4 class="m-0 mt-3">Courses</h4>
-                <% if(courses.length >0){%>
-                <ul class="list-group mt-2">
-                    <% courses.forEach(course => { 
-                        let courseProgress = progress.find(p => p.course_id === course.id);
-                    %>
-                        <li id="course_<%= course.id %>" class="list-group-item bg-primary-subtle rounded-0 mb-1 d-flex justify-content-between align-items-center">
-                            <span class="w-75" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="course_<%= course.id %>_">
-                                <a href="/api/courses/<%= course.id %>" class="text-decoration-none text-dark">
-                                    <strong style="" data-title ="course-title"><%= course.title %></strong>
-                                </a>
-                            </span>
-                            <% if(courseProgress) { %>
-                            <div class="d-flex align-items-center gap-1">
-                                <div class="progress-container">
-                                    <svg width="30" height="30">
-                                        <circle cx="15" cy="15" r="10" class="progress-ring"></circle>
-                                        <circle cx="15" cy="15" r="10" class="progress-ring-progress" data-progress="<%= courseProgress.course_progress %>"></circle>
-                                    </svg>
-                                    <div id="course_<%=course.id%>-progress" class="progress-text"><%= courseProgress.course_progress %>%</div>
-                                </div>
 
-                                <div class="btn-group dropup">
-                                    <button type="button" class="bg-transparent border-0" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li class="dropdown-item" data-id="<%= course.id %>">edit</li>
-                                        <li class="dropdown-item">
-                                            <form data-course-id="<%= course.id %>" class="delete-course-btn" action="/api/courses/<%= course.id %>/delete" method="delete">
-                                                <button type="submit" class="text-danger border-0 bg-transparent p-0">Delete Course</button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <% } %>
-                        </li>
-                    <% }) %>
-                </ul>
-                <% } else { %>
-                    <p>No Courses have been created yet.</p>
-                <% } %>            
-        </div>
-        <div class="col-lg-9">
-            <div class="row mt-3">
-                <div class="col-lg-8">
-                    <h4 class="mt-2 mb-0"> New course</h4>
-                    <form action="/api/courses" method="post" class="d-flex align-items-center gap-1">
-                        <input type="hidden" name="user_id" value="<%= user.userId %>">
-                        <input type="text" id="title" name="title" placeholder="Enter course title" class="form-control" required>
-                        <input type="submit" id="createBtn" class="btn btn-sm btn-primary" value="create">
-                    </form>
+<div class="container-fluid">
+    <div class="row">
+      <h2 class="my-2">My Courses</h2>
+    </div>
+    <div class="row">
+      <!-- Main Content Column -->
+      <div class="col-lg-8 order-lg-1 order-2">
+        <% if(courses.length > 0) { %>
+          <div class="row g-4">
+            <% courses.forEach(course => { 
+              let courseProgress = progress.find(p => p.course_id === course.id);
+            %>
+              <div class="col-xl-4 col-lg-6 col-md-6">
+                <div class="card course-card h-100 border-0 shadow-sm">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                      <h5 class="card-title mb-0 text-truncate" style="max-width: 100%;">
+                        <a href="/api/courses/<%= course.id %>" class="text-decoration-none text-dark">
+                          <%= course.title %>
+                        </a>
+                      </h5>
+                      <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary border-0" type="button" data-bs-toggle="dropdown">
+                          <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li><a class="dropdown-item edit-course" data-id="<%= course.id %>" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li>
+                            <form class="delete-course-btn" data-course-id="<%= course.id %>" action="/api/courses/<%= course.id %>/delete" method="delete">
+                              <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-trash me-2"></i>Delete
+                              </button>
+                            </form>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <% if(courseProgress) { %>
+                      <div class="progress-container mb-3" style="width: 100%;">
+                        <div class="d-flex justify-content-between mb-1">
+                          <small class="text-muted">Progress</small>
+                          <small class="text-primary fw-bold"><%= courseProgress.course_progress %>%</small>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                          <div class="progress-bar bg-primary" role="progressbar" 
+                               style="width: <%= courseProgress.course_progress %>%" 
+                               aria-valuenow="<%= courseProgress.course_progress %>" 
+                               aria-valuemin="0" 
+                               aria-valuemax="100">
+                          </div>
+                        </div>
+                      </div>
+                    <% } %>
+  
+                    <div class="d-flex justify-content-between align-items-center">
+                      <a href="/api/courses/<%= course.id %>" class="btn btn-sm btn-outline-primary">Continue</a>
+                      <small class="text-muted">
+                        <% if(course.updated_at) { %>
+                          Updated <%= new Date(course.updated_at).toLocaleDateString() %>
+                        <% } %>
+                      </small>
+                    </div>
+                  </div>
                 </div>
-                <div class="col-lg-4">
-                    <h4>Dashboard</h4>
-                    <h3>
-                        <%= user.username %></h3>
-                    <p><%= user.email %></p>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="text-center py-5 bg-light rounded-3">
+            <i class="bi bi-journal-text display-4 text-muted mb-3"></i>
+            <h4 class="text-muted">No courses yet</h4>
+            <p class="text-muted">Get started by creating your first course</p>
+            <button class="btn btn-primary d-inline-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#newCourseForm">
+              <i class="bi bi-plus-lg me-2"></i> Create Course
+            </button>
+          </div>
+        <% } %>
+      </div>
+  
+      <!-- Sidebar Column -->
+      <div class="col-lg-4 order-lg-2 order-1 mb-lg-0">
+        <div class="sticky-top" style="top: 20px;">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Create New Course</h5>
+              <form action="/api/courses" method="post" id="newCourseForm" class="collapse d-block">
+                <input type="hidden" name="user_id" value="<%= user.userId %>">
+                <div class="mb-3">
+                  <label for="title" class="form-label">Course Title</label>
+                  <input type="text" class="form-control" id="title" name="title" placeholder="Enter course title" required>
+                  <div class="form-text">Keep it short and descriptive</div>
                 </div>
-            </div>        
+                <button type="submit" id="createBtn" class="btn btn-primary w-100">
+                  <i class="bi bi-plus-lg me-2"></i> Create Course
+                </button>
+              </form>
+            </div>
+          </div>
+  
+          <% if(courses.length > 0) { %>
+            <div class="card border-0 shadow-sm mt-3">
+              <div class="card-body">
+                <h5 class="card-title">Progress Overview</h5>
+                <div class="d-flex align-items-center mb-2">
+                  <div class="flex-grow-1">
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar bg-success" role="progressbar" 
+                           style="width: <%= overallProgress %>%" 
+                           aria-valuenow="<%= overallProgress %>" 
+                           aria-valuemin="0" 
+                           aria-valuemax="100">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ms-3">
+                    <span class="fw-bold"><%= overallProgress %>%</span>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <small class="text-muted"><%= courses.length %> courses</small>
+                  <small class="text-muted"><%= completedCourses %> completed</small>
+                </div>
+              </div>
+            </div>
+          <% } %>
         </div>
-    
-   <script src="/js/courseProgress.js"></script>
-   <script src="/js/checkForDuplicate.js"></script>
-   <script src="/js/refreshToken.js"></script>
-   <script type="application/json" id="courses-data">
-    <%- JSON.stringify(courses) %>
-   </script>
-    <script>
-        let courses = JSON.parse(document.getElementById("courses-data").textContent);;
+      </div>
+    </div>
+  </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
 
-            let title = document.getElementById('title');
-            let createBtn = document.getElementById('createBtn');
+<!-- JavaScript -->
+<script src="/js/courseProgress.js"></script>
+<script src="/js/checkForDuplicate.js"></script>
+<script src="/js/refreshToken.js"></script>
+<script type="application/json" id="courses-data">
+  <%- JSON.stringify(courses) %>
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize duplicate checking
+    let courses = JSON.parse(document.getElementById("courses-data").textContent);
+    let title = document.getElementById('title');
+    let createBtn = document.getElementById('createBtn');
+    checkForDuplicate(courses, title, 'title', 'title', createBtn, "Course");
 
-            checkForDuplicate(courses, title,'title','title', createBtn, "Course");
-        });
-    </script>
-    <script src="/js/editCourse.js"></script>
+    // Make the new course form persistent when submitted on mobile
+    const newCourseForm = document.getElementById('newCourseForm');
+    if (window.innerWidth < 992) {
+      newCourseForm.classList.add('collapse');
+    } else {
+      newCourseForm.classList.remove('collapse');
+    }
+
+    // Edit course functionality
+    document.querySelectorAll('.edit-course').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const courseId = this.getAttribute('data-id');
+        // Implement your edit functionality here
+        console.log('Edit course:', courseId);
+      });
+    });
+  });
+</script>
+<script src="/js/editCourse.js"></script>
+
 <%- include('partials/_footer') %>

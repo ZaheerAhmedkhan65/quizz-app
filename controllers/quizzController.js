@@ -33,7 +33,8 @@ const showQuizz = async (req, res) => {
             user: req.user,
             sessionId,
             courseId: req.params.course_id,
-            quizzId: req.params.id
+            quizzId: req.params.id,
+            path: req.path 
         });
 
     } catch (err) {
@@ -203,7 +204,7 @@ const takeQuizz = async (req, res) => {
         const quizz = await Quizz.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
         const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-        res.status(200).render('takeQuizz', { quizz, title: quizz.title, quizData, course, user: req.user });
+        res.status(200).render('takeQuizz', { quizz, title: quizz.title, quizData, course, user: req.user,path: req.path  });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

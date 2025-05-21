@@ -92,6 +92,16 @@ const login = async (req, res) => {
             req.flash('error', 'Your account was created, but your email is not verified. Please check your gmail inbox for verification instructions.');
             return res.redirect('/auth/verify-email');
         }
+
+        if (user.status === 'blocked') {
+            req.flash('error', 'Your account has been blocked. Please contact support.');
+            return res.redirect('/auth/login');  
+        }
+
+        if (user.status === 'deleted') {
+            req.flash('error', 'Your account has been deleted. Please contact support.');
+            return res.redirect('/auth/login');  
+        }
         
         // Compare passwords
         const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -106,7 +116,8 @@ const login = async (req, res) => {
             { 
                 userId: user.id, 
                 username: user.username,
-                role: user.role 
+                role: user.role,
+                email: user.email
             }, 
             process.env.SECRET_KEY , 
             { expiresIn: '7d' }
@@ -120,7 +131,10 @@ const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000 
         });
         req.flash('success', 'Login successfully!');
-        res.redirect('/api/dashboard');
+        if(user.role === 'admin') {
+            return res.redirect('/api/admin/dashboard');
+        }
+        return res.redirect('/api/dashboard');
     } catch (error) {
         console.error(error);
         req.flash('error', 'Error logging in!');
