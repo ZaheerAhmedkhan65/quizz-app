@@ -139,7 +139,6 @@ async function loadChatHistoryItem(chatItem) {
         const aiMessage = document.createElement('div');
         writeUserMessage(data.chat.prompt);
         const formattedResponse = generateFormattedResponse(data.chat.response);
-
         addMessageToChat(formattedResponse, aiMessage, data.chat);
         chatMessages.appendChild(aiMessage);
     } catch (err) {
@@ -185,7 +184,6 @@ async function handleFeedbackClick(event) {
     event.stopPropagation();
 
     const dataId = feedbackBtn.getAttribute("data-id");
-
     if (!dataId) {
         console.log('No data-id found - exiting');
         return;
@@ -195,7 +193,6 @@ async function handleFeedbackClick(event) {
 
     const liked = action === "like" ? 1 : 0;
     const disliked = action === "dislike" ? 1 : 0;
-
     try {
         const response = await fetch("/api/gemini/save-feedback", {
             method: "POST",

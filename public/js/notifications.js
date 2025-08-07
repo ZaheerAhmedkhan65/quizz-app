@@ -15,7 +15,6 @@ function getNotifications() {
     fetch('/api/notifications/get-notifications')
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             notificationList.innerHTML = '';
             data.forEach(notification => {
                 const li = document.createElement('li');

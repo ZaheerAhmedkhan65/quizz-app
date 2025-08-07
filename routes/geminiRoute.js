@@ -69,7 +69,7 @@ router.post("/generate-response", async (req, res) => {
       pdfCache.delete(currentPdfId);
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContent([userPrompt]);
     const response = result.response.text();
     
@@ -107,7 +107,7 @@ router.delete("/delete-chat", async (req, res) => {
 
 router.post("/save-feedback", async (req, res) => {
   try {
-    await ChatHistory.saveFeedback(req.body);
+    const chat = await ChatHistory.saveFeedback(req.body);
     res.json({ message:"Feedback saved successfully." });
   } catch (err) {
     console.log(err);

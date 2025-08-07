@@ -29,6 +29,11 @@ class ChatHistory {
         return rows;
     }
 
+    static async saveFeedback({ chatHistoryId, liked, disliked }) {
+        const [rows] = await db.query('UPDATE chat_history SET liked = ?, disliked = ? WHERE id = ?', [liked, disliked, chatHistoryId]);
+        return rows;
+    }
+
 
     static async deleteChatById(id){
         const [rows] = await db.query('DELETE FROM chat_history WHERE id = ?', [id]);

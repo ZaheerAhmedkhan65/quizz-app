@@ -4,7 +4,6 @@ document.querySelectorAll('.edit-quizz-btn').forEach(editBtn => {
         let quizzContainer = document.getElementById(`quizz_${id}_`);
         let quizzTitle = quizzContainer.querySelector('strong[data-title="quizz-title"]');
         let courseId = quizzContainer.getAttribute('course-id');
-        console.log(courseId);    
         // Prevent duplicate form insertion
         if (quizzContainer.querySelector('form')) return;
 
@@ -58,7 +57,6 @@ document.querySelectorAll('.edit-quizz-btn').forEach(editBtn => {
                 });
         
                 if (response.ok) {
-                    console.log("Quizz updated successfully");
                     quizzContainer.innerHTML = `
                         <a href="${actionUrl}" class="text-decoration-none text-dark">
                             <strong data-title="quizz-title" style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${newTitle}</strong>
