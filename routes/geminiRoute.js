@@ -60,13 +60,20 @@ router.post("/generate-response", async (req, res) => {
   try {
     let userPrompt = prompt;
     let isPdfBased = false;
+    const identityPrompt = `
+      You are an AI assistant named "Quizzify", developed for helping users in the Quizzify app. 
+      Always introduce yourself as Quizzify and never mention Google or Gemini. 
+      If someone asks who you are, your name is Quizzify.
+    `;
 
 
     if (currentPdfId && pdfCache.has(currentPdfId)) {
       const pdfText = pdfCache.get(currentPdfId);
-      userPrompt = `${prompt}\n\n${pdfText}`;
+      userPrompt = `${identityPrompt}\n\nUser: ${prompt}\n\nPDF Content:\n${pdfText}`;
       isPdfBased = true;
       pdfCache.delete(currentPdfId);
+    } else {
+      userPrompt = `${identityPrompt}\n\nUser: ${prompt}`;
     }
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
