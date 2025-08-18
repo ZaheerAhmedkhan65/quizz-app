@@ -62,7 +62,7 @@ const publicRoutes = require('./routes/publicRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes');
-const quizzRoutes = require('./routes/quizzRoutes');
+const quizRoutes = require('./routes/quizRoutes');
 const geminiRoutes = require("./routes/geminiRoute");
 const todoRoutes = require("./routes/todoRoutes")
 const notificationRoutes = require("./routes/notificationRoutes")
@@ -85,7 +85,7 @@ app.use("/", userRoutes);
 app.use("/", lectureRoutes);
 app.use("/courses",courseRoutes);
 app.use(authenticate);
-app.use("/courses",quizzRoutes);
+app.use("/",quizRoutes);
 app.use("/api/gemini", geminiRoutes);
 app.use("/api/todo",todoRoutes);
 app.use("/api/notifications",notificationRoutes);

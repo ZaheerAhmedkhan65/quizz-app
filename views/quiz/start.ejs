@@ -1,0 +1,40 @@
+<%- include('../partials/_header') %>
+    <div class="container">
+        <h1><%= lecture_id ? 'Lecture Quiz' : 'Course Quiz' %></h1>
+        <p>Total Questions: <%= questions.length %></p>
+        
+        <form action="/quiz/submit/<%= course_id %><%= lecture_id ? '/' + lecture_id : '' %>" method="POST">
+            <% questions.forEach((question, index) => { %>
+                <div class="question-card">
+                    <h3>Question <%= index + 1 %></h3>
+                    <p><%= question.question_text %></p>
+                    
+                    <% if (question.question_image) { %>
+                        <img src="/uploads/<%= question.question_image %>" alt="Question image" style="max-width: 300px;">
+                    <% } %>
+                    
+                    <div class="options">
+                        <% question.options.forEach(option => { %>
+                            <div class="option">
+                                <input type="radio" 
+                                       name="answers[<%= question.id %>]" 
+                                       id="option_<%= option.id %>" 
+                                       value="<%= option.id %>"
+                                       required>
+                                <label for="option_<%= option.id %>">
+                                    <% if (option.option_image) { %>
+                                        <img src="/uploads/<%= option.option_image %>" alt="Option image" style="max-width: 200px;">
+                                    <% } else { %>
+                                        <%= option.option_text %>
+                                    <% } %>
+                                </label>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% }); %>
+            
+            <button type="submit" class="btn btn-primary">Submit Quiz</button>
+        </form>
+    </div>
+<%- include('../partials/_footer') %>

@@ -452,6 +452,7 @@ function formatPlainText(text) {
     return paragraphs.map(p => `<p>${cleanFormatting(p)}</p>`).join('');
 }
 
+
 function cleanFormatting(text) {
     // Clean markdown-style formatting
     return text

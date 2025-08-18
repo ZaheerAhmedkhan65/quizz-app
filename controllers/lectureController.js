@@ -1,7 +1,6 @@
 const Lecture = require('../models/Lecture');
 const Course = require('../models/Course');
 const UserCourse = require('../models/UserCourse');
-const QuizResult = require('../models/QuizResult');
 const pdf = require('html-pdf');
 const path = require('path');
 
@@ -53,7 +52,6 @@ const show = async (req, res) => {
 const create = async (req, res) => {
     try {
         const { title, course_id } = req.body;
-        console.log(title, course_id);
         await Lecture.create({ title, courseId: course_id });
         const lectures = await Lecture.findByCourseId(course_id);
         await Course.updateTotalQuizzes(course_id, lectures.length);
@@ -65,10 +63,10 @@ const create = async (req, res) => {
         }
 
         // Fetch quizzes attempted
-        const quizzesAttempted = await QuizResult.quizzesAttempted(req.user.userId, req.params.course_id);
+        // const quizzesAttempted = await QuizResult.quizzesAttempted(req.user.userId, req.params.course_id);
 
         // Calculate progress
-        let courseProgress = (quizzesAttempted / totalQuizzes) * 100;
+        let courseProgress = (lectures.length / totalQuizzes) * 100;
         courseProgress = Math.min(courseProgress, 100.00); // Prevent exceeding 100%
 
         // Update progress in `user_courses`

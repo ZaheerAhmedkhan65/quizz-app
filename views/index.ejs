@@ -59,14 +59,15 @@
                     // Render courses
                     courses.forEach(course => {
                         const courseItem = document.createElement('li');
-                        courseItem.className = 'list-group-item col-12 col-md-6 col-lg-4';
+                        courseItem.className = 'list-group-item col-lg-4 col-md-6 col-12';
 
                         courseItem.innerHTML = `
                         <div class="d-flex flex-column">
                             <a class="text-decoration-none text-muted fw-semibold" href="/courses/${course.id}">
-                                <p class="fw-bold fs-4 m-0">${course.title}</p>
+                                <p class="fw-bold fs-5 m-0">${course.title}</p>
                             </a>
                             <div class="d-flex gap-2">
+                                ${course.handout_pdf ? `
                                 <div class="download-container">
                                     <button class="download-btn" data-href="${course.handout_pdf}">
                                         <div class="icon-container">
@@ -84,6 +85,7 @@
                                         <span class="btn-text">Download PDF</span>
                                     </button>
                                 </div>
+                                ` : ''}
                                 <form action="/courses/${course.id}/join" method="post">
                                     <button type="submit" class="btn btn-primary">Join Course</button>
                                 </form>

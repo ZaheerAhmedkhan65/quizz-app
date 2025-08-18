@@ -17,10 +17,9 @@
         <div class="container-fluid">
             <a class="navbar-brand text-white" href="<%= user ? '/dashboard' : '/' %>">QuizApp</a>
             <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">                    
+                <ul class="navbar-nav ms-auto"> 
                     <% if(user) { %>
-
-                         <li class="nav-item position-relative">
+                        <li class="nav-item position-relative">
                             <a class="nav-link text-white" id="get-notifications">
                                 <i class="bi bi-bell-fill"></i>
                             </a>
@@ -34,6 +33,9 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     <p class="dropdown-item m-0"><%= user.email %></p>
+                                </li>
+                                <li>
+                                    <a href="/quiz/history" class="nav-link">My Quiz History</a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item text-danger" href="/auth/logout" onclick="return confirm('Are you sure you want to logout?')">Logout</a>

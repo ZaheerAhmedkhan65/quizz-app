@@ -1,0 +1,36 @@
+<%- include('../partials/_header') %>
+    <div class="container">
+        <h1>Quiz Results</h1>
+        
+        <div class="summary">
+            <h2>Summary</h2>
+            <p>Score: <%= attempt.score %>%</p>
+            <p>Correct Answers: <%= attempt.correct_answers %> / <%= attempt.total_questions %></p>
+            <p>Date: <%= new Date(attempt.created_at).toLocaleString() %></p>
+        </div>
+        
+        <div class="detailed-results">
+            <h2>Detailed Results</h2>
+            
+            <% responses.forEach((response, index) => { %>
+                <div class="question-result <%= response.is_correct ? 'correct' : 'incorrect' %>">
+                    <h3>Question <%= index + 1 %></h3>
+                    <p><%= response.question_text %></p>
+                    
+                    <div class="user-answer">
+                        <strong>Your answer:</strong> 
+                        <%= response.option_text || 'No answer provided' %>
+                    </div>
+                    
+                    <div class="result">
+                        <%= response.is_correct ? '✓ Correct' : '✗ Incorrect' %>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+        
+        <a href="/courses/<%= course_id %><%= lecture_id ? '/lectures/' + lecture_id : '' %>" class="btn btn-primary">
+            Back to <%= lecture_id ? 'Lecture' : 'Course' %>
+        </a>
+    </div>
+<%- include('../partials/_footer') %>

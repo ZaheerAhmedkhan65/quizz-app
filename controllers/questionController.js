@@ -123,7 +123,6 @@ const updateOption = async (req, res) => {
             is_correct,
             option_image
         });
-        console.log("Option updated successfully");
         res.status(200).json({ 
             success: true,
             message: "Option updated successfully"

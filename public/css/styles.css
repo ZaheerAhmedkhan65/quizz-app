@@ -212,6 +212,7 @@ svg {
     z-index: 1045;
     border-radius: 6px 50% 50% 6px;
     border-radius: 6px;
+    padding: 0px 0px 0px 10px;
 }
 
 .open-chat-btn-wrapper div {
@@ -830,7 +831,7 @@ code {
     }
 
     .open-chat-btn-wrapper {
-        background-color: #8338EC;
+        background-color: red;
     }
 
     .chat-messages {

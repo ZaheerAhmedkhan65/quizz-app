@@ -1,28 +1,37 @@
 <%- include('../partials/_header') %>
-    <div class="col-12">
-        <h1><%= course.title %> - <%= lecture.title %></h1>
+<nav class="p-0" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="/courses/<%= course.id %>"><%= course.title %></a></li>
+    <li class="breadcrumb-item active" aria-current="page"><%= lecture.title %></li>
+  </ol>
+</nav>
+    <div class="col-12 bg-primary-subtle px-4 py-5 rounded">
+        <h1><%= lecture.title %></h1>
         <div class="download-container">
-                <button class="download-btn" data-href="/courses/<%= course.slug %>/lectures/<%= lecture.id %>/pdf" id="pdf-download-btn">
-                    <div class="icon-container">
-                        <svg class="circular-progress" viewBox="0 0 26 26" >
-                            <circle class="progress-circle" cx="13" cy="13" r="11"></circle>
-                        </svg>
-                        <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                             stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                    </div>
-                    <span class="btn-text">Download PDF</span>
-                </button>
-            </div>
+            <button class="download-btn" data-href="/courses/<%= course.slug %>/lectures/<%= lecture.id %>/pdf" id="pdf-download-btn">
+                <div class="icon-container">
+                    <svg class="circular-progress" viewBox="0 0 26 26" >
+                        <circle class="progress-circle" cx="13" cy="13" r="11"></circle>
+                    </svg>
+                    <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </div>
+                <span class="btn-text">Download PDF</span>
+            </button>
+        </div>
+        <a href="/quiz/start/<%= course.id %>/<%= lecture.id %>" class="btn btn-primary">Take Lecture Quiz</a>
     </div>
 
-    <div class="col-12 my-3">
-    <h2>Questions</h2>
-    
+    <div class="col-12 p-0 mt-3">
+        <h2>Questions</h2>
+    </div>
+    <div class="col-12 p-0">
     <% if(questions.length > 0) { %>
         <% questions.forEach((question, index) => { %>
             <div class="question">
