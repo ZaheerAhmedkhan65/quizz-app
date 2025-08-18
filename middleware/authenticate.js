@@ -1,18 +1,37 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = '2a991f724f33ef14aacc3529a2a8e5747215370b96ca9b77478d76d5733fa7ee3ae8ff9b48c3b0b062b2f838d961e66d29b9cba53119c19f468ee46290c67142';
-function authenticate(req, res, next) {
+require('dotenv').config();
+
+function bindUser(req, res, next) {
     const token = req.cookies.token;
+    
     if (!token) {
-        return res.status(401).redirect('/auth/login');
+        req.user = null;
+        return next();
     }
 
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
         if (err) {
-            return res.status(401).redirect('/auth/login');
+            req.user = null;
+            return next();
         }
         req.user = decoded;
         next();
     });
 }
 
-module.exports = authenticate;
+// Keep your existing middlewares for routes that need strict authentication
+function authenticate(req, res, next) {
+    if (!req.user) {
+        return res.status(401).redirect('/auth/login');
+    }
+    next();
+}
+
+function isAdmin(req, res, next) {
+    if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).redirect('/');
+    }
+    next();
+}
+
+module.exports = { bindUser, authenticate, isAdmin };

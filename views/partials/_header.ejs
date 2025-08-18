@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/download.css">
     <link rel="shortcut icon" href="/img/favicon/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="/css/bootstrap-icons.min.css">
     <title><%= title %></title>
@@ -14,15 +15,9 @@
     <!-- Desktop Navbar (Visible on medium and larger screens) -->
     <nav class="navbar fixed-top navbar-expand-md bg-primary d-none d-md-block">
         <div class="container-fluid">
-            <a class="navbar-brand text-white" href="/api/dashboard">QuizApp</a>
+            <a class="navbar-brand text-white" href="<%= user ? '/dashboard' : '/' %>">QuizApp</a>
             <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <% if(!['/login', '/create-account', '/forgot-password', '/reset-password'].includes(path)) { %>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="/api/dashboard/">Dashboard</a>
-                        </li>
-                    <% } %>
-                    
+                <ul class="navbar-nav ms-auto">                    
                     <% if(user) { %>
 
                          <li class="nav-item position-relative">
@@ -98,5 +93,5 @@
         </div>
     </nav>
 
-    <div class="container-fluid mt-5">
+    <div class="container mt-5">
         <div class="row pt-3">

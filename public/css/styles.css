@@ -283,6 +283,11 @@ svg {
     /* Remove delay when showing */
 }
 
+.ask-ai-chat-modal.open.expanded .general-chat-window .chat-messages {
+    width: 60% !important;
+    margin: 0px auto !important;
+}
+
 .ask-ai-chat-header {
     flex-wrap: wrap;
     justify-content: space-between;

@@ -4,9 +4,10 @@ const router = express.Router();
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
 const { v4: uuidv4 } = require("uuid");
-const ChatHistory = require("../model/ChatHistory");
+const ChatHistory = require("../models/ChatHistory");
 const chatHistoryController = require("../controllers/chatController");
-const authenticate = require("../middleware/authenticate");
+
+const { isIdentityQuestion } = require("../utils/intentClassifier"); // import function
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
@@ -54,34 +55,47 @@ router.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
+
 router.post("/generate-response", async (req, res) => {
-  const { prompt, userId,currentPdfId, sessionId } = req.body;
+  const { prompt, userId, currentPdfId, sessionId } = req.body;
 
   try {
     let userPrompt = prompt;
     let isPdfBased = false;
+
+    const isIdentityQuery = isIdentityQuestion(prompt);
+    console.log("isIdentityQuery:", isIdentityQuery);
+
     const identityPrompt = `
-      You are an AI assistant named "Quizzify", developed for helping users in the Quizzify app. 
-      Always introduce yourself as Quizzify and never mention Google or Gemini. 
-      If someone asks who you are, your name is Quizzify.
+      You are an AI assistant named "Quizzify", developed for the Quizzify app.
+      If someone asks about your identity, name, or who you are, respond by saying:
+      "I’m Quizzify, your AI assistant from the Quizzify app."
+      Do not mention Google, Gemini, or any model name.
     `;
 
-
+    // Build full prompt
     if (currentPdfId && pdfCache.has(currentPdfId)) {
       const pdfText = pdfCache.get(currentPdfId);
-      userPrompt = `${identityPrompt}\n\nUser: ${prompt}\n\nPDF Content:\n${pdfText}`;
+      userPrompt = `${isIdentityQuery ? identityPrompt + "\n\n" : ""}User: ${prompt}\n\nPDF Content:\n${pdfText}`;
       isPdfBased = true;
       pdfCache.delete(currentPdfId);
     } else {
-      userPrompt = `${identityPrompt}\n\nUser: ${prompt}`;
+      userPrompt = `${isIdentityQuery ? identityPrompt + "\n\n" : ""}User: ${prompt}`;
     }
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContent([userPrompt]);
     const response = result.response.text();
-    
+
     // Save chat history
-    const chatHistory = await ChatHistory.saveChatHistory({ userId, sessionId, prompt, response, isPdfBased, pdfId: isPdfBased ? currentPdfId : null });
+    const chatHistory = await ChatHistory.saveChatHistory({
+      userId,
+      sessionId,
+      prompt,
+      response,
+      isPdfBased,
+      pdfId: isPdfBased ? currentPdfId : null
+    });
 
     res.json({ response, chatHistory });
   } catch (err) {
@@ -89,6 +103,7 @@ router.post("/generate-response", async (req, res) => {
     res.status(500).json({ error: "Failed to generate response" });
   }
 });
+
 
 
 // URL: /api/gemini/get-chat?id=123
@@ -122,7 +137,7 @@ router.post("/save-feedback", async (req, res) => {
   }
 });
 
-router.get("/get-chat-history",authenticate,chatHistoryController.getUserChatHistory);
+router.get("/get-chat-history",chatHistoryController.getUserChatHistory);
 
 
 module.exports = router;

@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     questionForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const questionText = document.getElementById("question-text").value;
-        const question = { question_text: questionText };
+        const lectureId = document.getElementById("lecture-id").value;
+        const question = { question_text: questionText, lecture_id: lectureId };
 
         try {
             const response = await fetch(questionForm.action, {
@@ -66,7 +67,7 @@ function attachOptionFormListener(form) {
 
         const optionText = form.querySelector(`input[name="option_text"]`).value;
         const isCorrect = form.querySelector(`select[name="is_correct"]`).value;
-        const questionId = form.action.split('/').slice(-2, -1)[0]; // Extract question ID
+        const questionId = form.action.split('/').slice(-3, -1)[0]; // Extract question ID
         const option = { option_text: optionText, is_correct: isCorrect };
 
         try {

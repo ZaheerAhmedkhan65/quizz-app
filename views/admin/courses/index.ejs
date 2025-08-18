@@ -1,0 +1,94 @@
+<%- include('../partials/_header') %>
+
+<div class="row ">
+    <div class="col-12">
+        <div class="card rounded-0">
+            <div class="card-body">
+                <h4 class="card-title">All Courses</h4>
+                <div id="loadingSpinner" class="text-center my-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
+                <div id="coursesContainer" class="row">
+                    <!-- Courses will be loaded here dynamically -->
+                </div>
+                <div id="noCoursesMessage" class="alert alert-warning text-center" style="display: none;">
+                    No courses found matching your criteria.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch courses data
+        fetchCourses();
+    });
+
+    function fetchCourses(searchTerm = '') {
+        const container = document.getElementById('coursesContainer');
+        const spinner = document.getElementById('loadingSpinner');
+        const noCoursesMsg = document.getElementById('noCoursesMessage');
+        
+        // Show loading spinner
+        container.innerHTML = '';
+        spinner.style.display = 'block';
+        noCoursesMsg.style.display = 'none';
+        
+        // Make AJAX request
+        fetch(`/courses-list?search=${encodeURIComponent(searchTerm)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(courses => {
+                spinner.style.display = 'none';
+                
+                if (courses.length === 0) {
+                    noCoursesMsg.style.display = 'block';
+                    return;
+                }
+                
+                // Render courses
+                courses.forEach(course => {
+                    console.log(course);
+                    const courseCol = document.createElement('div');
+                    courseCol.className = 'col-lg-4 col-md-4 col-sm-6 mb-4';
+                    
+                    courseCol.innerHTML = `
+                        <div class="card h-100">
+                            <a href="/courses/${course.id}" class="text-decoration-none text-restart">
+                                <div class="card-body">
+                                    <h5 class="card-title">${course.title}</h5>
+                                    <p class="card-text text-muted">Click to view course details</p>
+                                </div>
+                            </a>
+                            <div class="card-footer bg-transparent d-flex align-items-center justify-content-end gap-2">
+                                ${course.handout_pdf ? `<a href="${course.handout_pdf}" class="btn btn-success btn-sm" download>Download PDF</a>` : ''}
+                                <a href="/admin/courses/${course.id}/edit" class="btn btn-warning btn-sm">Edit</a>
+                                <form class="delete-course-btn" data-course-id="${course.id}" action="/admin/courses/${course.id}/delete" onsubmit="return confirm('Are you sure you want to delete this course?')" method="post">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(courseCol);
+                });
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">Error loading courses. Please try again later.</div>
+                    </div>
+                `;
+                console.error('Error fetching courses:', error);
+            });
+    }
+</script>
+
+<%- include('../partials/_footer') %>

@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function fetchQuizzResults() {
-    fetch(`/api/courses/${courseId}/quizzes/${quizzId}/get-quizz-results`)
+    fetch(`/courses/${courseId}/quizzes/${quizzId}/get-quizz-results`)
         .then(response => response.json())
         .then(data => {
             displayQuizzResults(data);

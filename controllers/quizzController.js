@@ -1,40 +1,39 @@
-const Quizz = require('../model/Quizz');
-const Course = require('../model/Course');
-const Question = require('../model/Question');
-const Option = require('../model/Option');
-const QuizResult = require('../model/QuizResult');
-const UserCourse = require('../model/UserCourse');
-const ChatHistory = require("../model/ChatHistory");
+const Lecture = require('../models/Lecture');
+const Course = require('../models/Course');
+const Question = require('../models/Question');
+const Option = require('../models/Option');
+const QuizResult = require('../models/QuizResult');
+const UserCourse = require('../models/UserCourse');
 
 
 const getAll = async (req, res) => {
     try {
-        const quizzs = await Quizz.getAll();
-        res.status(200).json(quizzs);
+        const lectures = await Lecture.getAll();
+        res.status(200).json(lectures);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-const showQuizz = async (req, res) => {
+const showLecture = async (req, res) => {
     try {
-        const quizz = await Quizz.findById(req.params.id);
+        const lecture = await Lecture.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
 
-        const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
+        const quizData = await Lecture.getQuestionsAndOptions(req.params.id);
 
         let sessionId = req.cookies.sessionId;
 
-        res.status(200).render('quizz', {
-            quizz,
+        res.status(200).render('user/quizz', {
+            lecture,
             title: quizz.title,
             quizData,
             course,
             user: req.user,
             sessionId,
             courseId: req.params.course_id,
-            quizzId: req.params.id,
-            path: req.path 
+            lectureId: req.params.id,
+            path: req.path
         });
 
     } catch (err) {
@@ -91,8 +90,8 @@ const getQuizzResults = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        await Quizz.create(req.body.title, req.params.course_id);
-        const quizzes = await Quizz.findByCourseId(req.params.course_id);
+        await Lecture.create(req.body.title, req.params.course_id);
+        const lectures = await Lecture.findByCourseId(req.params.course_id);
         await Course.updateTotalQuizzes(req.params.course_id, quizzes.length);
 
         // Fetch total quizzes
@@ -119,19 +118,19 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        await Quizz.update(req.params.id, req.body.title);
-        res.status(200).json({ message: "Quizz updated successfully", title: req.body.title });
+        await Lecture.update(req.params.id, req.body.title);
+        res.status(200).json({ message: "Lecture updated successfully", title: req.body.title });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 }
 
 
-const deleteQuizz = async (req, res) => {
+const deleteLecture = async (req, res) => {
     try {
-        await Quizz.delete(req.params.id);
-        await Question.deleteByQuizzId(req.params.id);
-        res.status(200).json({ message: "Quizz deleted successfully" });
+        await Lecture.delete(req.params.id);
+        await Question.deleteByLectureId(req.params.id);
+        res.status(200).json({ message: "Lecture deleted successfully" });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -140,8 +139,8 @@ const deleteQuizz = async (req, res) => {
 const createQuestion = async (req, res) => {
     try {
         const question = await Question.create(req.body.question_text, req.params.id);
-        const questions = await Question.findByQuizzId(req.params.id);
-        await Quizz.updateQuizzTotalQuestions(req.params.id, questions.length);
+        const questions = await Question.findByLectureId(req.params.id);
+        await Lecture.updateLectureTotalQuestions(req.params.id, questions.length);
         const questionIndex = questions.findIndex(q => q.id === question.id) + 1;
 
         res.status(201).json({
@@ -201,10 +200,10 @@ const createOption = async (req, res) => {
 
 const takeQuizz = async (req, res) => {
     try {
-        const quizz = await Quizz.findById(req.params.id);
+        const quizz = await Lecture.findById(req.params.id);
         const course = await Course.findById(req.params.course_id);
-        const quizData = await Quizz.getQuestionsAndOptions(req.params.id);
-        res.status(200).render('takeQuizz', { quizz, title: quizz.title, quizData, course, user: req.user,path: req.path  });
+        const quizData = await Lecture.getQuestionsAndOptions(req.params.id);
+        res.status(200).render('user/takeQuizz', { quizz, title: quizz.title, quizData, course, user: req.user,path: req.path  });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -249,4 +248,4 @@ const saveResults = async (req, res) => {
     }
 };
 
-module.exports = { getAll, showQuizz, create, update, deleteQuizz, createQuestion, updateQuestion, deleteQuestion, createOption, takeQuizz, saveResults, getQuizzResults };
+module.exports = { takeQuizz, saveResults, getQuizzResults };

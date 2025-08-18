@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const User = require('../model/User');
+const User = require('../models/User');
 const sendEmail = require('../utils/emailService'); // You'll need to implement this
 
 const signup = async (req, res) => {
@@ -86,7 +86,7 @@ const login = async (req, res) => {
             req.flash('error', 'Invalid username or password!');
             return res.redirect('/auth/login');
         }
-        
+
         //Check if email is verified
         if (!user.email_verified) {
             req.flash('error', 'Your account was created, but your email is not verified. Please check your gmail inbox for verification instructions.');
@@ -102,7 +102,7 @@ const login = async (req, res) => {
             req.flash('error', 'Your account has been deleted. Please contact support.');
             return res.redirect('/auth/login');  
         }
-        
+
         // Compare passwords
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -132,7 +132,7 @@ const login = async (req, res) => {
         });
         req.flash('success', 'Login successfully!');
         if(user.role === 'admin') {
-            return res.redirect('/api/admin/dashboard');
+            return res.redirect('/admin/dashboard');
         }
         return res.redirect('/api/dashboard');
     } catch (error) {
@@ -178,10 +178,8 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
     const { token } = req.query;
     const { password } = req.body;
-    console.log('Reset token received:', token); // Log the incoming token
     try {
         const user = await User.findByResetToken(token);
-        console.log('user in reset pass', user);
         if (!user) {
             return res.status(400).json({ message: 'Invalid or expired token' });
         }

@@ -1,0 +1,195 @@
+<%- include('../partials/_header') %>
+<div class="row">
+    <div class="col-12">
+        <div class="card rounded-0">
+            <div class="card-body">
+                <h4 class="card-title">New Course</h4>
+                <form action="/admin/courses/create" method="post" enctype="multipart/form-data">
+                    <div class="form-group mb-4">
+                        <label for="title" class="form-label">Course Title</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Enter course title" required>
+                        <div class="form-text">Keep it short and descriptive</div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="slug">Slug</label>
+                        <input type="text" class="form-control" id="slug" name="slug" required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="handout_pdf" class="form-label">Upload PDF</label>
+                        <div class="card border-2 border-dashed rounded-2" id="dropzone">
+                            <div class="card-body text-center d-flex flex-column justify-content-center align-items-center" style="min-height: 150px;">
+                                <i class="bi bi-file-earmark-pdf fs-1 text-muted mb-2"></i>
+                                <h5 class="mb-2">Drag & drop your PDF here</h5>
+                                <p class="text-muted mb-3">or</p>
+                                <input type="file" class="form-control-file d-none" id="handout_pdf" name="handout_pdf" accept=".pdf">
+                                <button type="button" class="btn btn-outline-primary" id="browseBtn">
+                                    <i class="mdi mdi-file-outline me-2"></i>Browse Files
+                                </button>
+                                <p class="small text-muted mt-2 mb-0">Supports: PDF only (Max: 10MB)</p>
+                                <div id="fileInfo" class="mt-3 d-none position-relative">
+                                    <span class="badge bg-success">
+                                        <i class="mdi mdi-file me-1"></i>
+                                        <span id="fileName"></span>
+                                    </span>
+                                     <button type="button" class="btn btn-sm btn-danger rounded-circle position-absolute" style="top: -15px; right: -15px; padding: 2px 4px;" id="removeFile">
+                                        <i class="mdi mdi-close"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-4">
+                        <button type="submit" class="btn btn-primary">
+                           Create
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('handout_pdf');
+        const browseBtn = document.getElementById('browseBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
+        const titleInput = document.getElementById('title');
+        const slugInput = document.getElementById('slug');
+        
+        // Slug generation from title
+        titleInput.addEventListener('input', function() {
+            const title = titleInput.value;
+            let slug = title;
+            
+            // Preserve Roman numerals (I, II, III, IV, V, etc.)
+            const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+            
+            // First, protect Roman numerals by wrapping them with a special marker
+            romanNumerals.forEach(num => {
+                const regex = new RegExp(`\\b${num}\\b`, 'g');
+                slug = slug.replace(regex, `ROMAN_${num}_ROMAN`);
+            });
+            
+            // Convert to lowercase
+            slug = slug.toLowerCase();
+            
+            // Replace spaces with hyphens
+            slug = slug.replace(/\s+/g, '-');
+            
+            // Remove special characters except hyphens
+            slug = slug.replace(/[^a-z0-9-]/g, '');
+            
+            // Remove multiple consecutive hyphens
+            slug = slug.replace(/-+/g, '-');
+            
+            // Remove leading/trailing hyphens
+            slug = slug.replace(/^-+|-+$/g, '');
+            
+            // Restore Roman numerals to their original form
+            romanNumerals.forEach(num => {
+                const lowerNum = num.toLowerCase();
+                slug = slug.replace(`roman_${lowerNum}_roman`, num);
+            });
+            
+            slugInput.value = slug;
+        });
+        
+        // Highlight dropzone when dragging over
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add('border-primary', 'bg-light');
+        }
+        
+        function unhighlight(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('border-primary', 'bg-light');
+        }
+        
+        // Handle drop
+        dropzone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            if (e.dataTransfer.files.length) {
+                const file = e.dataTransfer.files[0];
+                if (file.type === 'application/pdf') {
+                    fileInput.files = e.dataTransfer.files;
+                    updateFileInfo(file.name);
+                } else {
+                    alert('Please upload a PDF file only.');
+                }
+            }
+        });
+        
+        // Handle paste
+        document.addEventListener('paste', function(e) {
+            if (e.clipboardData && e.clipboardData.items) {
+                const items = e.clipboardData.items;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].kind === 'file' && items[i].type === 'application/pdf') {
+                        const file = items[i].getAsFile();
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        fileInput.files = dataTransfer.files;
+                        updateFileInfo(file.name);
+                        break;
+                    }
+                }
+            }
+        });
+        
+        // Browse button click
+        browseBtn.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        // File input change
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length) {
+                const file = fileInput.files[0];
+                if (file.type === 'application/pdf') {
+                    updateFileInfo(file.name);
+                } else {
+                    alert('Please upload a PDF file only.');
+                    fileInput.value = '';
+                }
+            }
+        });
+        
+        // Remove file
+        removeFile.addEventListener('click', function() {
+            fileInput.value = '';
+            fileInfo.classList.add('d-none');
+        });
+        
+        function updateFileInfo(name) {
+            fileName.textContent = name;
+            fileInfo.classList.remove('d-none');
+        }
+    });
+</script>
+
+<style>
+    #dropzone {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    #dropzone:hover {
+        border-color: #0d6efd !important;
+        background-color: rgba(13, 110, 253, 0.05) !important;
+    }
+</style>
+
+<%- include('../partials/_footer') %>

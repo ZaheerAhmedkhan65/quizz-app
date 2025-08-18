@@ -66,9 +66,9 @@ function fetchChatHistory() {
                             ${chat.prompt}
                         </div>
                     </div>
-                    <div class="btn-group dropdown">
-                        <button type="button" class="btn btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-three-dots-vertical"></i>
+                    <div class="btn-group dropup">
+                        <button type="button" class="btn btn-sm outline-none border-0" data-bs-toggle="dropdown" aria-expanded="false">
+                           <i class="bi bi-three-dots"></i>
                         </button>
                         <ul class="dropdown-menu">
                             <li><button class="dropdown-item delete-chat-btn" data-id="${chat.id}">Delete</button></li>

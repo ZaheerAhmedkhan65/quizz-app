@@ -58,30 +58,39 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 const authRoutes = require('./routes/authRoutes');
+const publicRoutes = require('./routes/publicRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const quizzRoutes = require('./routes/quizzRoutes');
 const geminiRoutes = require("./routes/geminiRoute");
 const todoRoutes = require("./routes/todoRoutes")
 const notificationRoutes = require("./routes/notificationRoutes")
+const lectureRoutes = require("./routes/lectureRoutes");
 
-const authenticate = require('./middleware/authenticate');
-const { title } = require('process');
+const {bindUser, authenticate, isAdmin} = require('./middleware/authenticate');
+
+
+app.use(bindUser);
+
+app.get('/',(req,res) => { 
+    res.render('index', { title: "Home", user: req.user || null, path: req.path }); 
+});
+
+app.use("/",publicRoutes);
 
 app.use("/auth",authRoutes);
-app.use("/api",userRoutes);
-app.use("/api/courses",courseRoutes);
-app.use("/api/courses",quizzRoutes);
+
+app.use("/", userRoutes);
+app.use("/", lectureRoutes);
+app.use("/courses",courseRoutes);
+app.use(authenticate);
+app.use("/courses",quizzRoutes);
 app.use("/api/gemini", geminiRoutes);
 app.use("/api/todo",todoRoutes);
 app.use("/api/notifications",notificationRoutes);
-
-app.get('/',authenticate,(req,res) => { 
-    if(req.user.role === 'admin') {
-        res.redirect('/api/admin/dashboard');
-    }
-    res.redirect('/api/dashboard'); 
-});
+app.use(isAdmin)
+app.use("/admin",adminRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

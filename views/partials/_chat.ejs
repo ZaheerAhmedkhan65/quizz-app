@@ -64,7 +64,7 @@
                     <div class="welcome-message-content">
                         <div class="welcome-header">
                             <div class="welcome-icon">👋</div>
-                            <h3 class="welcome-title">Welcome <span class="welcome-username"><%= user.username %></span>!</h3>
+                            <h3 class="welcome-title">Welcome <span class="welcome-username"><%= user ? user.username : "Guest" %></span>!</h3>
                         </div>
                         
                         <div class="welcome-content">
@@ -171,7 +171,7 @@
 </div>
 <script>
   let sessionId = "<%= sessionId %>";
-  let userId = "<%= user.userId %>"
+  let userId = "<%= user ? user.userId : 'null' %>"
 </script>
 <script src="/js/aiChat.js"></script>
 <script src="/js/chatHistory.js"></script>

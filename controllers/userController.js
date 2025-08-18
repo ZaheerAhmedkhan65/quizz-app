@@ -1,7 +1,7 @@
-const User = require('../model/User');
-const Course = require('../model/Course');
-const UserCourse = require('../model/UserCourse');
-const ChatHistory = require('../model/ChatHistory');
+const User = require('../models/User');
+const Course = require('../models/Course');
+const UserCourse = require('../models/UserCourse');
+const ChatHistory = require('../models/ChatHistory');
 
 const userDashboard = async (req, res) => {
     try {
@@ -12,8 +12,7 @@ const userDashboard = async (req, res) => {
         // Get stats using the new methods
         const overallProgress = await UserCourse.getAverageProgress(req.user.userId);
         const completedCourses = await Course.getCompletedCourseCount(req.user.userId);
-        console.log('route : ',  req.path );
-        res.render('dashboard', { 
+        res.render('user/dashboard', { 
             user, 
             courses, 
             progress, 

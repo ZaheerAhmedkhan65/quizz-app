@@ -1,4 +1,4 @@
-const ToDo = require('../model/ToDo');
+const ToDo = require('../models/ToDo');
 
 const getToDo = async (req, res) => {
   try {

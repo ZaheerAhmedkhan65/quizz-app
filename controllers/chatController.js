@@ -1,4 +1,4 @@
-const ChatHistory = require("../model/ChatHistory");
+const ChatHistory = require("../models/ChatHistory");
 
 const groupChatsByDate = (chats) => {
     const groups = {};

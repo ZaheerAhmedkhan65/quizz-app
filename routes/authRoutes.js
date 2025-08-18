@@ -4,7 +4,7 @@ const authController = require('../controllers/authController');
 
 // Authentication pages
 router.get('/create-account', (req, res) => {
-    res.render('signup', { 
+    res.render('auth/signup', { 
         title: "Create an account",
         user: req.user || null,
         messages: req.flash(),
@@ -13,7 +13,7 @@ router.get('/create-account', (req, res) => {
 });
 
 router.get('/login', (req, res) => {
-    res.render('signin', { 
+    res.render('auth/signin', { 
         title: "Log in",
         user: req.user || null,
         messages: req.flash(),
@@ -22,7 +22,7 @@ router.get('/login', (req, res) => {
 });
 
 router.get('/forgot-password', (req, res) => {
-    res.render('forgot-password', {
+    res.render('auth/forgot-password', {
         title: "Forgot Password",
         user: req.user || null,
         messages: req.flash(),
@@ -32,7 +32,7 @@ router.get('/forgot-password', (req, res) => {
 
 router.get('/reset-password', (req, res) => {
     const { token } = req.query;
-    res.render('reset-password', {
+    res.render('auth/reset-password', {
         title: "Reset Password",
         token,
         user: req.user || null,

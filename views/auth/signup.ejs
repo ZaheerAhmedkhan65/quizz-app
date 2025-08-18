@@ -1,0 +1,35 @@
+<%- include('../partials/_header') %>
+<%- include('../partials/_flash') %>
+<div class="row d-flex justify-content-center align-items-center">
+    <div class="col-lg-6">
+        <div class="col-lg-6 mt-5">
+            <h4>Create an account</h4>
+            <form action="/auth/create-account" method="post">
+                <div class="form-group mb-2">
+                    <label for="username" class="form-label m-0">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Username" class="form-control" required>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="email" class="form-label m-0">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Email" class="form-control" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="password" class="form-label m-0">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Password" class="form-control" required>
+                    <div class="d-flex align-items-center mt-1 gap-1">
+                        <input type="checkbox" class="form-check" name="show-password" id="show-password-checkbox">
+                        <label class="m-0 text-muted" style="font-size: 14px;" for="show-password-checkbox">Show password</label>
+                    </div>
+                </div>
+                <input type="submit" class="btn btn-sm btn-primary" value="Create account">
+                <a class="mt-3 text-decoration-none text-dark d-block" href="/auth/login">
+                    Already have an account?
+                    <span class="text-primary">Log in</span>
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/showPassword.js"></script>
+<%- include('../partials/_footer') %>
