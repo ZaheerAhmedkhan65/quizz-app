@@ -1,12 +1,11 @@
-const Question = require('../Models/Question');
-const Option = require('../Models/Option');
-const QuizAttempt = require('../Models/QuizAttempt');
-const QuizResponse = require('../Models/QuizResponse');
+const Question = require('../models/Question');
+const Option = require('../models/Option');
+const QuizAttempt = require('../models/QuizAttempt');
+const QuizResponse = require('../models/QuizResponse');
 const db = require('../config/db');
 
-const quizController = {
     // Start a new quiz (lecture or course)
-    startQuiz: async (req, res) => {
+const startQuiz = async (req, res) => {
         try {
             const { course_id, lecture_id } = req.params;
             const user_id = req.user.id; // Assuming you have user authentication
@@ -74,10 +73,10 @@ const quizController = {
             console.error(error);
             res.status(500).json({ message: 'Server error' });
         }
-    },
+    };
     
     // Submit quiz answers
-    submitQuiz: async (req, res) => {
+const submitQuiz = async (req, res) => {
         try {
             const { course_id, lecture_id } = req.params;
             const user_id = req.user.userId;
@@ -156,10 +155,10 @@ const quizController = {
             console.error(error);
             res.status(500).json({ message: 'Server error' });
         }
-    },
+    };
     
     // Show quiz results
-    showResults: async (req, res) => {
+const showResults = async (req, res) => {
         try {
             const { attempt_id } = req.params;
             const user_id = req.user.userId;
@@ -190,10 +189,10 @@ const quizController = {
             console.error(error);
             res.status(500).render('error', { message: 'Server error' });
         }
-    },
+    };
     
     // Get user's quiz history
-    getQuizHistory: async (req, res) => {
+const getQuizHistory = async (req, res) => {
         try {
             const user_id = req.user.userId;
             const { course_id, lecture_id } = req.query;
@@ -215,6 +214,10 @@ const quizController = {
             res.status(500).render('error', { message: 'Server error' });
         }
     }
-};
 
-module.exports = quizController;
+module.exports = {
+    startQuiz,
+    submitQuiz,
+    showResults,
+    getQuizHistory
+};

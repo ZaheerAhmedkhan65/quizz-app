@@ -2,6 +2,8 @@ const Course = require('../models/Course');
 const Lecture = require('../models/Lecture');
 const Question = require('../models/Question');
 const UserCourse = require('../models/UserCourse');
+const path = require('path');
+const fs = require('fs');
 
 // const { render } = require('ejs');
 
@@ -130,4 +132,30 @@ const deleteCourse = async (req, res) => {
   }
 };
 
-module.exports = { getAll, showCourse, create, update, deleteCourse, edit, joinCourse };
+const downloadPDF = async (req, res) => {
+    try {
+        const course = await Course.findById(req.params.id);
+        if (!course || !course.handout_pdf) {
+            return res.status(404).send('Handout not found');
+        }
+
+        // Build absolute path (ensure it points to /public/uploads/...)
+        const filePath = path.join(__dirname, '..', 'public', course.handout_pdf.replace(/^\/+/, ''));
+        const fileName = course.handout_original_filename || `${course.title}-handout.pdf`;
+
+        // Check if file exists
+        if (!fs.existsSync(filePath)) {
+            console.error('File not found at path:', filePath);
+            return res.status(404).send('File not found');
+        }
+
+        // Send file with custom filename
+        res.download(filePath, fileName);
+    } catch (err) {
+        console.error('Error serving handout:', err);
+        res.status(500).send('Server error while downloading handout');
+    }
+};
+
+
+module.exports = { getAll, showCourse, create, update, deleteCourse, edit, joinCourse, downloadPDF };

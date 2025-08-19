@@ -6,5 +6,7 @@ const {authenticate} = require('../middleware/authenticate');
 router.get('/all', courseController.getAll);
 router.get('/:id', courseController.showCourse);
 
+router.get('/:id/handout/download', courseController.downloadPDF);
+
 router.post('/:id/join', authenticate, courseController.joinCourse);
 module.exports = router;

@@ -183,6 +183,7 @@ const downloadPDF = async (req, res) => {
 
         const questions = await Lecture.getQuestionsWithDetails(req.params.id);
         const course = await Course.findById(lecture.course_id);
+
         if (!course) {
             return res.status(404).json({ message: 'Course not found' });
         }
@@ -238,7 +239,7 @@ const downloadPDF = async (req, res) => {
                 }
             });
         });
-
+        
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${lecture.title}-questions.pdf"`);
         pdfStream.pipe(res);
