@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const pool = require('./config/db'); // Import your MySQL pool
 const flash = require('connect-flash');
 const app = express();
 const PORT = 3000;
@@ -13,20 +15,31 @@ app.use(cookieParser());
 app.use(express.static('public'));
 app.use(express.static('views'));
 app.use(express.urlencoded({ extended: true }));
+
+// Create MySQL session store
+const sessionStore = new MySQLStore({
+  expiration: 86400000, // 1 day in milliseconds
+  createDatabaseTable: true, // Will create sessions table if it doesn't exist
+  schema: {
+    tableName: 'sessions',
+    columnNames: {
+      session_id: 'session_id',
+      expires: 'expires',
+      data: 'data'
+    }
+  }
+}, pool);
+
 app.use(session({
     secret: process.env.SECRET_KEY || 'fallback-secret-key-for-development-only',
     resave: true,  // Changed from false to true
     saveUninitialized: true,  // Changed from false to true
+    store: sessionStore,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000
-    },
-    store: process.env.NODE_ENV === 'production' 
-        ? new (require('connect-pg-simple')(session))() 
-        : new (require('memorystore')(session))({
-            checkPeriod: 86400000
-        })
+    }
 }));
 
 app.use((req, res, next) => {
