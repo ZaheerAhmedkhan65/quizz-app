@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const quizController = require('../Controllers/quizController');
+const quizController = require('../controllers/quizController');
 
 // Start a new quiz (lecture or course)
 router.get('/quiz/start/:course_id',  quizController.startQuiz);

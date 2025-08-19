@@ -70,7 +70,6 @@ const lectureRoutes = require("./routes/lectureRoutes");
 
 const {bindUser, authenticate, isAdmin} = require('./middleware/authenticate');
 
-
 app.use(bindUser);
 
 app.get('/',(req,res) => { 
