@@ -19,16 +19,9 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
 });
 
-const keys = process.env.GEMINI_API_KEYS.split(",");
-let currentKeyIndex = 3;
-// Google Gemini setup
-const genAI = new GoogleGenerativeAI(keys[currentKeyIndex]);
 
-function switchKey() {
-  currentKeyIndex = (currentKeyIndex + 1) % keys.length;
-  genAI = new GoogleGenerativeAI(keys[currentKeyIndex]);
-  console.log(`Switched to key: ${keys[currentKeyIndex]}`);
-}
+// Google Gemini setup
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // In-memory cache to store PDF content mapped by UUID
 const pdfCache = new Map();
@@ -106,14 +99,8 @@ router.post("/generate-response", async (req, res) => {
 
     res.json({ response, chatHistory });
   } catch (err) {
-    console.error("Error:", err.message);
-
-    // Check if quota/rate limit error
-    if (err.message.includes("429") || err.message.includes("quota")) {
-      switchKey();
-      return res.status(429).json({ error: "Rate limit exceeded. Please try again later." });
-    }
-    throw err;
+    console.error("Error generating response:", err);
+    res.status(500).json({ error: "Failed to generate response" });
   }
 });
 
