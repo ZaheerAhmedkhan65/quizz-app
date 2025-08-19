@@ -7,11 +7,13 @@ const userDashboard = async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);
         const courses = await Course.findByUserId(req.user.userId);
-        const progress = await UserCourse.getProgressByUserId(req.user.userId);
+        let progress = await UserCourse.getProgressByUserId(req.user.userId);
         
         // Get stats using the new methods
         const overallProgress = await UserCourse.getAverageProgress(req.user.userId);
         const completedCourses = await Course.getCompletedCourseCount(req.user.userId);
+
+        progress = progress.map(p => ({ ...p, course_progress: Math.round(p.course_progress) }));
         res.render('user/dashboard', { 
             user, 
             courses, 
