@@ -8,7 +8,8 @@
     <div class="col-12 bg-primary-subtle px-4 py-5 rounded">
         <h1><%= course.title %></h1>
         <div class="d-flex align-items-center gap-3">
-            <div class="download-container">
+            <!-- course.ejs - Update the data-href to use the download endpoint -->
+<div class="download-container">
                 <button class="download-btn" data-href="/courses/<%= course.id %>/handout/download">
                     <div class="icon-container">
                         <svg class="circular-progress" viewBox="0 0 26 26">

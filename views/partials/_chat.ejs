@@ -172,7 +172,7 @@
 <script>
   let sessionId = Math.random().toString(36).substring(2);
   localStorage.setItem("sessionId", sessionId);
-  let userId = "<%= user ? user.userId : 'null' %>"
+  let userId = "<%= user ? user.userId : null %>"
 </script>
 <script src="/js/aiChat.js"></script>
 <script src="/js/chatHistory.js"></script>

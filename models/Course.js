@@ -21,16 +21,16 @@ class Course {
         return rows;
     }
 
-    static async create({ title, slug, user_id, handout_pdf = null, handout_original_filename = null }) {
+    static async create({ title, slug, user_id, handout_pdf = null, handout_original_filename = null, handout_pdf_public_id = null }) {
         console.log({ title, slug, user_id, handout_pdf, handout_original_filename });
-        const [result] = await db.query('INSERT INTO courses (title, slug, handout_pdf, handout_original_filename, created_by) VALUES (?, ?, ?, ?, ?)', [title, slug, handout_pdf, handout_original_filename, user_id]);
+        const [result] = await db.query('INSERT INTO courses (title, slug, handout_pdf, handout_original_filename, created_by, handout_pdf_public_id) VALUES (?, ?, ?, ?, ?, ?)', [title, slug, handout_pdf, handout_original_filename, user_id, handout_pdf_public_id]);
         const [course] = await db.query('SELECT * FROM courses WHERE id = ?', [result.insertId]); // Get full course
         return course[0]; // Return course object
         // return result.insertId;
     }
 
-    static async update(id, { title, slug, handout_pdf = null, handout_original_filename = null }) {
-        const [result] = await db.query('UPDATE courses SET title = ?, slug = ?, handout_pdf = ?, handout_original_filename = ? WHERE id = ?', [title, slug, handout_pdf, handout_original_filename, id]);
+    static async update(id, { title, slug, handout_pdf = null, handout_original_filename = null, handout_pdf_public_id = null }) {
+        const [result] = await db.query('UPDATE courses SET title = ?, slug = ?, handout_pdf = ?, handout_original_filename = ?, handout_pdf_public_id = ? WHERE id = ?', [title, slug, handout_pdf, handout_original_filename, handout_pdf_public_id, id]);
         return result.affectedRows;
     }
 

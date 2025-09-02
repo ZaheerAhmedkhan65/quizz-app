@@ -77,4 +77,8 @@ function formatTimeAgo(dateStr) {
     return 'Just now';
 }
 
-document.addEventListener("DOMContentLoaded", getNotifications);
+document.addEventListener("DOMContentLoaded", ()=>{
+    if(getNotificationsBtn && notificationList && notificationContainer){
+        getNotifications();
+    }
+});

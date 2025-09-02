@@ -10,12 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         </div>
     `;
-    
+
+    if(userId){
     // Set up event delegation first
     setupEventDelegation();
-    
     // Then fetch chat history after a short delay (you can reduce or remove the delay if needed)
-    setTimeout(fetchChatHistory, 500);
+    fetchChatHistory();
+    }
 });
 
 // Fetch and display chat history

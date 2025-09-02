@@ -5,8 +5,6 @@ const UserCourse = require('../models/UserCourse');
 const path = require('path');
 const fs = require('fs');
 
-// const { render } = require('ejs');
-
 const getAll = async (req, res) => {
     try {
         const courses = await Course.getAll();
@@ -48,23 +46,25 @@ const create = async (req, res) => {
     }
 
     const handoutData = req.file ? {
-      handout_pdf: req.file.path.replace('public', ''),
+      // ✅ Save path WITH 'public'
+      handout_pdf: req.file.path,
       handout_original_filename: req.file.originalname
     } : {};
 
     const course = await Course.create({
-      title: title,
+      title,
       user_id: req.user.userId,
-      slug: slug,
+      slug,
       ...handoutData
     });
 
-    // await UserCourse.create(req.user.userId, course.id);
     res.status(201).redirect('/admin/courses');
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+
 
 const edit = async (req, res) => {
   try {
@@ -77,20 +77,20 @@ const edit = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const updateData = 
-                    { 
-                      title: req.body.title,
-                      slug: req.body.slug 
-                    };
+    const updateData = { 
+      title: req.body.title,
+      slug: req.body.slug 
+    };
     
     if (req.file) {
-      updateData.handout_pdf = req.file.path.replace('public', '');
+      // ✅ Save path WITH 'public'
+      updateData.handout_pdf = req.file.path;
       updateData.handout_original_filename = req.file.originalname;
-      
+
       // Delete old file if exists
       const oldCourse = await Course.findById(req.params.id);
       if (oldCourse.handout_pdf) {
-        const oldPath = path.join(__dirname, '../public', oldCourse.handout_pdf);
+        const oldPath = path.join(__dirname, '..', oldCourse.handout_pdf);
         if (fs.existsSync(oldPath)) {
           fs.unlinkSync(oldPath);
         }
@@ -110,7 +110,7 @@ const deleteCourse = async (req, res) => {
     
     // Delete associated PDF file if exists
     if (course.handout_pdf) {
-      const filePath = path.join(__dirname, '../public', course.handout_pdf);
+      const filePath = path.join(__dirname, '..', course.handout_pdf);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
@@ -139,17 +139,15 @@ const downloadPDF = async (req, res) => {
             return res.status(404).send('Handout not found');
         }
 
-        // Build absolute path (ensure it points to /public/uploads/...)
-        const filePath = path.join(__dirname, '..', 'public', course.handout_pdf.replace(/^\/+/, ''));
-        const fileName = course.handout_original_filename || `${course.title}-handout.pdf`;
-
-        // Check if file exists
+        // Build absolute path correctly
+        const filePath = path.join(__dirname, '..', course.handout_pdf.replace(/^\/+/, ''));
+        const fileName = course.handout_original_filename || `${course.slug}-handout.pdf`;
+        
         if (!fs.existsSync(filePath)) {
             console.error('File not found at path:', filePath);
             return res.status(404).send('File not found');
         }
 
-        // Send file with custom filename
         res.download(filePath, fileName);
     } catch (err) {
         console.error('Error serving handout:', err);

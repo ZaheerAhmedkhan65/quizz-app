@@ -126,4 +126,3 @@ function downloadWithProgress(button, pdfUrl) {
             btnText.textContent = 'Error!';
         });
 }
-
