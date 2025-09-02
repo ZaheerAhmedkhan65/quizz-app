@@ -24,7 +24,8 @@ router.get('/courses/new', (req, res)=>{
         title: "New Course",
         user: req.user || null,
         messages: req.flash(),
-        path: req.path 
+        path: req.path ,
+        token: req.cookies.token
     });
 });
 router.get('/courses/:id', courseController.showCourse);
