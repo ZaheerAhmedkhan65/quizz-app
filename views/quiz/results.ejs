@@ -1,36 +1,49 @@
 <%- include('../partials/_header') %>
-    <div class="container">
-        <h1>Quiz Results</h1>
-        
-        <div class="summary">
-            <h2>Summary</h2>
-            <p>Score: <%= attempt.score %>%</p>
-            <p>Correct Answers: <%= attempt.correct_answers %> / <%= attempt.total_questions %></p>
-            <p>Date: <%= new Date(attempt.created_at).toLocaleString() %></p>
-        </div>
-        
-        <div class="detailed-results">
-            <h2>Detailed Results</h2>
-            
-            <% responses.forEach((response, index) => { %>
-                <div class="question-result <%= response.is_correct ? 'correct' : 'incorrect' %>">
-                    <h3>Question <%= index + 1 %></h3>
-                    <p><%= response.question_text %></p>
-                    
-                    <div class="user-answer">
-                        <strong>Your answer:</strong> 
-                        <%= response.option_text || 'No answer provided' %>
-                    </div>
-                    
-                    <div class="result">
-                        <%= response.is_correct ? '✓ Correct' : '✗ Incorrect' %>
-                    </div>
-                </div>
-            <% }); %>
-        </div>
-        
-        <a href="/courses/<%= course_id %><%= lecture_id ? '/lectures/' + lecture_id : '' %>" class="btn btn-primary">
-            Back to <%= lecture_id ? 'Lecture' : 'Course' %>
-        </a>
+<div class="container">
+    <h1>Quiz Results</h1>
+    
+    <div class="summary mb-4">
+        <h2>Summary</h2>
+        <p>Score: <%= attempt.score %>%</p>
+        <p>Correct Answers: <%= attempt.correct_answers %> / <%= attempt.total_questions %></p>
+        <p>Date: <%= attempt.created_at %></p>
     </div>
+
+    <div class="detailed-results">
+        <h2>Detailed Results</h2>
+
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Question</th>
+                    <th>Your Answer</th>
+                    <th>Result</th>
+                    <th>Correct Answer</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% responses.forEach((response, index) => { %>
+                    <tr class="<%= response.is_correct ? 'table-success' : 'table-danger' %>">
+                        <td><%= index + 1 %></td>
+                        <td><%= response.question_text %></td>
+                        <td><%= response.user_option_text || 'No answer' %></td>
+                        <td><%= response.is_correct ? '✓ Correct' : '✗ Incorrect' %></td>
+                        <td>
+                            <% if (!response.is_correct) { %>
+                                <%= response.correct_option_text %>
+                            <% } else { %>
+                                -
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <a href="/courses/<%= course_id %><%= lecture_id ? '/lectures/' + lecture_id : '' %>" class="btn btn-primary">
+        Back to <%= lecture_id ? 'Lecture' : 'Course' %>
+    </a>
+</div>
 <%- include('../partials/_footer') %>

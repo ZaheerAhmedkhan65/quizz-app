@@ -5,7 +5,7 @@ const courseController = require('../controllers/courseController');
 const lectureController = require('../controllers/lectureController');
 const questionController = require('../controllers/questionController');
 const Course = require('../models/Course');
-const { uploadHandout, handleUploadErrors, uploadQuestionImage, uploadOptionImage, handleImageUploadErrors } = require('../middleware/upload');
+const { uploadQuestionImage, uploadOptionImage, handleImageUploadErrors } = require('../middleware/upload');
 
 router.get('/dashboard', userController.adminDashboard);
 
@@ -15,10 +15,11 @@ router.get('/courses', (req, res)=>{
         title: "Courses",
         user: req.user || null,
         messages: req.flash(),
-        path: req.path 
+        path: req.path ,
+        token: req.cookies.token
     });
 });
-router.post('/courses/create', uploadHandout, handleUploadErrors, courseController.create);
+
 router.get('/courses/new', (req, res)=>{
     res.render('admin/courses/new', { 
         title: "New Course",
@@ -30,16 +31,16 @@ router.get('/courses/new', (req, res)=>{
 });
 router.get('/courses/:id', courseController.showCourse);
 router.get('/courses/:id/edit', courseController.edit);
-router.post('/courses/:id/update', uploadHandout, handleUploadErrors, courseController.update);
-router.post('/courses/:id/delete', courseController.deleteCourse);
 
 // Lectures
-router.get('/lectures/new', async (req, res)=>{
+router.get('/:course_id/lectures/new', async (req, res)=>{
     const courses = await Course.getAll();
+    const currentCourse = await Course.findById(req.params.course_id);
     res.render('admin/lectures/new', { 
         title: "New Lecture",
         user: req.user || null,
         courses,
+        currentCourse,
         messages: req.flash(),
         path: req.path 
     });

@@ -1,7 +1,7 @@
 <%- include('../partials/_header') %>
     <div class="row">
         <div class="col-12">
-            <div class="card rounded-0">
+            <div class="card rounded-0 min-vh-100">
                 <div class="card-body">
                     <h4 class="card-title">New Course</h4>
                     <form id="new-course-form" action="https://pdf-files-production.up.railway.app/admin/courses/create"
@@ -201,7 +201,7 @@
                 const response = await fetch(newCourseForm.action, {
                     method: newCourseForm.method,
                     headers: {
-                        "Authorization": `Bearer ${token}` // Don't set Content-Type manually, FormData handles it
+                        "Authorization": `Bearer ${token}`
                     },
                     body: formData
                 });
@@ -211,9 +211,14 @@
                 }
 
                 const result = await response.json();
-                console.log("Course created:", result);
+                setTimeout(() => {
+                    window.location.href = '/admin/courses';
+                }, 1000);
                 // optionally show success message or redirect
             } catch (err) {
+                setTimeout(() => {
+                    window.location.href = '/admin/courses';
+                }, 1000);
                 console.error("Failed to create course:", err);
             }
         });

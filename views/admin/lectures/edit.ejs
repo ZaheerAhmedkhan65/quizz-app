@@ -1,100 +1,43 @@
-<!-- views/lectures/edit.ejs -->
-<%- include('../../partials/_header') %>
-
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-md-8 mx-auto">
-      <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h4 class="mb-0">Edit Lecture</h4>
+<%- include('../partials/_header') %>
+    <div class="row">
+        <div class="col-12">
+            <div class="card rounded-0 min-vh-100">
+                <div class="card-body">
+                    <h4 class="card-title">Edit Lecture</h4>
+                    <form action="/admin/lectures/<%= lecture.id %>/update" method="POST">
+                        <div class="form-group  mb-4">
+                            <label for="course_id">Course</label>
+                            <select name="course_id" id="course_id" class="form-control">
+                                <% courses.forEach(course=> { %>
+                                    <option value="<%= course.id %>" <%= course.id == lecture.course_id ? 'selected' : '' %>
+                                        ><%= course.title %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                        <div class="form-group  mb-4">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                placeholder="Enter lecture title" value="<%= lecture.title %>" required>
+                        </div>
+                        <div class="form-group  mb-4">
+                            <label for="start_page">Start Page</label>
+                            <input type="number" class="form-control" id="start_page" name="start_page" value="<%= lecture.start_page %>" required>
+                        </div>
+                        <div class="form-group  mb-4">
+                            <label for="end_page">End Page</label>
+                            <input type="number" class="form-control" id="end_page" name="end_page" value="<%= lecture.end_page %>" required>
+                        </div>
+                        <div class="col-12 mb-4">
+                            <button type="submit" class="btn btn-primary">
+                               Update
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        
-        <div class="card-body">
-          <form action="/admin/lectures/<%= lecture.id %>/update" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="_method" value="PUT">
-            
-            <!-- Lecture Basic Info -->
-            <div class="mb-3">
-              <label for="title" class="form-label">Lecture Title</label>
-              <input type="text" class="form-control" id="title" name="title" 
-                     value="<%= lecture.title %>" required>
-            </div>
-            
-            <!-- Current PDF Info -->
-            <% if (lecture.handout_path) { %>
-            <div class="mb-3 border p-3 rounded bg-light">
-              <h5>Current Handout</h5>
-              <p class="mb-1">
-                <i class="fas fa-file-pdf me-2"></i>
-                <%= lecture.handout_path.split('/').pop() %>
-              </p>
-              <div class="d-flex justify-content-between align-items-center mt-2">
-                <div>
-                  <span class="badge bg-info me-2">
-                    Pages: <%= lecture.start_page %>-<%= lecture.end_page %>
-                  </span>
-                </div>
-                <a href="/<%= lecture.handout_path %>" 
-                   class="btn btn-sm btn-outline-primary" target="_blank">
-                  <i class="fas fa-eye me-1"></i> View PDF
-                </a>
-              </div>
-            </div>
-            <% } %>
-            
-            <!-- PDF Update Section -->
-            <div class="mb-4 border p-3 rounded">
-              <h5>Update Handout</h5>
-              
-              <div class="alert alert-info">
-                <small>
-                  <i class="fas fa-info-circle me-1"></i>
-                  Upload the complete course PDF and specify which pages belong to this lecture.
-                </small>
-              </div>
-              
-              <div class="mb-3">
-                <label for="handout_pdf" class="form-label">Course PDF File</label>
-                <input class="form-control" type="file" id="handout_pdf" 
-                       name="handout_pdf" accept=".pdf">
-                <div class="form-text">Max 10MB. Will replace existing PDF.</div>
-              </div>
-              
-              <div class="row">
-                <div class="col-md-6">
-                  <label for="start_page" class="form-label">Start Page</label>
-                  <input type="number" class="form-control" id="start_page" 
-                         name="start_page" min="1" value="<%= lecture.start_page || 1 %>">
-                </div>
-                <div class="col-md-6">
-                  <label for="end_page" class="form-label">End Page</label>
-                  <input type="number" class="form-control" id="end_page" 
-                         name="end_page" min="1" value="<%= lecture.end_page || 1 %>">
-                </div>
-              </div>
-            </div>
-
-            <!-- Change this section in views/lectures/edit.ejs -->
-<div class="form-group">
-  <label for="course_id">Course ID</label>
-  <input type="hidden" class="form-control" id="course_id" name="course_id" value="<%= lecture.course_id %>">
-  <p class="form-control-plaintext"><%= lecture.course_id %></p>
-</div>
-            
-            <!-- Form Actions -->
-            <div class="d-flex justify-content-between mt-4">
-              <a href="/courses/<%= lecture.course_id %>" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Cancel
-              </a>
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-1"></i> Save Changes
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
-  </div>
-</div>
 
-<%- include('../../partials/_footer') %>
+    
+<%- include('../partials/_footer') %>

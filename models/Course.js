@@ -6,14 +6,19 @@ class Course {
         return rows;
     }
 
+    static async getAllCourses(userId) {
+        const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
+        return rows[0].count;
+    }
+
     static async findById(id) {
         const [rows] = await db.query('SELECT * FROM courses WHERE id = ?', [id]);
         return rows[0];
     }
 
-    static async getTotalQuizzes(id) {
-        const [rows] = await db.query('SELECT total_quizzes FROM courses WHERE id = ?', [id]);
-        return rows.length ? rows[0].total_quizzes : 0; // Ensure it returns a number
+    static async getTotalLectures(id) {
+        const [rows] = await db.query('SELECT total_lectures FROM courses WHERE id = ?', [id]);
+        return rows.length ? rows[0].total_lectures : 0; // Ensure it returns a number
     }
 
     static async findByUserId(userId) {
@@ -34,8 +39,8 @@ class Course {
         return result.affectedRows;
     }
 
-    static async updateTotalQuizzes(id, totalQuizzes) {
-        const [result] = await db.query('UPDATE courses SET total_quizzes = ? WHERE id = ?', [totalQuizzes, id]);
+    static async updateTotalLectures(id, total_lectures) {
+        const [result] = await db.query('UPDATE courses SET total_lectures = ? WHERE id = ?', [total_lectures, id]);
         return result.affectedRows;
     }
 

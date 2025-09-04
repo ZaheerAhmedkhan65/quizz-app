@@ -4,7 +4,11 @@
         <div class="card rounded-0">
             <div class="card-body">
                 <h4 class="card-title"><%= lecture.title %></h4>
+                <span class="card-text me-1">Start Page : <%= lecture.start_page %></span> 
+                <span class="card-text">End Page : <%= lecture.end_page %></span>
+                <br>
                 <a href="<%= course.handout_pdf %>" class="text-decoration-none text-muted fw-semibold" download>Download <%= course.handout_original_filename %></a>
+                <a href="/admin/lectures/<%= lecture.id %>/edit" class="btn btn-primary float-end">Edit Lecture</a>
                 <hr>
                 <h4 class="card-title m-0">Questions</h4>
                 <% if(questions.length> 0) { %>

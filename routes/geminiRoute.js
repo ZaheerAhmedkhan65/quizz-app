@@ -64,7 +64,6 @@ router.post("/generate-response", async (req, res) => {
     let isPdfBased = false;
 
     const isIdentityQuery = isIdentityQuestion(prompt);
-    console.log("isIdentityQuery:", isIdentityQuery);
 
     const identityPrompt = `
       You are an AI assistant named "Quizzify", developed for the Quizzify app.

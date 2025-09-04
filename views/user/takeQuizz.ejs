@@ -4,7 +4,7 @@
             <div class="d-flex align-items-center justify-content-between position-relative">
                 <h1 class="m-0 p-0"><%= quizz.title %></h1>
                 <div id="timer"></div>
-                <p class="m-0">Total Marks : <strong><%= quizData.length %></strong></p>  
+                <p class="m-0">Total Marks : <strong><%= questions.length %></strong></p>  
             </div>
         </div>
         <div class="content-container">
@@ -29,22 +29,17 @@
         <h4 class="m-0 py-1">Questions</h4>
         <div id="questions-navigation-container" class="d-flex flex-wrap gap-1 border p-2 border-1 border-dark"></div>      
     </div>
-<script type="application/json" id="quiz-data">
-    <%- JSON.stringify(quizData) %>
+<script type="application/json" id="questions-data">
+    <%- JSON.stringify(questions) %>
 </script>
-<script type="application/json" id="current-quiz">
-    <%- JSON.stringify(quizz) %>
-</script>
+
 <script>
-    let courseId = "<%= course.id %>";
-    let quizzId = "<%= quizz.id %>";
+    let courseId = "<%= course_id %>";
+    let lectureId = "<%= lecture_id %>";
     let userId = "<%= user.userId %>";
-    let quizz = JSON.parse(document.getElementById("current-quiz").textContent);
-    let quizData = JSON.parse(document.getElementById("quiz-data").textContent);
+    let questions = JSON.parse(document.getElementById("questions-data").textContent);
 </script>
-<script src="/js/validateTakeQuizz.js"></script>
-<script src="/js/refreshToken.js"></script>
-<% if(quizData.length > 0){%>
+<% if(questions.length > 0){%>
 <script src="/js/takeQuizz.js"></script>
 <%}%>
 <%- include('../partials/_footer') -%>

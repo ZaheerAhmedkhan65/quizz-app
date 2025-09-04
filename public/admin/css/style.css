@@ -27241,7 +27241,7 @@ dl li {
     min-height: calc(100vh - 70px);
     overflow-x: hidden;
     overflow-y: auto;
-    padding-top: 70px;
+    margin-top: 70px;
     display: -webkit-flex;
     display: flex;
     -webkit-flex-direction: column;

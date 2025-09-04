@@ -1,10 +1,11 @@
 <%- include('../partials/_header') %>
 <div class="row ">
     <div class="col-12">
-        <div class="card rounded-0">
+        <div class="card rounded-0 min-vh-100">
             <div class="card-body">
                 <h4 class="card-title"><%= course.title %></h4>
                 <a href="<%= course.handout_pdf %>" class="text-decoration-none text-muted fw-semibold" download>Download <%= course.handout_original_filename %></a>
+                <a href="/admin/<%= course.id %>/lectures/new" class="btn btn-primary float-end">New Lecture</a>
                 <hr>
                 <h4 class="card-title">Lectures</h4>
                 <ul class="list-group">

@@ -6,8 +6,8 @@ const MySQLStore = require('express-mysql-session')(session);
 const pool = require('./config/db'); // Import your MySQL pool
 const flash = require('connect-flash');
 const app = express();
-const PORT = 3000;
 const path = require('path');
+require('dotenv').config();
 
 app.use(bodyParser.json());
 app.use(express.json());
@@ -104,6 +104,6 @@ app.use("/api/notifications",notificationRoutes);
 app.use(isAdmin)
 app.use("/admin",adminRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });

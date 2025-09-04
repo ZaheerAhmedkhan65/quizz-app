@@ -77,13 +77,13 @@ const verifyEmail = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     
     try {
         // Find the user by email
-        const user = await User.findByUsername(username);
+        const user = await User.findByEmail(email);
         if (!user) {
-            req.flash('error', 'Invalid username or password!');
+            req.flash('error', 'Invalid email or password!');
             return res.redirect('/auth/login');
         }
 
@@ -107,7 +107,7 @@ const login = async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            req.flash('error', 'Invalid username or password!');
+            req.flash('error', 'Invalid email or password!');
             return res.redirect('/auth/login');
         }
         

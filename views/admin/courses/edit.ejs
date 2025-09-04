@@ -1,10 +1,10 @@
 <%- include('../partials/_header') %>
 <div class="row">
     <div class="col-12">
-        <div class="card rounded-0">
+        <div class="card rounded-0 min-vh-100">
             <div class="card-body">
                 <h4 class="card-title">Edit Course</h4>
-                <form action="/admin/courses/<%= course.id %>/update" method="post" enctype="multipart/form-data">
+                <form id="edit-course-form" action="https://pdf-files-production.up.railway.app/admin/courses/<%= course.id %>/update" method="post" enctype="multipart/form-data">
                     <div class="form-group mb-4">
                         <label for="title" class="form-label">Course Title</label>
                         <input type="text" class="form-control" id="title" name="title" 
@@ -150,5 +150,43 @@
     #dropzone { transition: all 0.3s ease; cursor: pointer; }
     #dropzone:hover { border-color:#0d6efd !important; background-color:rgba(13,110,253,0.05) !important; }
 </style>
+
+<script>
+    
+        const token = "<%= token %>";
+
+        const editCourseForm = document.getElementById('edit-course-form');
+        editCourseForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // collect all form data
+            const formData = new FormData(editCourseForm);
+            console.log("formData: ", formData);
+            try {
+                const response = await fetch(editCourseForm.action, {
+                    method: editCourseForm.method,
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                setTimeout(() => {
+                    window.location.href = '/admin/courses';
+                }, 1000);
+                // optionally show success message or redirect
+            } catch (err) {
+                setTimeout(() => {
+                    window.location.href = '/admin/courses';
+                }, 1000);
+                console.error("Failed to create course:", err);
+            }
+        });
+</script>
 
 <%- include('../partials/_footer') %>

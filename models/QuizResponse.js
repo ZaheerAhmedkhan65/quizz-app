@@ -19,15 +19,20 @@ class QuizResponse {
 
     static async getAttemptResults(attempt_id) {
         const [rows] = await db.query(
-            `SELECT qr.*, q.question_text, o.option_text 
-             FROM quiz_responses qr
-             JOIN questions q ON qr.question_id = q.id
-             LEFT JOIN options o ON qr.option_id = o.id
-             WHERE qr.attempt_id = ?`,
+            `SELECT qr.*, 
+                q.question_text, 
+                uo.option_text AS user_option_text,
+                co.option_text AS correct_option_text
+         FROM quiz_responses qr
+         JOIN questions q ON qr.question_id = q.id
+         LEFT JOIN options uo ON qr.option_id = uo.id
+         LEFT JOIN options co ON co.question_id = q.id AND co.is_correct = 1
+         WHERE qr.attempt_id = ?`,
             [attempt_id]
         );
         return rows;
     }
+
 }
 
 module.exports = QuizResponse;

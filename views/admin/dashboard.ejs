@@ -1,7 +1,6 @@
 <%- include('./partials/_header') %>
     
-                <div class="content-wrapper">
-                    <div class="row">
+            <div class="row">
                         <div class="col-sm-4 grid-margin">
                             <div class="card">
                                 <div class="card-body">
@@ -271,13 +270,12 @@
                                                         </td>
                                                         <td>
                                                             <%if(user.courses.length> 0) {%>
-                                                                <a href="#" id="profile-dropdown"
-                                                                    data-bs-toggle="dropdown" aria-expanded="true"
-                                                                    class="show">
+                                                                <a href="#" id="user-<%= user.id %>-profile-dropdown"
+                                                                    data-bs-toggle="dropdown" aria-expanded="true">
                                                                     View
                                                                 </a>
                                                                 <div class="dropdown-menu dropdown-menu-end"
-                                                                    aria-labelledby="profile-dropdown">
+                                                                    aria-labelledby="user-<%= user.id %>-profile-dropdown">
                                                                     <% user.courses.forEach((course, index)=> { %>
                                                                         <a href="#" class="dropdown-item">
                                                                             <%= index + 1 %> - <%= course.title %>
@@ -412,7 +410,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
                 <!-- content-wrapper ends -->
                  <!-- container-scroller -->
     <script type="application/json" id="chat-history">

@@ -1,69 +1,82 @@
 const db = require('../config/db');
-const fs = require('fs');
-const pdf = require('pdf-parse'); // You'll need to install this package
 const path = require('path');
-
+const fs = require('fs');
+const { PDFDocument } = require('pdf-lib');
 
 class Lecture {
-    static async create({ title, courseId, handoutPath, startPage, endPage }) {
+    static async create({ title, courseId, startPage, endPage }) {
         const [result] = await db.query(
-            'INSERT INTO lectures (title, course_id, handout_path, start_page, end_page) VALUES (?, ?, ?, ?, ?)',
-            [title, courseId, handoutPath, startPage, endPage]
+            'INSERT INTO lectures (title, course_id, start_page, end_page) VALUES (?, ?, ?, ?)',
+            [title, courseId, startPage, endPage]
         );
         return this.findById(result.insertId);
     }
 
     static async delete(id) {
         const [result] = await db.query(
-            'DELETE FROM lectures WHERE id = ?', 
+            'DELETE FROM lectures WHERE id = ?',
             [id]
         );
         return result.affectedRows;
     }
 
-    static async update(id, { title, courseId, handoutPath, startPage, endPage }) {
-    const [result] = await db.query(
-        'UPDATE lectures SET title = ?, course_id = ?, handout_path = ?, start_page = ?, end_page = ? WHERE id = ?', 
-        [title, courseId, handoutPath, startPage, endPage, id]
-    );
-    return result.affectedRows;
-}
+    static async update(id, { title, courseId, startPage, endPage }) {
+        const [result] = await db.query(
+            'UPDATE lectures SET title = ?, course_id = ?, start_page = ?, end_page = ? WHERE id = ?',
+            [title, courseId, startPage, endPage, id]
+        );
+        return result.affectedRows;
+    }
+
+    static async getCourse(id) {
+        const [rows] = await db.query(
+            'SELECT * FROM courses WHERE id = ?',
+            [id]
+        );
+        return rows[0];
+    }
 
 
-    static async extractLectureContent(lectureId) {
-        const lecture = await this.findById(lectureId);
-        if (!lecture || !lecture.handout_path) return null;
+    static async extractLecturePDF(lecture) {
+        const course = await this.getCourse(lecture.course_id);
+        if (!course || !course.handout_pdf) return null;
 
-        const fullPath = path.join('public', lecture.handout_path);
-        if (!fs.existsSync(fullPath)) return null;
+        const coursePdfPath = path.join(__dirname, '..', 'public', course.handout_pdf);
+        if (!fs.existsSync(coursePdfPath)) return null;
 
         try {
-            const dataBuffer = fs.readFileSync(fullPath);
-            const data = await pdf(dataBuffer);
-            
-            // Extract pages for this lecture
-            const allPages = data.text.split(/\f/); // Split by form feed character (page break)
-            const lecturePages = allPages.slice(lecture.start_page - 1, lecture.end_page);
-            
-            return {
-                content: lecturePages.join('\n\n[PAGE BREAK]\n\n'), // Mark page breaks
-                totalPages: allPages.length,
-                currentPages: lecturePages.length
-            };
+            const existingPdfBytes = fs.readFileSync(coursePdfPath);
+            const pdfDoc = await PDFDocument.load(existingPdfBytes);
+            const newPdf = await PDFDocument.create();
+
+            // Zero-based pages
+            const pageIndices = [];
+            for (let i = lecture.start_page - 1; i < lecture.end_page; i++) {
+                pageIndices.push(i);
+            }
+
+            const copiedPages = await newPdf.copyPages(pdfDoc, pageIndices);
+            copiedPages.forEach((page) => newPdf.addPage(page));
+
+            // Return PDF as Buffer (not saved anywhere)
+            const lecturePdfBytes = await newPdf.save();
+            return lecturePdfBytes;
         } catch (err) {
-            console.error('Error extracting PDF content:', err);
+            console.error("Error generating lecture PDF:", err);
             return null;
         }
     }
+
 
     static async getLectureWithContent(lectureId) {
         const lecture = await this.findById(lectureId);
         if (!lecture) return null;
 
-        const content = await this.extractLectureContent(lectureId);
+        const lecturePdf = await this.extractLecturePDF(lecture);
+
         return {
             ...lecture,
-            content
+            pdf: lecturePdf
         };
     }
 
@@ -82,7 +95,7 @@ class Lecture {
 
     static async findById(id) {
         const [rows] = await db.query(
-            'SELECT * FROM lectures WHERE id = ?', 
+            'SELECT * FROM lectures WHERE id = ?',
             [id]
         );
         return rows[0];
@@ -90,7 +103,7 @@ class Lecture {
 
     static async findByCourseId(courseId) {
         const [rows] = await db.query(
-            'SELECT * FROM lectures WHERE course_id = ?', 
+            'SELECT * FROM lectures WHERE course_id = ?',
             [courseId]
         );
         return rows;
@@ -98,7 +111,7 @@ class Lecture {
 
     static async deleteByCourseId(courseId) {
         const [result] = await db.query(
-            'DELETE FROM lectures WHERE course_id = ?', 
+            'DELETE FROM lectures WHERE course_id = ?',
             [courseId]
         );
         return result.affectedRows;
@@ -111,22 +124,10 @@ class Lecture {
         );
         return rows.length ? rows[0].attempt_count : 0;
     }
-    
-    static async updateQuizProgressBasedOnAttempts(lectureId) {
-        const attemptCount = await this.getQuizAttemptCount(lectureId);
-        let progress = (attemptCount >= 5) ? 100.00 : (attemptCount / 5) * 100;
-    
-        await db.query(
-            "UPDATE lectures SET lecture_progress = ? WHERE id = ?",
-            [progress, lectureId]
-        );
-    
-        return progress;
-    }
-    
+
     static async updateLectureTotalQuestions(lectureId, totalQuestions) {
         const [result] = await db.query(
-            'UPDATE lectures SET total_questions = ? WHERE id = ?', 
+            'UPDATE lectures SET total_questions = ? WHERE id = ?',
             [totalQuestions, lectureId]
         );
         return result.affectedRows;

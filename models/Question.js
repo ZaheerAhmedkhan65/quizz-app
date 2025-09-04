@@ -11,7 +11,7 @@ class Question {
         const [rows] = await db.query(`SELECT * FROM questions WHERE id IN (?)`, [ids]);
         return rows;
     }
-    
+
     static async findByLectureId(lectureId) {
         const [rows] = await db.query('SELECT * FROM questions WHERE lecture_id = ?', [lectureId]);
         return rows;
@@ -36,7 +36,7 @@ class Question {
         return result.affectedRows;
     }
 
-    static async update(id, { question_text, question_type='multiple_choice', question_image=null }) {
+    static async update(id, { question_text, question_type = 'multiple_choice', question_image = null }) {
         const [result] = await db.query(
             'UPDATE questions SET question_text = ?, question_type = ?, question_image = ? WHERE id = ?',
             [question_text, question_type, question_image, id]
@@ -48,7 +48,7 @@ class Question {
     static async setCorrectAnswer(question_id, correct_answer, max_length = null) {
         // First delete any existing answer for this question
         await db.query('DELETE FROM answers WHERE question_id = ?', [question_id]);
-        
+
         // Insert new correct answer
         const [result] = await db.query(
             'INSERT INTO answers (question_id, correct_answer, max_length) VALUES (?, ?, ?)',

@@ -34,8 +34,7 @@ function downloadWithProgress(button, pdfUrl) {
     fetch(pdfUrl)
         .then(response => {
             if (!response.ok) throw new Error('Network error');
-
-            // ✅ Extract filename from Content-Disposition header
+            // Extract filename from Content-Disposition header
             let fileName = 'document.pdf';
             const contentDisposition = response.headers.get('content-disposition');
             if (contentDisposition && contentDisposition.includes('filename=')) {
@@ -47,7 +46,7 @@ function downloadWithProgress(button, pdfUrl) {
 
             const contentLength = response.headers.get('content-length');
 
-            // ✅ Case 1: content-length available (real progress)
+            // Case 1: content-length available (real progress)
             if (contentLength) {
                 const total = parseInt(contentLength, 10);
                 let loaded = 0;
@@ -74,7 +73,7 @@ function downloadWithProgress(button, pdfUrl) {
                 }));
             }
 
-            // ✅ Case 2: no content-length (fake smooth progress until blob ready)
+            // Case 2: no content-length (fake smooth progress until blob ready)
             let progress = 0;
             const fakeInterval = setInterval(() => {
                 progress = Math.min(progress + 5, 90); // cap at 90%
