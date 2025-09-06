@@ -1,111 +1,272 @@
 <%- include('partials/_header') %>
-
-    <div class="container mt-3">
-        <div class="row">
-            <div class="col-md-6">
-                <h2>Courses</h2>
-            </div>
-        </div>
-
-        <div id="loadingSpinner" class="text-center my-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only"></span>
-            </div>
-        </div>
-
-        <ul id="coursesContainer" class="row p-0 px-3 gap-3">
-            <!-- Courses will be loaded here dynamically -->
-        </ul>
-
-        <div id="noCoursesMessage" class="alert alert-warning text-center" style="display: none;">
-            No courses found matching your criteria.
+    <div class="p-4 p-md-5 mb-5 rounded text-body-emphasis bg-body-secondary ">
+        <div class="col-lg-12 px-0">
+            <h1 class="display-6 fst-italic text-uppercase">welcome to vu empire</h1>
+            <p class="lead my-3">
+                Welcome to vu empire. Its A Site Where You Will Find Out All Type Of Vu Stuff Very Easily
+                and Without Doing any Extra Struggle. Just Go to the Menu Select the Whatever You Want Like Past Papers,
+                Quizes Or Assignment and Click On Download. Its Easy then You Think. So For What You are Waiting For.
+                Download
+                what you want and Share it with your Friends so they can also Save their time.
+            </p>
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="container text-center">
+                    <h1 class="display-3 fw-bold mb-4">Your Complete VU Learning Solution</h1>
+                    <p class="lead mb-4">Access handouts, quizzes, past papers, assignments and track your progress - all in one place</p>
+                    <a href="#" class="btn btn-light btn-lg px-4 py-2 fw-bold">Explore Features <i class="fas fa-arrow-right ms-2"></i></a>
+                </div>
+            </section>
         </div>
     </div>
 
-    <script src="/js/download.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Fetch courses data
-            fetchCourses();
-    });
+    <!-- Stats Section -->
+    <section class="container mb-5">
+        <div class="row text-center">
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-number">500+</div>
+                <p>Courses Available</p>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-number">10,000+</div>
+                <p>Downloadable Resources</p>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-number">5,000+</div>
+                <p>Quiz Questions</p>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-number">98%</div>
+                <p>User Satisfaction</p>
+            </div>
+        </div>
+    </section>
 
+    <!-- Features Section -->
+    <section class="container mb-5">
+        <h2 class="text-center mb-5 gradient-text">Everything You Need For VU Success</h2>
+        
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="feature-card card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h3 class="h4">Handout PDFs</h3>
+                        <p>Download handouts for any VU course, either lecture-wise or create custom PDFs by selecting specific lecture ranges.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="feature-card card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <h3 class="h4">Course Enrollment</h3>
+                        <p>Join your VU courses and track your progress through interactive quizzes and activities.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="feature-card card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h3 class="h4">Interactive Quizzes</h3>
+                        <p>Test your knowledge with comprehensive quizzes - either for full courses or specific lectures.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="col-md-4">
+                <div class="feature-card card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="h4">Progress Tracking</h3>
+                        <p>Monitor your learning journey with detailed progress reports based on your quiz attempts and activities.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 5 -->
+            <div class="col-md-4">
+                <div class="feature-card card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3 class="h4">MCQs Collection</h3>
+                        <p>Access comprehensive multiple-choice questions for each lecture to enhance your preparation.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Feature 6 -->
+            <div class="col-md-4">
+                <div class="feature-card card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon">
+                            <i class="fas fa-archive"></i>
+                        </div>
+                        <h3 class="h4">Past Papers & Assignments</h3>
+                        <p>Find past exam papers, assignments, and GDBs to practice and excel in your exams.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        function fetchCourses(searchTerm = '') {
-            const container = document.getElementById('coursesContainer');
-            const spinner = document.getElementById('loadingSpinner');
-            const noCoursesMsg = document.getElementById('noCoursesMessage');
+    <!-- How It Works Section -->
+    <section class="container mb-5">
+        <h2 class="text-center mb-5 gradient-text">How VU Empire Works</h2>
+        
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="d-flex mb-4">
+                    <div class="me-4">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">1</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Sign Up & Join Courses</h4>
+                        <p>Create your account and enroll in your VU courses with a single click.</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex mb-4">
+                    <div class="me-4">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">2</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Access Study Materials</h4>
+                        <p>Download handouts, MCQs, past papers, and assignments for your courses.</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex mb-4">
+                    <div class="me-4">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">3</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Test Your Knowledge</h4>
+                        <p>Take quizzes lecture-wise or for the entire course to assess your understanding.</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex">
+                    <div class="me-4">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                            <span class="fw-bold">4</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Track Your Progress</h4>
+                        <p>Monitor your improvement through detailed analytics and performance reports.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <img src="https://images.unsplash.com/photo-1522881193457-37ae97c905bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="How it works" class="img-fluid rounded">
+            </div>
+        </div>
+    </section>
 
-            // Show loading spinner
-            container.innerHTML = '';
-            spinner.style.display = 'block';
-            noCoursesMsg.style.display = 'none';
-
-            // Make AJAX request
-            fetch(`/courses-list?search=${encodeURIComponent(searchTerm)}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(courses => {
-                    spinner.style.display = 'none';
-
-                    if (courses.length === 0) {
-                        noCoursesMsg.style.display = 'block';
-                        return;
-                    }
-
-                    // Render courses
-                    courses.forEach(course => {
-                        const courseItem = document.createElement('li');
-                        courseItem.className = 'list-group-item col-lg-4 col-md-6 col-12';
-
-                        courseItem.innerHTML = `
-                        <div class="d-flex flex-column">
-                            <a class="text-decoration-none text-muted fw-semibold" href="/courses/${course.id}">
-                                <p class="fw-bold fs-5 m-0">${course.title}</p>
-                            </a>
-                            <div class="d-flex gap-2">
-                                ${course.handout_pdf ? `
-                                <div class="download-container">
-                                    <button class="download-btn" data-href="/courses/${course.id}/handout/download">
-                                        <div class="icon-container">
-                                            <svg class="circular-progress" viewBox="0 0 26 26">
-                                                <circle class="progress-circle" cx="13" cy="13" r="11"></circle>
-                                            </svg>
-                                            <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                <polyline points="7 10 12 15 17 10"></polyline>
-                                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                                            </svg>
-                                        </div>
-                                        <span class="btn-text">Download PDF</span>
-                                    </button>
-                                </div>
-                                ` : ''}
-                                <form action="/courses/${course.id}/join" method="post">
-                                    <button type="submit" class="btn btn-primary">Join Course</button>
-                                </form>
+    <!-- Testimonials -->
+    <section class="container mb-5">
+        <h2 class="text-center mb-5 gradient-text">What Students Say</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="testimonial-card card">
+                    <div class="card-body">
+                        <div class="d-flex mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="fst-italic">"VU Empire has been a lifesaver! The handout PDFs and quizzes have helped me improve my grades significantly."</p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="User" class="rounded-circle me-2" width="40">
+                            <div>
+                                <strong>Ayesha Khan</strong>
+                                <p class="mb-0 text-muted small">BS Computer Science</p>
                             </div>
                         </div>
-                    `;
-
-                        container.appendChild(courseItem);
-                    });
-                })
-                .catch(error => {
-                    spinner.style.display = 'none';
-                    container.innerHTML = `
-                    <div class="col-12">
-                        <div class="alert alert-danger">Error loading courses. Please try again later.</div>
                     </div>
-                `;
-                    console.error('Error fetching courses:', error);
-                });
-        }
-</script>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="testimonial-card card">
+                    <div class="card-body">
+                        <div class="d-flex mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="fst-italic">"The custom PDF feature is amazing! I can create handouts with exactly the lectures I need to focus on."</p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="rounded-circle me-2" width="40">
+                            <div>
+                                <strong>Ali Ahmed</strong>
+                                <p class="mb-0 text-muted small">MBA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="testimonial-card card">
+                    <div class="card-body">
+                        <div class="d-flex mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="fst-italic">"The progress tracking feature helps me stay motivated. I can see my improvement after each quiz attempt."</p>
+                        <div class="d-flex align-items-center">
+                            <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="User" class="rounded-circle me-2" width="40">
+                            <div>
+                                <strong>Fatima Hassan</strong>
+                                <p class="mb-0 text-muted small">BBA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <%- include('partials/_footer') %>
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container text-center">
+            <h2 class="display-5 fw-bold mb-4">Ready to Enhance Your VU Learning Experience?</h2>
+            <p class="lead mb-4">Join thousands of successful VU students who are already using VU Empire</p>
+            <a href="/auth/create-account" class="btn btn-light btn-lg px-5 py-3 fw-bold">Get Started Now</a>
+        </div>
+    </section>
+<%- include('partials/_footer') %>

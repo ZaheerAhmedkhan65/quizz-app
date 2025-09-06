@@ -1,31 +1,54 @@
 // utils/emailService.js
-const nodemailer = require('nodemailer');
+const Mailjet = require('node-mailjet');
 
-// Create transporter (configure with your email service)
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE || 'gmail', // e.g., 'gmail', 'sendgrid', etc.
-  auth: {
-    user: process.env.EMAIL_USERNAME,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+// Initialize Mailjet client
+const mailjet = Mailjet.apiConnect(
+  process.env.MAILJET_API_KEY,
+  process.env.MAILJET_SECRET_KEY
+);
 
 // Email sending function
-const sendEmail = async ({ email, subject, message }) => {
+const sendEmail = async ({ email, subject, message, html }) => {
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_FROM || `"Quiz App" <${process.env.EMAIL_USERNAME}>`,
-      to: email,
-      subject,
-      text: message,
-      // You can also add html: for HTML emails
-    };
+    const request = mailjet
+      .post('send', { version: 'v3.1' })
+      .request({
+        Messages: [
+          {
+            From: {
+              Email: process.env.EMAIL_FROM || 'ranazaheerahmed65@gmail.com',
+              Name: process.env.EMAIL_FROM_NAME || 'Quiz App'
+            },
+            To: [
+              {
+                Email: email,
+                Name: email.split('@')[0]
+              }
+            ],
+            Subject: subject,
+            TextPart: message,
+            HTMLPart: html || message
+          }
+        ]
+      });
 
-    await transporter.sendMail(mailOptions);
-    console.info(`Email sent to ${email}`);
+    const result = await request;
+    console.info(`Email sent to ${email}:`, result.body.Messages[0].Status);
     return true;
   } catch (error) {
     console.error(`Error sending email to ${email}:`, error);
+    
+    // Fallback to console in development
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('=== EMAIL CONTENT (DEV FALLBACK) ===');
+      console.log('To:', email);
+      console.log('Subject:', subject);
+      console.log('Message:', message);
+      if (html) console.log('HTML:', html);
+      console.log('===============================');
+      return true; // Pretend it worked in development
+    }
+    
     throw new Error('Failed to send email');
   }
 };

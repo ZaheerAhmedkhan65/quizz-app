@@ -1,0 +1,59 @@
+.hero-section {
+    background: linear-gradient(rgba(113, 44, 249, 0.8), rgba(108, 117, 125, 0.8)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 5rem 0;
+    border-radius: 50% 10% 50% 10% / 10% 50% 10% 50%;
+}
+
+.feature-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, #712cf9, #6c757d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.cta-section {
+    background: linear-gradient(to right, #712cf9, #6c757d);
+    color: white;
+    padding: 4rem 0;
+    border-radius: 20px;
+    margin: 4rem 0;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #712cf9, #6c757d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.testimonial-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-text {
+    background: linear-gradient(to right, #712cf9, #6c757d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}

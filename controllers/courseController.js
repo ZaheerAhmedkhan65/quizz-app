@@ -20,7 +20,7 @@ const showCourse = async (req, res) => {
           if(req.user && req.user.role=='admin'){
             return res.status(200).render('admin/courses/show', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
           }
-          res.status(200).render('user/course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
+          res.status(200).render('course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

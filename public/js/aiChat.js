@@ -59,13 +59,16 @@ function formatFileSize(bytes) {
 document.addEventListener("DOMContentLoaded", (event) => {
     chatInput.value = "";
     chatSendBtn.disabled = true;
+    chatSendBtn.style.color = "gray";
 })
 
 chatInput.addEventListener("input", () => {
     if (chatInput.value) {
         chatSendBtn.disabled = false;
+        chatSendBtn.style.color = "black";
     } else {
         chatSendBtn.disabled = true;
+        chatSendBtn.style.color = "gray";
     }
 })
 
@@ -154,6 +157,7 @@ function sendMessage(message) {
         // Show stop button and hide send button
         chatSendBtn.classList.add('d-none');
         chatStopBtn.classList.remove('d-none');
+        chatStopBtn.style.color = "black";
 
         writeUserMessage(message);
         scrollToBottom();
@@ -187,6 +191,7 @@ function stopMessage() {
     // Hide stop button and show send button
     chatSendBtn.classList.remove('d-none');
     chatStopBtn.classList.add('d-none');
+    chatStopBtn.style.color = "gray";
 
     // Abort the fetch request if it exists
     if (abortController) {
@@ -241,24 +246,26 @@ async function fetchGeminiResponse(prompt, controller) {
         // Hide stop button and show send button when done
         chatSendBtn.classList.remove('d-none');
         chatStopBtn.classList.add('d-none');
+        chatStopBtn.style.color = "gray";
 
         if (!data.response) {
             aiMessage.classList.add("ai-message");
-            gettingResponse.remove();
             aiMessage.innerHTML = `<div class="message-content">Server is busy. Please try again later.</div>`;
+            gettingResponse.remove();
             chatMessages.appendChild(aiMessage);
             return;
         }
         setTimeout(() => {
-            gettingResponse.remove();
             const formattedResponse = generateFormattedResponse(data.response);
             addMessageToChat(formattedResponse, aiMessage, data.chatHistory);
+            gettingResponse.remove();
             chatMessages.appendChild(aiMessage);
         }, 3000);
     } catch (error) {
         // Hide stop button and show send button on error
         chatSendBtn.classList.remove('d-none');
         chatStopBtn.classList.add('d-none');
+        chatStopBtn.style.color = "gray";
 
         if (error.name === 'AbortError') {
             console.log('Fetch aborted by user');

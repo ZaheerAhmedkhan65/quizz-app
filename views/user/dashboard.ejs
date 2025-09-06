@@ -23,13 +23,13 @@
                         </a>
                       </h5>
                       <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-secondary border-0" type="button" data-bs-toggle="dropdown">
+                        <button class="btn btn-sm rounded-circle btn-outline-primary border-0" type="button" data-bs-toggle="dropdown">
                           <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                           <li>
                             <form class="delete-course-btn" data-course-id="<%= course.id %>" action="/courses/<%= course.id %>/leave" method="POST">
-                              <button type="submit" class="dropdown-item text-restart fw-semibold">
+                              <button type="submit" class="dropdown-item text-reset fw-semibold">
                                 <i class="bi bi-door-open me-1"></i> Left
                               </button>
                             </form>
@@ -39,7 +39,7 @@
                     </div>
                     
                     <% if(courseProgress) { %>
-                    <a href="/courses/<%= course.id %>" class="text-decoration-none text-restart">
+                    <a href="/courses/<%= course.id %>" class="text-decoration-none text-reset">
                       <div class="progress-container mb-3" style="width: 100%;">
                         <div class="d-flex justify-content-between mb-1">
                           <small class="text-muted">Progress</small>
@@ -73,7 +73,7 @@
   
       <!-- Sidebar Column -->
       <div class="col-lg-4 order-lg-2 order-1 mb-lg-0">
-        <div class="sticky-top" style="top: 0px;">
+        <div class="position-sticky" style="top: 0px;">
           <% if(courses.length > 0) { %>
             <div class="card border-0 shadow-sm">
               <div class="card-body">

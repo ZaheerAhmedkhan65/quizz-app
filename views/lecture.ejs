@@ -1,0 +1,83 @@
+<%- include('partials/_header') %>
+<nav class="p-0" style="--bs-breadcrumb-divider: '&gt;';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <%if(user){%>
+    <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+    <%}else{%>
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <%}%>
+    <li class="breadcrumb-item"><a href="/courses/<%= course.id %>"><%= course.title %></a></li>
+    <li class="breadcrumb-item active" aria-current="page"><%= lecture.title %></li>
+  </ol>
+</nav>
+    <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary ">
+      <div class="col-lg-12 px-0">
+        <h1 class="display-6 fst-italic text-uppercase"><%= lecture.title %></h1>
+        <div class="d-flex align-items-center justify-content-between">
+           <div class="d-flex gap-lg-5 gap-md-5 gap-3 align-items-center">
+                <div class="download-container">
+                    <button class="action-btn download-btn" data-href="https://pdf-files-production.up.railway.app/courses/<%= course.slug %>/lectures/<%= lecture.id %>/pdf" id="pdf-download-btn">
+                        <div class="icon-container">
+                            <svg class="circular-progress" viewBox="0 0 26 26" >
+                                <circle class="progress-circle" cx="13" cy="13" r="11"></circle>
+                            </svg>
+                            <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                        <span class="btn-text">Download Mcqs</span>
+                    </button>
+                </div>
+
+                <div class="download-container">
+                    <button class="action-btn download-btn" data-href="/lectures/<%= lecture.id %>/pdf" id="pdf-download-btn">
+                        <div class="icon-container">
+                            <svg class="circular-progress" viewBox="0 0 26 26" >
+                                <circle class="progress-circle" cx="13" cy="13" r="11"></circle>
+                            </svg>
+                            <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                        <span class="btn-text">Download PDF</span>
+                    </button>
+                </div>
+           </div>
+            <a href="/quiz/start/<%= course.id %>/<%= lecture.id %>" class="action-btn bg-primary text-decoration-none text-reset">Take Quiz</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 p-0 mt-3">
+        <h2>Questions</h2>
+    </div>
+    <div class="col-12 p-0">
+    <% if(questions.length > 0) { %>
+        <% questions.forEach((question, index) => { %>
+            <div class="question">
+                <div class="question-text">
+                    <%= index + 1 %>. <%= question.question_text %>
+                </div>
+                <div class="options">
+                    <% question.options.forEach(option => { %>
+                        <div class="option <%= option.is_correct ? 'correct' : '' %>">
+                            • <%= option.option_text %>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <p>No questions available for this lecture.</p>
+    <% } %>
+    </div>
+     <script src="/js/download.js"></script>
+<%- include('partials/_footer') %>

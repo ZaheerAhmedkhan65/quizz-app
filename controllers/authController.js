@@ -34,13 +34,27 @@ const signup = async (req, res) => {
         });
         
         // Send verification email
-        const verificationUrl = `${req.protocol}://${req.get('host')}/auth/verify-email?token=${verificationToken}`;
-        await sendEmail({
-            email: newUser.email,
-            subject: 'Verify Your Email',
-            message: `Please click on the following link to verify your email: ${verificationUrl}`
-        });
-
+       const verificationUrl = `${req.protocol}://${req.get('host')}/auth/verify-email?token=${verificationToken}`;
+       await sendEmail({
+         email: newUser.email,
+         subject: 'Verify Your Email Address',
+         message: `Please click on the following link to verify your email: ${verificationUrl}`,
+         html: `
+           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+             <h2 style="color: #4F46E5;">Email Verification</h2>
+             <p>Hello ${username},</p>
+             <p>Thank you for creating an account with Quiz App! Please verify your email address by clicking the button below:</p>
+             <div style="text-align: center; margin: 30px 0;">
+               <a href="${verificationUrl}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Verify Email Address</a>
+             </div>
+             <p>Or copy and paste this link into your browser:</p>
+             <p style="word-break: break-all; color: #4F46E5;">${verificationUrl}</p>
+             <p>If you didn't create this account, please ignore this email.</p>
+             <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;">
+             <p style="color: #6B7280; font-size: 14px;">This is an automated message, please do not reply to this email.</p>
+           </div>
+         `
+       });
         req.flash('success', 'Your account has been created! Please check your gmail inbox to verify your account.');
         return res.redirect('/auth/login');
     } catch (error) {
@@ -52,7 +66,7 @@ const signup = async (req, res) => {
 
 const verifyEmail = async (req, res) => {
     const { token } = req.query;
-    
+    console.log("token : ",token);
     try {
         // Find user by verification token (checking expiration in the query)
         const user = await User.findByVerificationToken(token);
@@ -144,26 +158,45 @@ const login = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
-    
+    console.log(email);
     try {
         const user = await User.findByEmail(email);
         if (!user) {
             req.flash('error', 'The user with this Email not found.Please try other email.');
             return res.redirect('/auth/forgot-password');
         }
+
+        console.log("user : ",user);
         
         // Generate reset token
         const resetToken = crypto.randomBytes(32).toString('hex');
         const resetTokenExpires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
-        
+        console.log("resetTokenExpires : ",resetTokenExpires);
+        console.log("resetToken : ",resetToken);
         await User.setResetToken(user.email, resetToken, resetTokenExpires);
 
         // Send reset email
         const resetUrl = `${req.protocol}://${req.get('host')}/auth/reset-password?token=${resetToken}`;
         await sendEmail({
-            email: user.email,
-            subject: 'Password Reset Request',
-            message: `To reset your password, please click on the following link: ${resetUrl}\nThis link will expire in 30 minutes.`
+          email: user.email,
+          subject: 'Password Reset Request',
+          message: `To reset your password, please click on the following link: ${resetUrl}\nThis link will expire in 30 minutes.`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #DC2626;">Password Reset Request</h2>
+              <p>Hello ${user.username},</p>
+              <p>We received a request to reset your password. Click the button below to create a new password:</p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetUrl}" style="background-color: #DC2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Reset Password</a>
+              </div>
+              <p>Or copy and paste this link into your browser:</p>
+              <p style="word-break: break-all; color: #DC2626;">${resetUrl}</p>
+              <p>This link will expire in 30 minutes for security reasons.</p>
+              <p>If you didn't request this password reset, please ignore this email - your account is secure.</p>
+              <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;">
+              <p style="color: #6B7280; font-size: 14px;">This is an automated message, please do not reply to this email.</p>
+            </div>
+          `
         });
 
         req.flash('success', 'Password reset email sent successfully!');

@@ -1,112 +1,79 @@
 <div class="ask-ai-chat-modal bg-secondary-subtle">
-    <div class="d-flex flex-column">
-        <div class="ask-ai-chat-header d-flex">
-            <button class="side-bar-menu-btn border-0 outline-none bg-transparent">
-              <svg width="24" height="24" style="transform: rotate(0deg);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-lg text-token-text-secondary mx-2">
-                <path fill-rule="evenodd" style="fill: #8b8989;" clip-rule="evenodd" d="M3 8C3 7.44772 3.44772 7 4 7H20C20.5523 7 21 7.44772 21 8C21 8.55228 20.5523 9 20 9H4C3.44772 9 3 8.55228 3 8ZM3 16C3 15.4477 3.44772 15 4 15H14C14.5523 15 15 15.4477 15 16C15 16.5523 14.5523 17 14 17H4C3.44772 17 3 16.5523 3 16Z" fill="currentColor"></path></svg>
-            </button>
-            <div class="d-flex align-items-center">
-                <h3 class="m-0">AI Chat</h3>
-            </div>
-            <div class="d-flex">
-                <button type="button" role="button" class="clear-chat-btn bg-transparent popconfirm-toggle d-flex"
-                    aria-label="Clear Chat" title="Clear Chat" fdprocessedid="37sycb">
-                    <svg style="width:20px; transform: rotate(360deg); height:20px; fill:#8e8e8e;" viewBox="0 0 512 512"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z">
-                        </path>
-                    </svg>
-                </button>
+  <div class="d-flex flex-column">
+    <div class="ask-ai-chat-header d-flex">
+      <button class="side-bar-menu-btn border-0 outline-none bg-transparent">
+        <svg width="24" height="24" style="transform: rotate(0deg);" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg" class="icon-lg text-token-text-secondary mx-2">
+          <path fill-rule="evenodd" style="fill: #8b8989;" clip-rule="evenodd"
+            d="M3 8C3 7.44772 3.44772 7 4 7H20C20.5523 7 21 7.44772 21 8C21 8.55228 20.5523 9 20 9H4C3.44772 9 3 8.55228 3 8ZM3 16C3 15.4477 3.44772 15 4 15H14C14.5523 15 15 15.4477 15 16C15 16.5523 14.5523 17 14 17H4C3.44772 17 3 16.5523 3 16Z"
+            fill="currentColor"></path>
+        </svg>
+      </button>
+      <div class="d-flex align-items-center">
+        <h3 class="m-0">AI Chat</h3>
+      </div>
+      <div class="d-flex">
+        <button type="button" role="button" class="clear-chat-btn bg-transparent popconfirm-toggle d-flex"
+          aria-label="Clear Chat" title="Clear Chat" fdprocessedid="37sycb">
+          <svg style="width:20px; transform: rotate(360deg); height:20px; fill:#8e8e8e;" viewBox="0 0 512 512"
+            xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M135.2 17.7C140.6 6.8 151.7 0 163.8 0H284.2c12.1 0 23.2 6.8 28.6 17.7L320 32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 96 0 81.7 0 64S14.3 32 32 32h96l7.2-14.3zM32 128H416V448c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V128zm96 64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16zm96 0c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16s16-7.2 16-16V208c0-8.8-7.2-16-16-16z">
+            </path>
+          </svg>
+        </button>
 
-                <button type="button" role="button" class="shrink-chat-btn bg-transparent d-flex d-none"
-                    aria-label="Shrink Chat" title="Shrink Chat">
-                    <svg style="width:18px; height:18px; fill:#8e8e8e;" viewBox="0 0 512 512"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M439 7c9.4-9.4 24.6-9.4 33.9 0l32 32c9.4 9.4 9.4 24.6 0 33.9l-87 87 39 39c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8H296c-13.3 0-24-10.7-24-24V72c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2l39 39L439 7zM72 272H216c13.3 0 24 10.7 24 24V440c0 9.7-5.8 18.5-14.8 22.2s-19.3 1.7-26.2-5.2l-39-39L73 505c-9.4 9.4-24.6 9.4-33.9 0L7 473c-9.4-9.4-9.4-24.6 0-33.9l87-87L55 313c-6.9-6.9-8.9-17.2-5.2-26.2s12.5-14.8 22.2-14.8z">
-                        </path>
-                    </svg>
-                </button>
+        <button type="button" role="button" class="shrink-chat-btn bg-transparent d-flex d-none"
+          aria-label="Shrink Chat" title="Shrink Chat">
+          <svg style="width:18px; height:18px; fill:#8e8e8e;" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M439 7c9.4-9.4 24.6-9.4 33.9 0l32 32c9.4 9.4 9.4 24.6 0 33.9l-87 87 39 39c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8H296c-13.3 0-24-10.7-24-24V72c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2l39 39L439 7zM72 272H216c13.3 0 24 10.7 24 24V440c0 9.7-5.8 18.5-14.8 22.2s-19.3 1.7-26.2-5.2l-39-39L73 505c-9.4 9.4-24.6 9.4-33.9 0L7 473c-9.4-9.4-9.4-24.6 0-33.9l87-87L55 313c-6.9-6.9-8.9-17.2-5.2-26.2s12.5-14.8 22.2-14.8z">
+            </path>
+          </svg>
+        </button>
 
-                <button type="button" role="button" class="expand-chat-btn bg-transparent d-flex"
-                    aria-label="Expand Chat" title="Expand Chat" fdprocessedid="bdwmcl">
-                    <svg style="width:18px; height:18px; fill:#8e8e8e;" viewBox="0 0 512 512"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
-                        <path
-                            d="M344 0H488c13.3 0 24 10.7 24 24V168c0 9.7-5.8 18.5-14.8 22.2s-19.3 1.7-26.2-5.2l-39-39-87 87c-9.4 9.4-24.6 9.4-33.9 0l-32-32c-9.4-9.4-9.4-24.6 0-33.9l87-87L327 41c-6.9-6.9-8.9-17.2-5.2-26.2S334.3 0 344 0zM168 512H24c-13.3 0-24-10.7-24-24V344c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2l39 39 87-87c9.4-9.4 24.6-9.4 33.9 0l32 32c9.4 9.4 9.4 24.6 0 33.9l-87 87 39 39c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8z">
-                        </path>
-                    </svg>
-                </button>
+        <button type="button" role="button" class="expand-chat-btn bg-transparent d-flex" aria-label="Expand Chat"
+          title="Expand Chat" fdprocessedid="bdwmcl">
+          <svg style="width:18px; height:18px; fill:#8e8e8e;" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+            <path
+              d="M344 0H488c13.3 0 24 10.7 24 24V168c0 9.7-5.8 18.5-14.8 22.2s-19.3 1.7-26.2-5.2l-39-39-87 87c-9.4 9.4-24.6 9.4-33.9 0l-32-32c-9.4-9.4-9.4-24.6 0-33.9l87-87L327 41c-6.9-6.9-8.9-17.2-5.2-26.2S334.3 0 344 0zM168 512H24c-13.3 0-24-10.7-24-24V344c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2l39 39 87-87c9.4-9.4 24.6-9.4 33.9 0l32 32c9.4 9.4 9.4 24.6 0 33.9l-87 87 39 39c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8z">
+            </path>
+          </svg>
+        </button>
 
-                <button type="button" role="button" class="close-chat-btn border-0 bg-transparent d-flex" aria-label="Close Chat"
-                    title="Close Chat" fdprocessedid="glk1su">
-                    <svg style="width:24px; height:24px; fill:#8b8989;" viewBox="0 0 384 512"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-        </div>
+        <button type="button" role="button" class="close-chat-btn border-0 bg-transparent d-flex"
+          aria-label="Close Chat" title="Close Chat" fdprocessedid="glk1su">
+          <svg style="width:24px; height:24px; fill:#8b8989;" viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z">
+            </path>
+          </svg>
+        </button>
+      </div>
     </div>
+  </div>
 
 
-    <div class="general-chat-window tab-pane active show-chat-window tab-pane position-relative" id="ai-chat-tabs-2" role="tabpanel"
-        aria-labelledby="ai-chat-tab-technical">
+  <div class="general-chat-window tab-pane active show-chat-window tab-pane position-relative" id="ai-chat-tabs-2"
+    role="tabpanel" aria-labelledby="ai-chat-tab-technical">
 
 
-        <div class="flex-column chat-messages">
-            <div class="ai-guidance-message">
-                <div data-message-id="welcome-message" class="ai-message welcome-message">
-                    <div class="welcome-message-content">
-                        <div class="welcome-header">
-                            <div class="welcome-icon">👋</div>
-                            <h3 class="welcome-title">Welcome <span class="welcome-username"><%= user ? user.username : "Guest" %></span>!</h3>
-                        </div>
-                        
-                        <div class="welcome-content">
-                            <p class="welcome-text">I'm here to help you with:</p>
-                            
-                            <div class="feature-list">
-                                <div class="feature-item">
-                                    <span class="feature-icon">🎯</span>
-                                    <span class="feature-text">Goal setting</span>
-                                </div>
-                                <div class="feature-item">
-                                    <span class="feature-icon">📋</span>
-                                    <span class="feature-text">Task planning</span>
-                                </div>
-                                <div class="feature-item">
-                                    <span class="feature-icon">❓</span>
-                                    <span class="feature-text">Question generation</span>
-                                </div>
-                                <div class="feature-item">
-                                    <span class="feature-icon">💡</span>
-                                    <span class="feature-text">Learning assistance</span>
-                                </div>
-                                <div class="feature-item">
-                                    <span class="feature-icon">📚</span>
-                                    <span class="feature-text">General knowledge</span>
-                                </div>
-                                <div class="feature-item">
-                                    <span class="feature-icon">📝</span>
-                                    <span class="feature-text">PDF content analysis</span>
-                                </div>
-                            </div>
-                            <div class="welcome-action">
-                                <p>To get started, just ask me anything.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="flex-column chat-messages">
+      <div class="ai-guidance-message">
+        <div data-message-id="welcome-message" class="d-flex flex-column align-items-center">
+          <h3 class="welcome-title">Welcome <span class="welcome-username">
+              <%= user ? user.username : "Guest" %>
+            </span>!</h3>
+          <div class="text-center">
+            <p class="fw-semibold">How can I help you today?</p>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <div class="chat-input-wrapper">
+  <div class="chat-input-wrapper">
     <div class="file-info-container d-none">
       <div class="file-info">
         <i class="bi bi-file-earmark-text file-pdf-icon"></i>
@@ -116,58 +83,66 @@
         </div>
         <button class="remove-file-btn bg-transparent border-0">
           <svg style="width:16px; height:16px; fill:#8e8e8e;" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-            <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"></path>
+            <path
+              d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z">
+            </path>
           </svg>
         </button>
       </div>
     </div>
-    <form id="chat-input-form" class="bg-primary chat-form-outline form-outline" data-mdb-input-init="" data-mdb-input-initialized="true"
-    data-gtm-form-interact-id="0">
-    <div class="chat-input-wrapper w-100">
-      <textarea id="chat-input" class="chat-input placeholder-active" type="text" placeholder="Ask anything" rows="1"
-      aria-label="AI Chat Input" title="AI Chat Input" data-gtm-form-interact-field-id="0">
-      </textarea>
-    </div>
-    
-    <div class="chat-input-actions d-flex align-items-center justify-content-between w-100">
-      <div class="d-flex">
-        <input type="file" id="file-input" accept=".pdf" style="display: none;">
-         <button type="button" id="file-upload-button" class="rounded-circle bg-transparent outline-none">
-           <i class="bi bi-plus-lg fw-bold"></i>
-         </button>
+    <form id="chat-input-form" class="bg-primary text-body-emphasis chat-form-outline form-outline"
+      data-mdb-input-init="" data-mdb-input-initialized="true" data-gtm-form-interact-id="0">
+      <div class="chat-input-wrapper w-100">
+        <textarea id="chat-input" class="chat-input placeholder-active" type="text" placeholder="Ask anything" rows="1"
+          aria-label="AI Chat Input" title="AI Chat Input" data-gtm-form-interact-field-id="0">
+        </textarea>
       </div>
-      <div class="d-flex align-items-center">
-        <button class="chat-send-btn rounded-circle me-2 d-block" fdprocessedid="777gt8">
-          <i class="bi bi-send fw-bold"></i>
-        </button>
-        <button type="button" class="chat-stop-btn rounded-circle me-2 d-none" fdprocessedid="0jup7q">
+
+      <div class="chat-input-actions d-flex align-items-center justify-content-between w-100">
+        <div class="d-flex">
+          <input type="file" id="file-input" accept=".pdf" style="display: none;">
+          <button type="button" id="file-upload-button"
+            class="btn btn-sm btn-outline-secondary rounded-circle border-0 outline-none">
+            <i class="bi bi-paperclip"></i>
+          </button>
+        </div>
+        <div class="d-flex align-items-center">
+          <button class="chat-send-btn rounded-circle me-2 d-block" fdprocessedid="777gt8">
+            <i class="bi bi-send fw-bold"></i>
+          </button>
+          <button type="button" class="chat-stop-btn rounded-circle me-2 d-none" fdprocessedid="0jup7q">
             <i class="bi bi-stop-fill"></i>
-        </button>
+          </button>
+        </div>
       </div>
-    </div>
-    
-</form>
-</div>
-<p class="chat-footer text-center text-muted">This can make mistakes.Check important info!</p>
-<div id="side-bar" class="bg-secondary-subtle">
-  <button class="side-bar-menu-btn border-0 outline-none bg-transparent">
-    <svg width="24" height="24" style="transform: rotate(0deg);" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-lg text-token-text-secondary mx-2">
-      <path fill-rule="evenodd" style="fill: #8b8989;" clip-rule="evenodd" d="M3 8C3 7.44772 3.44772 7 4 7H20C20.5523 7 21 7.44772 21 8C21 8.55228 20.5523 9 20 9H4C3.44772 9 3 8.55228 3 8ZM3 16C3 15.4477 3.44772 15 4 15H14C14.5523 15 15 15.4477 15 16C15 16.5523 14.5523 17 14 17H4C3.44772 17 3 16.5523 3 16Z" fill="currentColor"></path>
-    </svg>
-  </button>
-  <div id="side-bar-body">
-    <h3 class="m-0">chat history</h3>
-    <ul id="chat-history-container" class="chat-history-container list-group"></ul>
+
+    </form>
   </div>
-</div>
+  <div class="chat-footer text-center">
+    <p class="text-muted">This can make mistakes.Check important info!</p>
+  </div>
+  <div id="side-bar" class="bg-secondary-subtle">
+    <button class="side-bar-menu-btn border-0 outline-none bg-transparent">
+      <svg width="24" height="24" style="transform: rotate(0deg);" viewBox="0 0 24 24" fill="none"
+        xmlns="http://www.w3.org/2000/svg" class="icon-lg text-token-text-secondary mx-2">
+        <path fill-rule="evenodd" style="fill: #8b8989;" clip-rule="evenodd"
+          d="M3 8C3 7.44772 3.44772 7 4 7H20C20.5523 7 21 7.44772 21 8C21 8.55228 20.5523 9 20 9H4C3.44772 9 3 8.55228 3 8ZM3 16C3 15.4477 3.44772 15 4 15H14C14.5523 15 15 15.4477 15 16C15 16.5523 14.5523 17 14 17H4C3.44772 17 3 16.5523 3 16Z"
+          fill="currentColor"></path>
+      </svg>
+    </button>
+    <div id="side-bar-body">
+      <h3 class="m-0">chat history</h3>
+      <ul id="chat-history-container" class="chat-history-container list-group"></ul>
+    </div>
+  </div>
 </div>
 
 <div class="open-chat-btn-wrapper" aria-label="Open AI Chat" title="Open AI Chat">
-    <div>AI Chat</div>
-    <button class="open-chat-btn btn-floating d-flex align-items-center justify-content-center"
-        aria-label="Open AI Chat" title="Open AI Chat" fdprocessedid="4qvser">
-        <i class="bi bi-chat-dots-fill"></i>
-    </button>
+  <div>AI Chat</div>
+  <button class="btn btn-primary open-chat-btn d-flex align-items-center justify-content-center"
+    aria-label="Open AI Chat" title="Open AI Chat" fdprocessedid="4qvser">
+    <i class="bi bi-chat-dots-fill"></i>
+  </button>
 </div>
 <script>
   let sessionId = Math.random().toString(36).substring(2);
@@ -176,3 +151,45 @@
 </script>
 <script src="/js/aiChat.js"></script>
 <script src="/js/chatHistory.js"></script>
+<script>
+const textarea = document.getElementById("chat-input");
+const chatForm = document.getElementById("chat-input-form");
+
+let minRows = 1;
+let maxRows = 5;
+let rowHeight = 24; // Approx row height (depends on font-size/line-height)
+let baseBottom = 15;
+
+textarea.addEventListener("input", () => {
+  // Reset rows to recalc properly
+  textarea.rows = minRows;
+
+  // Calculate needed rows
+  let currentRows = Math.floor(textarea.scrollHeight / rowHeight);
+
+  if (currentRows > maxRows) {
+    currentRows = maxRows;
+    textarea.style.overflowY = "auto"; // allow scroll if more than 5
+  } else {
+    textarea.style.overflowY = "hidden";
+  }
+
+  textarea.rows = currentRows;
+
+  // Update sticky bottom (15px + 30px per extra row beyond 1)
+  chatForm.style.bottom = baseBottom + (currentRows - 1) * 30 + "px";
+});
+
+
+
+// textarea.addEventListener("keydown", function (e) {
+//   if (e.key === "Enter") {
+//     if (e.shiftKey) {
+//       // Shift+Enter → insert new line, but prevent form submission
+//       e.stopPropagation(); 
+//       return; // allow default newline
+//     }
+//   }
+// });
+</script>
+

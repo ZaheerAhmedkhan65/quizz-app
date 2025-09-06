@@ -1,0 +1,117 @@
+/* Add the animated download button styles */
+.download-container {
+    position: relative;
+    width: 100%;
+    max-width: 125px;
+}
+
+.download-btn {
+    position: relative;
+    background-color: #e74c3c;
+    gap: clamp(0.4rem, 1vw, 0.6rem);
+}
+
+.download-btn:active {
+    transform: translateY(0);
+}
+
+.icon-container {
+    position: relative;
+}
+
+.download-icon {
+    position: relative;
+    width: clamp(16px, 2vw, 20px);
+    height: clamp(16px, 2vw, 20px);
+    stroke-width: 2;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.circular-progress {
+    position: absolute;
+    top: -3px;
+    left: -6px;
+    width: 30px;
+    height: 30px;
+    transform: rotate(-90deg);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+svg {
+    transform: rotate(0deg);
+}
+
+.progress-circle {
+    fill: none;
+    stroke: #2ecc71;
+    stroke-width: 3;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    transition: stroke-dashoffset 0.4s ease;
+}
+
+.download-btn.loading {
+    pointer-events: none;
+    background-color: #e67e22;
+}
+
+.download-btn.success {
+    background-color: #2ecc71;
+}
+
+.download-btn.success .circular-progress {
+    opacity: 0;
+}
+
+.btn-text {
+    transition: all 0.3s ease;
+}
+
+
+.question {
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+}
+
+.question-text {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.options {
+    margin-left: 20px;
+}
+
+.option {
+    margin-bottom: 5px;
+}
+
+.correct {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(0.4rem, 1.3vw, 0.6rem) clamp(0.6rem, 2vw, 1.2rem);
+    border: none;
+    border-radius: 8px;
+    font-size: clamp(0.75rem, 1.5vw, 0.75rem); /* min 12px, scales, max 16px */
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+}
+
+
