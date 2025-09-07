@@ -1,119 +1,123 @@
 <%- include('partials/_header') %>
-    <div class="row">
-        <div class="col-md-6">
-            <h2>Handouts</h2>
-        </div>
-    </div>
 
-    <div id="loadingSpinner" class="text-center my-5">
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only"></span>
-        </div>
-    </div>
+<div class="row">
+  <div class="col-md-6">
+    <h2>Handouts</h2>
+  </div>
+</div>
 
-    <div class="col-12">
-        <table class="table table-responsive table-hover table-bordered">
-           <thead>
-               <tr>
-                   <th scope="col">Course</th>
-                   <th scope="col">Handout</th>
-                   <th scope="col">Enroll</th>
-               </tr>
-           </thead>
-           <tbody id="coursesContainer">
-               <!-- Courses will be loaded here dynamically -->
-           </tbody>
-        </table>
-    </div>
-    <div id="noCoursesMessage" class="alert alert-warning text-center" style="display: none;">
-        No courses found matching your criteria.
-    </div>
+<!-- Spinner -->
+<div id="loadingSpinner" class="text-center my-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="sr-only"></span>
+  </div>
+</div>
 
-    <script src="/js/download.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Fetch courses data
-            fetchCourses();
-    });
+<!-- Table (hidden initially) -->
+<div id="coursesTableWrapper" class="table-responsive" style="display: none;">
+  <table class="table table-hover table-bordered align-middle">
+    <thead>
+      <tr>
+        <th scope="col">Course</th>
+        <th scope="col">Handout</th>
+        <th scope="col">Enroll</th>
+      </tr>
+    </thead>
+    <tbody id="coursesContainer">
+      <!-- Courses will be loaded here dynamically -->
+    </tbody>
+  </table>
+</div>
 
+<!-- No Courses Message -->
+<div id="noCoursesMessage" class="alert alert-warning text-center" style="display: none;">
+  No courses found matching your criteria.
+</div>
 
-        function fetchCourses(searchTerm = '') {
-            const container = document.getElementById('coursesContainer');
-            const spinner = document.getElementById('loadingSpinner');
-            const noCoursesMsg = document.getElementById('noCoursesMessage');
+<script src="/js/download.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    fetchCourses();
+  });
 
-            // Show loading spinner
-            container.innerHTML = '';
-            spinner.style.display = 'block';
-            noCoursesMsg.style.display = 'none';
+  function fetchCourses(searchTerm = '') {
+    const container = document.getElementById('coursesContainer');
+    const spinner = document.getElementById('loadingSpinner');
+    const noCoursesMsg = document.getElementById('noCoursesMessage');
+    const tableWrapper = document.getElementById('coursesTableWrapper');
 
-            // Make AJAX request
-            fetch(`/courses-list?search=${encodeURIComponent(searchTerm)}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(courses => {
-                    spinner.style.display = 'none';
+    // Reset view
+    container.innerHTML = '';
+    spinner.style.display = 'block';
+    tableWrapper.style.display = 'none';
+    noCoursesMsg.style.display = 'none';
 
-                    if (courses.length === 0) {
-                        noCoursesMsg.style.display = 'block';
-                        return;
-                    }
+    // Fetch request
+    fetch(`/courses-list?search=${encodeURIComponent(searchTerm)}`)
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(courses => {
+        spinner.style.display = 'none';
 
-                    // Render courses
-                    courses.forEach(course => {
-                        const courseRow = document.createElement('tr');
-                        courseRow.innerHTML = `
-                        <td>
-                            <a class="fw-semibold hover-underline text-reset" href="/courses/${course.id}">
-                                ${course.title}
-                            </a>
-                        </td>
-                        <td>
-                            ${course.handout_pdf ? `
-                                <div class="download-container">
-                                    <button class="action-btn download-btn" data-href="/courses/${course.id}/handout/download">
-                                        <div class="icon-container">
-                                            <svg class="circular-progress" viewBox="0 0 26 26">
-                                                <circle class="progress-circle" cx="13" cy="13" r="11"></circle>
-                                            </svg>
-                                            <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                <polyline points="7 10 12 15 17 10"></polyline>
-                                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                                            </svg>
-                                        </div>
-                                        <span class="btn-text">Download PDF</span>
-                                    </button>
-                                </div>
-                            ` : 'No PDF Available'}
-                        </td>
-                        <td>
-                            <form action="/courses/${course.id}/join" method="post">
-                                <button type="submit" class="action-btn bg-primary">
-                                    Join Course
-                                </button>
-                            </form>
-                        </td>
-                    `;
-                        container.appendChild(courseRow);
-                    });
-                })
-                .catch(error => {
-                    spinner.style.display = 'none';
-                    container.innerHTML = `
-                    <div class="col-12">
-                        <div class="alert alert-danger">Error loading courses. Please try again later.</div>
-                    </div>
-                `;
-                    console.error('Error fetching courses:', error);
-                });
+        if (courses.length === 0) {
+          noCoursesMsg.style.display = 'block';
+          return;
         }
+
+        tableWrapper.style.display = 'block'; // Show table
+
+        // Render courses
+        courses.forEach(course => {
+          const courseRow = document.createElement('tr');
+          courseRow.innerHTML = `
+            <td>
+              <a class="fw-semibold hover-underline text-reset" href="/courses/${course.id}">
+                ${course.title}
+              </a>
+            </td>
+            <td>
+              ${course.handout_pdf ? `
+                <div class="download-container">
+                  <button class="action-btn download-btn" data-href="/courses/${course.id}/handout/download">
+                    <div class="icon-container">
+                      <svg class="circular-progress" viewBox="0 0 26 26">
+                        <circle class="progress-circle" cx="13" cy="13" r="11"></circle>
+                      </svg>
+                      <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                           stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                    </div>
+                    <span class="btn-text">Download PDF</span>
+                  </button>
+                </div>
+              ` : 'No PDF Available'}
+            </td>
+            <td>
+              <form action="/courses/${course.id}/join" method="post">
+                <button type="submit" class="action-btn bg-primary">
+                  Join Course
+                </button>
+              </form>
+            </td>
+          `;
+          container.appendChild(courseRow);
+        });
+      })
+      .catch(error => {
+        spinner.style.display = 'none';
+        tableWrapper.style.display = 'none';
+        container.innerHTML = '';
+        noCoursesMsg.style.display = 'block';
+        noCoursesMsg.textContent = 'Error loading courses. Please try again later.';
+        console.error('Error fetching courses:', error);
+      });
+  }
 </script>
 
-    <%- include('partials/_footer') %>
+<%- include('partials/_footer') %>

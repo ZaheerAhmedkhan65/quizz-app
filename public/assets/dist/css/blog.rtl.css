@@ -2,7 +2,7 @@
 
 .blog-header-logo {
   font-family: Amiri, Georgia, "Times New Roman", serif;
-  font-size: clamp(1.25rem, 4vw, 2.25rem);
+  font-size: clamp(2rem, 4vw, 2.25rem);
   margin-top: 0.5rem;
 }
 

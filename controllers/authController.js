@@ -43,7 +43,7 @@ const signup = async (req, res) => {
            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
              <h2 style="color: #4F46E5;">Email Verification</h2>
              <p>Hello ${username},</p>
-             <p>Thank you for creating an account with Quiz App! Please verify your email address by clicking the button below:</p>
+             <p>Thank you for creating an account with VU EMPIRE! Please verify your email address by clicking the button below:</p>
              <div style="text-align: center; margin: 30px 0;">
                <a href="${verificationUrl}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Verify Email Address</a>
              </div>
@@ -66,7 +66,6 @@ const signup = async (req, res) => {
 
 const verifyEmail = async (req, res) => {
     const { token } = req.query;
-    console.log("token : ",token);
     try {
         // Find user by verification token (checking expiration in the query)
         const user = await User.findByVerificationToken(token);

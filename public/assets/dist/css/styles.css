@@ -196,7 +196,7 @@
     align-items: center;
     background-color: transparent;
     color: #fff;
-    z-index: 1045;
+    z-index: 999;
     border-radius: 6px 50% 50% 6px;
     border-radius: 6px;
     padding: 0px 0px 0px 10px;
@@ -225,6 +225,7 @@
     margin: 0 !important;
     border-radius: 0;
     height: 100vh;
+    height: 100dvh;
 }
 
 .ask-ai-chat-modal.expanded #side-bar {
@@ -233,6 +234,7 @@
 
 .ask-ai-chat-modal {
     height: calc(100vh - 3rem);
+    height: calc(100dvh - 3rem);
     position: fixed;
     right: 0;
     top: 0;
