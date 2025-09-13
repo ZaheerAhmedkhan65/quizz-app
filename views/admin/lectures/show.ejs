@@ -1,118 +1,324 @@
 <%- include('../partials/_header') %>
-<div class="row ">
+  <div class="row ">
     <div class="col-12">
-        <div class="card rounded-0">
-            <div class="card-body">
-                <h4 class="card-title"><%= lecture.title %></h4>
-                <span class="card-text me-1">Start Page : <%= lecture.start_page %></span> 
-                <span class="card-text">End Page : <%= lecture.end_page %></span>
-                <br>
-                <a href="<%= course.handout_pdf %>" class="text-decoration-none text-muted fw-semibold" download>Download <%= course.handout_original_filename %></a>
-                <a href="/admin/lectures/<%= lecture.id %>/edit" class="btn btn-primary float-end">Edit Lecture</a>
-                <hr>
-                <h4 class="card-title m-0">Questions</h4>
-                <% if(questions.length> 0) { %>
-                  <ul id="questions-container" class="list-group overflow-auto">
-                    <% questions.forEach((question, index)=> { %>
-                      <li class="card list-group-item mb-4 bg-transparent border-0 px-0">
-                        <div class="card-body p-0">
-                          <div id="question_<%= question.id %>" class="card-title py-3 d-flex align-items-center justify-content-between m-0">
-                            <strong class="w-100 d-flex align-items-center gap-1">
-                              <span id="question-index-container-<%= question.id %>">
-                                  <%=index+1%> :
-                              </span>
-                              <span data-text="question-text" id="question-text-<%= question.id %>">
-                                  <%= question.question_text %>
-                              </span>
-                            </strong>
-                            <div class="btn-group dropup">
-                              <button type="button" class="bg-transparent border-0" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-three-dots-vertical"></i>
-                              </button>
-                              <ul class="dropdown-menu">
-                                <li class="dropdown-item edit-question-btn" data-question-id="<%= question.id %>">Edit</li>
-                                  <li class="dropdown-item text-danger">
-                                    <form class="delete-question" data-question-id="<%= question.id %>"
-                                        action="/admin/questions/<%= question.id %>/delete"
-                                        method="delete">
-                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                    </form>
-                                  </li>
-                              </ul>
-                            </div>
-                          </div>
-                          <ul class="list-group" id="options-container-<%= question.id %>">
-                            <% question.options.forEach(option=> { %>
-                              <li class="list-group-item border-0 d-flex align-items-center gap-1 px-0 bg-transparent">
-                                <input type="radio" name="question_<%= question.id %>"
-                                  id="option_<%= option.id %>" value="<%= option.option_text %>"
-                                  class="form-check-input">
-                                <label for="option_<%= option.id %>" class="w-100 d-flex align-items-center gap-1">
-                                    <%= option.option_text %>
-                                    <%= option.is_correct ? '(Correct)' : '' %>
-                                </label>
-                                <div class="btn-group dropup">
-                                  <button type="button" class="bg-transparent border-0" data-bs-toggle="dropdown"
-                                      aria-expanded="false">
-                                      <i class="bi bi-three-dots-vertical"></i>
-                                  </button>
-                                  <ul class="dropdown-menu">
-                                      <li class="dropdown-item edit-option-btn"
-                                          data-option-id="<%= option.id %>">
-                                          Edit</li>
-                                      <li class="dropdown-item text-danger">
-                                          <form class="delete-option" data-option-id="<%= option.id %>"
-                                              action="/admin/options/<%= option.id %>/delete"
-                                              method="delete">
-                                              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                          </form>
-                                      </li>
-                                  </ul>
-                                </div>
-                              </li>
-                            <% }) %>
-                          </ul>
-                          <% if (question.options.length <=3) { %>
-                            <form class="option-form"
-                              action="/admin/questions/<%= question.id %>/options/create"
-                              method="post">
-                              <input type="text" name="option_text" class="form-control mt-3"
-                                  placeholder="Enter Option text" required>
-                              <select name="is_correct" class="form-select mt-3">
-                                  <option value="0">Incorrect</option>
-                                  <option value="1">Correct</option>
-                              </select>
-                              <div class="text-end mb-2">
-                                  <button type="submit" class="btn btn-sm btn-primary mt-3">Add Option</button>
-                              </div>
-                            </form>
-                          <% } %>
-                        </div>
-                      </li>
-                      <hr class="m-0">
-                    <% }) %>
-                  </ul>
-                <% } else { %>
-                    <p>No questions have been created for this quiz.</p>
-                    <ul id="questions-container" class="list-group overflow-auto rounded-0"
-                        style="height: 100%; padding-bottom: 130px;"></ul>
-                <% } %>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <h4 class="card-title">
+            <%= lecture.title %>
+          </h4>
+          <span class="card-text me-1">Start Page : <%= lecture.start_page %></span>
+          <span class="card-text">End Page : <%= lecture.end_page %></span>
+          <br>
+          <a href="<%= course.handout_pdf %>" class="text-decoration-none text-muted fw-semibold" download>Download <%=
+              course.handout_original_filename %></a>
+          <button type="button" class="btn btn-primary float-end mx-2" data-bs-toggle="modal"
+            data-bs-target="#newquestion">New Question</button>
+          <a href="/admin/lectures/<%= lecture.id %>/edit" class="btn btn-primary float-end">Edit Lecture</a>
+
+          <div class="modal fade" id="newquestion" tabindex="-1" aria-labelledby="newquestionLabel">
+            <div class="modal-dialog modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="newquestionLabel">New Question</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Add enctype for image upload -->
+                <form id="question-form" action="https://pdf-files-production.up.railway.app/admin/questions/create"
+                  method="post" enctype="multipart/form-data">
+                  <div class="modal-body" style="height: 50vh;">
+
+                    <!-- Question Type -->
+                    <div class="mb-3">
+                      <label for="question_type" class="form-label">Question Type</label>
+                      <select name="question_type" id="question_type" class="form-select">
+                        <option value="multiple_choice" selected>Multiple Choice</option>
+                        <option value="long_answer">Long Answer</option>
+                        <option value="short_answer">Short Answer</option>
+                      </select>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="mb-3">
+                      <label for="question_text" class="form-label">Question Text</label>
+                      <textarea name="question_text" id="question_text" rows="5" class="form-control mt-3"
+                        placeholder="Write Question text here" required></textarea>
+                    </div>
+
+                    <!-- Preview Image -->
+                    <div class="mb-3 text-center">
+                      <div id="preview-container" class="position-relative d-inline-block">
+                        <img id="image-preview" alt="question image" class="img-fluid rounded border"
+                          style="max-height: 250px; object-fit: contain; display:none;">
+                        <!-- Remove button -->
+                        <button type="button" id="remove-image"
+                          class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
+                          style="display:none; border-radius:50%;">
+                          &times;
+                        </button>
+                      </div>
+                    </div>
+
+
+                    <!-- Modern Upload -->
+                    <div class="mb-3">
+                      <label for="question_image" class="form-label fw-bold">Upload Question Image</label>
+                      <div class="input-group">
+                        <input type="file" name="question_image" id="question_image"
+                          class="form-control visually-hidden" accept="image/*">
+                        <label class="btn btn-outline-primary w-100" for="question_image">
+                          <i class="bi bi-upload me-2"></i> Choose Image
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- Hidden Lecture ID -->
+                    <input type="hidden" name="lecture_id" id="lecture-id" value="<%= lecture.id %>">
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
+
+          <hr>
+          <h4 class="card-title m-0">Questions</h4>
+          <% if(questions.length> 0) { %>
+            <ul id="questions-container" class="list-group overflow-auto">
+              <% questions.forEach((question, index)=> { %>
+                <li class="card list-group-item mb-4 bg-transparent border-0 px-0">
+                  <div class="card-title py-3 m-0">
+                    <!-- First row: index + text + dropup -->
+                    <div class="d-flex align-items-center justify-content-between">
+                      <div class="w-100 d-flex align-items-center gap-1">
+                        <strong id="question-index-container-<%= question.id %>">
+                          <%= index+1 %> :
+                        </strong>
+                        <span data-text="question-text" id="question-text-<%= question.id %>">
+                          <%= question.question_text %>
+                        </span>
+                      </div>
+                      <div class="btn-group dropup">
+                        <button type="button" class="bg-transparent border-0" data-bs-toggle="dropdown"
+                          aria-expanded="false">
+                          <i class="mdi mdi-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li class="dropdown-item dropdown-link edit-question-btn"
+                            data-question-id="<%= question.id %>">Edit</li>
+                          <li class="dropdown-item">
+                            <form class="delete-question" data-question-id="<%= question.id %>"
+                              action="https://pdf-files-production.up.railway.app/admin/questions/<%= question.id %>/delete"
+                              method="delete">
+                              <button type="submit" class="dropdown-item text-danger p-0">Delete</button>
+                            </form>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <!-- Second row: question image (if any) -->
+                    <% if(question.question_image) { %>
+                      <div class="mt-2">
+                        <img id="question-<%= question.id %>-image"  src="https://pdf-files-production.up.railway.app<%= question.question_image %>"
+                          alt="question image" class="img-fluid rounded" style="max-height:150px;">
+                      </div>
+                      <% } %>
+                  </div>
+
+                  <ul class="list-group" id="options-container-<%= question.id %>">
+                    <% question.options.forEach(option=> { %>
+                      <li class="list-group-item border-0 px-0 bg-transparent">
+                        <!-- First row: option text + correct + dropup -->
+                        <div class="d-flex align-items-center justify-content-between">
+                          <div class="w-100 d-flex align-items-center gap-1">
+                            <input type="radio" name="question_<%= question.id %>" id="option_<%= option.id %>"
+                              value="<%= option.option_text %>" class="form-check-input">
+                            <label for="option_<%= option.id %>" class="w-100">
+                              <%= option.option_text %>
+                                <%= option.is_correct ? '(Correct)' : '' %>
+                            </label>
+                          </div>
+                          <div class="btn-group dropup">
+                            <button type="button" class="bg-transparent border-0" data-bs-toggle="dropdown"
+                              aria-expanded="false">
+                              <i class="mdi mdi-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li class="dropdown-item edit-option-btn" data-option-id="<%= option.id %>">Edit</li>
+                              <li class="dropdown-item text-danger">
+                                <form class="delete-option" data-option-id="<%= option.id %>"
+                                  action="https://pdf-files-production.up.railway.app/admin/options/<%= option.id %>/delete"
+                                  method="delete">
+                                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+
+                        <!-- Second row: option image -->
+                        <% if(option.option_image) { %>
+                          <div class="mt-2">
+                            <img src="https://pdf-files-production.up.railway.app<%= option.option_image %>"
+                              alt="option image" class="img-fluid rounded" style="max-height:120px;">
+                          </div>
+                          <% } %>
+                      </li>
+
+                      <% }) %>
+                  </ul>
+                  <% if (question.options.length <=3) { %>
+                    <form class="option-form"
+                      action="https://pdf-files-production.up.railway.app/admin/questions/<%= question.id %>/options/create"
+                      method="post" enctype="multipart/form-data">
+
+                      <!-- Option Text -->
+                      <input type="text" name="option_text" class="form-control mt-3" placeholder="Enter Option text"
+                        required>
+
+                      <!-- Correct/Incorrect -->
+                      <select name="is_correct" class="form-select mt-3">
+                        <option value="0">Incorrect</option>
+                        <option value="1">Correct</option>
+                      </select>
+
+                      <!-- Option Image -->
+                      <div class="mt-3">
+                        <label for="option_image_<%= question.id %>" class="form-label">Upload Option Image</label>
+                        <input type="file" name="option_image" id="option_image_<%= question.id %>"
+                          class="form-control option-image-input" accept="image/*">
+                      </div>
+
+                      <!-- Preview -->
+                      <div class="mt-2">
+                        <img id="option-image-preview-<%= question.id %>" class="img-fluid rounded d-none"
+                          style="max-height:80px;" alt="Option Preview">
+                      </div>
+
+                      <div class="text-end mb-2">
+                        <button type="submit" class="btn btn-sm btn-primary mt-3">Add Option</button>
+                      </div>
+                    </form>
+                    <% } %>
+                </li>
+                <hr class="m-0">
+                <% }) %>
+            </ul>
+            <% } else { %>
+              <p>No questions have been created for this quiz.</p>
+              <ul id="questions-container" class="list-group overflow-auto rounded-0"
+                style="height: 100%; padding-bottom: 130px;"></ul>
+              <% } %>
         </div>
-<div class="row bg-dark">
-  <div class="col-6 mx-auto">
-    <form id="question-form" action="/admin/questions/create" method="post">
-      <input type="text" name="question_text" id="question-text" class="form-control mt-3"
-        placeholder="Write Question text here" required>
-      <input type="text" name="lecture_id" id="lecture-id" value="<%= lecture.id %>" hidden>
-      <div class="text-end mb-2">
-        <button type="submit" class="btn btn-sm btn-primary mt-3">Create</button>
       </div>
-    </form>
+    </div>
+  </div>
+
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editModalLabel">Edit</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form id="editForm" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editText" class="form-label">Text</label>
+            <textarea id="editText" name="text" class="form-control" rows="3" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="editFile" class="form-label">Upload Image</label>
+            <input type="file" id="editFile" name="image" class="form-control" accept="image/*">
+          </div>
+
+          <div class="text-center position-relative">
+            <img id="editPreview" class="img-fluid rounded d-none" width="100%" height="100%" style="max-height:150px; max-width: 280px;" alt="Preview">
+            <button type="button" id="removeImageBtn" style="top: -10px; right: 60px;" class="btn btn-sm btn-danger rounded-circle position-absolute d-none">
+              <i class="mdi mdi-close"></i>
+            </button>
+          </div>
+
+          <!-- Correct/Incorrect toggle (only for options) -->
+          <div id="correctToggleWrapper" class="form-check mt-3 d-none">
+            <input class="form-check-input" type="checkbox" id="editIsCorrect">
+            <label class="form-check-label" for="editIsCorrect">Mark as Correct</label>
+          </div>
+
+          <!-- Hidden values -->
+          <input type="hidden" id="removeImage" value="false">
+          <input type="hidden" id="editId">
+          <input type="hidden" id="editType">
+          <input type="hidden" id="existingImage">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
-<script src="/js/createQuestionAndOptions.js"></script>
-<script src="/js/editAndDeleteQuestion.js"></script>
-<%- include('../partials/_footer') %>
+
+
+  <script src="/js/createQuestionAndOptions.js"></script>
+  <script src="/js/editAndDeleteQuestion.js"></script>
+
+  <script>
+    const token = "<%= token %>";
+    const imageInput = document.getElementById('question_image');
+    const preview = document.getElementById('image-preview');
+    const removeBtn = document.getElementById('remove-image');
+
+    imageInput.addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+          removeBtn.style.display = "inline-block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Remove image when "X" clicked
+    removeBtn.addEventListener('click', function () {
+      preview.src = "";
+      preview.style.display = "none";
+      removeBtn.style.display = "none";
+      imageInput.value = ""; // Reset file input
+    });
+
+
+    document.querySelectorAll(".option-image-input").forEach(input => {
+      input.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const previewId = "option-image-preview-" + this.id.split("_")[2];
+        const preview = document.getElementById(previewId);
+
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.classList.remove("d-none");
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  </script>
+
+  <%- include('../partials/_footer') %>

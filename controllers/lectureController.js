@@ -28,7 +28,8 @@ const show = async (req, res) => {
                 user: req.user,
                 courseId: req.params.course_id,
                 lectureId: req.params.id,
-                path: req.path
+                path: req.path,
+                token: req.cookies.token
             });
         }
 
@@ -119,40 +120,4 @@ const edit = async (req, res) => {
 };
 
 
-// Get lecture with extracted content
-const getLectureWithContent = async (req, res) => {
-    try {
-        const lecture = await Lecture.getLectureWithContent(req.params.id);
-        if (!lecture) {
-            return res.status(404).json({ success: false, message: 'Lecture not found' });
-        }
-
-        res.status(200).json({ success: true, lecture });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-};
-
-const downloadLecturePDF =  async (req, res) => {
-    try {
-        const lecture = await Lecture.findById(req.params.id);
-        if (!lecture) {
-            return res.status(404).json({ message: "Lecture not found" });
-        }
-
-        const pdfBuffer = await Lecture.extractLecturePDF(lecture);
-        if (!pdfBuffer) {
-            return res.status(500).json({ message: "Failed to generate lecture PDF" });
-        }
-
-        // Set headers for download
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${lecture.title}.pdf"`);
-        res.send(Buffer.from(pdfBuffer));
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Error generating lecture PDF" });
-    }
-};
-
-module.exports = { getAll, show, create, update, deleteLecture, edit, getLectureWithContent, downloadLecturePDF };
+module.exports = { getAll, show, create, update, deleteLecture, edit };

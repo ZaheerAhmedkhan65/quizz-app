@@ -1,7 +1,5 @@
 function setUpActions(){
     const deleteCourseForms = document.querySelectorAll('.delete-course-form');
-    
-    console.log(deleteCourseForms);
     if(deleteCourseForms.length == 0) return;
     deleteCourseForms.forEach(form => {
         form.addEventListener('submit', function(event) {

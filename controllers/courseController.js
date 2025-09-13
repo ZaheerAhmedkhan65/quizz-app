@@ -58,7 +58,7 @@ const downloadPDF = async (req, res) => {
     if (!course || !course.handout_pdf) {
       return res.status(404).send('Handout not found');
     }
-
+console.log(course.handout_pdf)
     // Build remote URL
     const fileUrl = `https://pdf-files-production.up.railway.app${course.handout_pdf}`;
     const fileName = course.handout_original_filename || `${course.slug}-handout.pdf`;

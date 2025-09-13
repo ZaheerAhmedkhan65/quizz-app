@@ -1,7 +1,20 @@
-// create admin side for users, courses & course content(mcqs & subjective), course pdf, blog, management 
-// create public side for the users to access the courses & course content(mcqs & subjective), course pdf and also can take quizzes with progress of users
-// user can create mcqs and subjective questions file by selecting the "to" and "from" lectures of the course and download the pdf file.
-// store mcqs and subjective questions by lecture wise for each course.
+/1/UPLOAD COURSE HANDOUT PDF
+/2/CREATE LECTURES OF EACH COURSE ACCORDING TO ITS HANDOUT PDF
+/3/CREATE MCQS,SHORT AND LONG QUESTIONS WITH THEIR OPTIONS, AND ANSWERS
+------------------------------------------------------------------------------------------------------------------------------------------
 
-//Course Schema: title, lectures/topics , course_pdf
-//Lecture/Topic Schema : title
+=======================COURSES WHICH HAVE COMPLETED LECTURES===========================================
+1. CS301
+2. CS304
+3. CS403
+
+=======================COURSES WHICH HAVE COMPLETED LECTURES MCQS===========================================
+
+
+
+
+=======================COURSES WHICH HAVE COMPLETED LECTURES SHORT QUESTIONS===========================================
+
+
+
+=======================COURSES WHICH HAVE COMPLETED LECTURES LONG QUESTIONS===========================================

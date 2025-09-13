@@ -36,38 +36,6 @@ class Lecture {
         return rows[0];
     }
 
-
-    static async extractLecturePDF(lecture) {
-        const course = await this.getCourse(lecture.course_id);
-        if (!course || !course.handout_pdf) return null;
-
-        const coursePdfPath = path.join(__dirname, '..', 'public', course.handout_pdf);
-        if (!fs.existsSync(coursePdfPath)) return null;
-
-        try {
-            const existingPdfBytes = fs.readFileSync(coursePdfPath);
-            const pdfDoc = await PDFDocument.load(existingPdfBytes);
-            const newPdf = await PDFDocument.create();
-
-            // Zero-based pages
-            const pageIndices = [];
-            for (let i = lecture.start_page - 1; i < lecture.end_page; i++) {
-                pageIndices.push(i);
-            }
-
-            const copiedPages = await newPdf.copyPages(pdfDoc, pageIndices);
-            copiedPages.forEach((page) => newPdf.addPage(page));
-
-            // Return PDF as Buffer (not saved anywhere)
-            const lecturePdfBytes = await newPdf.save();
-            return lecturePdfBytes;
-        } catch (err) {
-            console.error("Error generating lecture PDF:", err);
-            return null;
-        }
-    }
-
-
     static async getLectureWithContent(lectureId) {
         const lecture = await this.findById(lectureId);
         if (!lecture) return null;
