@@ -2,6 +2,9 @@ const db = require('../config/db');
 const path = require('path');
 const fs = require('fs');
 const { PDFDocument } = require('pdf-lib');
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
 
 class Lecture {
     static async create({ title, courseId, startPage, endPage }) {
@@ -28,13 +31,6 @@ class Lecture {
         return result.affectedRows;
     }
 
-    static async getCourse(id) {
-        const [rows] = await db.query(
-            'SELECT * FROM courses WHERE id = ?',
-            [id]
-        );
-        return rows[0];
-    }
 
     static async getLectureWithContent(lectureId) {
         const lecture = await this.findById(lectureId);
@@ -56,11 +52,6 @@ class Lecture {
         return result.affectedRows;
     }
 
-    static async getAll() {
-        const [rows] = await db.query('SELECT * FROM lectures');
-        return rows;
-    }
-
     static async findById(id) {
         const [rows] = await db.query(
             'SELECT * FROM lectures WHERE id = ?',
@@ -69,12 +60,123 @@ class Lecture {
         return rows[0];
     }
 
+
+    static async getQuizAttemptCount(lectureId) {
+        const [rows] = await db.query(
+            "SELECT COUNT(*) AS attempt_count FROM quiz_results WHERE quiz_id = ?",
+            [lectureId]
+        );
+        return rows.length ? rows[0].attempt_count : 0;
+    }
+
+    static async getLectureWithFullDetails(lectureId) {
+        const lecture = await this.findById(lectureId);
+        if (!lecture) return null;
+
+        const questions = await this.getQuestionsWithDetails(lectureId);
+        return {
+            ...lecture,
+            questions
+        };
+    }
+
+
+
+
+
+
+
+
+    static async extractLecturePDF(lecture) {
+        const course = await this.getCourse(lecture.course_id);
+        if (!course || !course.handout_pdf) return null;
+        try {
+              const fileUrl = `https://drive.google.com/uc?export=download&id=${course.handout_pdf}`;
+        console.log("Fetching PDF from:", fileUrl);
+        // Fetch PDF from Google Drive
+      const response = await fetch(fileUrl);
+      if (!response.ok) {
+        console.error("Google Drive fetch failed:", response.statusText);
+        return null;
+      }
+
+
+      const existingPdfBytes = Buffer.from(await response.arrayBuffer());
+            const pdfDoc = await PDFDocument.load(existingPdfBytes);
+            const newPdf = await PDFDocument.create();
+
+            // Zero-based pages
+            const pageIndices = [];
+            for (let i = lecture.start_page - 1; i < lecture.end_page; i++) {
+                pageIndices.push(i);
+            }
+
+            const copiedPages = await newPdf.copyPages(pdfDoc, pageIndices);
+            copiedPages.forEach((page) => newPdf.addPage(page));
+
+            // Return PDF as Buffer (not saved anywhere)
+            const lecturePdfBytes = await newPdf.save();
+            return lecturePdfBytes;
+        } catch (err) {
+            console.error("Error generating lecture PDF:", err);
+            return null;
+        }
+    }
+
+    static async extractLecturesPDF(start_lecture, end_lecture) {
+        const course = await this.getCourse(start_lecture.course_id);
+        if (!course || !course.handout_pdf) return null;
+
+        const coursePdfPath = path.join(__dirname, '..', 'public', course.handout_pdf);
+        console.log(coursePdfPath);
+        if (!fs.existsSync(coursePdfPath)) return null;
+
+        try {
+            const existingPdfBytes = fs.readFileSync(coursePdfPath);
+            const pdfDoc = await PDFDocument.load(existingPdfBytes);
+            const newPdf = await PDFDocument.create();
+
+            // Zero-based pages
+            const pageIndices = [];
+            for (let i = start_lecture.start_page - 1; i < end_lecture.end_page; i++) {
+                pageIndices.push(i);
+            }
+
+            const copiedPages = await newPdf.copyPages(pdfDoc, pageIndices);
+            copiedPages.forEach((page) => newPdf.addPage(page));
+
+            // Return PDF as Buffer (not saved anywhere)
+            const lecturePdfBytes = await newPdf.save();
+            return lecturePdfBytes;
+        } catch (err) {
+            console.error("Error generating lecture PDF:", err);
+            return null;
+        }
+    }
+
+    static async getAll() {
+        const [rows] = await db.query('SELECT * FROM lectures');
+        return rows;
+    }
+
     static async findByCourseId(courseId) {
         const [rows] = await db.query(
             'SELECT * FROM lectures WHERE course_id = ?',
             [courseId]
         );
-        return rows;
+        if (rows.length > 0) {
+            return rows;
+        } else {
+            return [];
+        }
+    }
+
+    static async getCourse(courseId) {
+        const [rows] = await db.query(
+            'SELECT * FROM courses WHERE id = ?',
+            [courseId]
+        );
+        return rows[0];
     }
 
     static async deleteByCourseId(courseId) {
@@ -83,14 +185,6 @@ class Lecture {
             [courseId]
         );
         return result.affectedRows;
-    }
-
-    static async getQuizAttemptCount(lectureId) {
-        const [rows] = await db.query(
-            "SELECT COUNT(*) AS attempt_count FROM quiz_results WHERE quiz_id = ?",
-            [lectureId]
-        );
-        return rows.length ? rows[0].attempt_count : 0;
     }
 
     static async updateLectureTotalQuestions(lectureId, totalQuestions) {
@@ -159,17 +253,6 @@ class Lecture {
         });
 
         return Array.from(questionsMap.values());
-    }
-
-    static async getLectureWithFullDetails(lectureId) {
-        const lecture = await this.findById(lectureId);
-        if (!lecture) return null;
-
-        const questions = await this.getQuestionsWithDetails(lectureId);
-        return {
-            ...lecture,
-            questions
-        };
     }
 }
 

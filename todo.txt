@@ -1,4 +1,4 @@
-/1/UPLOAD COURSE HANDOUT PDF
+/1/UPLOAD COURSE HANDOUT PDF  (uploaded to drive)
 /2/CREATE LECTURES OF EACH COURSE ACCORDING TO ITS HANDOUT PDF
 /3/CREATE MCQS,SHORT AND LONG QUESTIONS WITH THEIR OPTIONS, AND ANSWERS
 ------------------------------------------------------------------------------------------------------------------------------------------
@@ -18,3 +18,38 @@
 
 
 =======================COURSES WHICH HAVE COMPLETED LECTURES LONG QUESTIONS===========================================
+
+
+//pdf download link from drive https://drive.google.com/uc?export=download&id=ID_OF_THE_PDF_FILE_ON_DRIVE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sta301 - 45
+mth202 - 45
+cs201 - 45
+cs504 - 45
+cs304 - 45

@@ -32,8 +32,8 @@ const sessionStore = new MySQLStore({
 
 app.use(session({
     secret: process.env.SECRET_KEY || 'fallback-secret-key-for-development-only',
-    resave: true,  // Changed from false to true
-    saveUninitialized: true,  // Changed from false to true
+    resave: false,  // Changed from false to true
+    saveUninitialized: false,  // Changed from false to true
     store: sessionStore,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',

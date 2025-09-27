@@ -4,7 +4,7 @@
         <div class="card rounded-0 min-vh-100">
             <div class="card-body">
                 <h4 class="card-title">Edit Course</h4>
-                <form id="edit-course-form" action="https://pdf-files-production.up.railway.app/admin/courses/<%= course.id %>/update" method="post" enctype="multipart/form-data">
+                <form id="edit-course-form" action="/admin/courses/<%= course.id %>/update" method="post" enctype="multipart/form-data">
                     <div class="form-group mb-4">
                         <label for="title" class="form-label">Course Title</label>
                         <input type="text" class="form-control" id="title" name="title" 
@@ -28,6 +28,15 @@
                                     <i class="mdi mdi-file-outline me-2"></i>Browse Files
                                 </button>
                                 <p class="small text-muted mt-2 mb-0">Supports: PDF only (Max: 100MB)</p>
+                                <p class="text-muted mb-3">or</p>
+                                <div class="form-group">
+                                    <label for="pdfUrl" class="form-label">PDF URL</label>
+                                    <input type="text" class="form-control" id="pdfUrl" name="pdfUrl" placeholder="Enter PDF URL">
+                                </div>
+                                 <div class="form-group">
+                                    <label for="handout_original_filename" class="form-label">PDF Original Name</label>
+                                    <input type="text" class="form-control" id="handout_original_filename" name="handout_original_filename" placeholder="Enter PDF Original Name">
+                                </div>
                                 
                                 <!-- Show existing file if available -->
                                 <% if (course.handout_pdf) { %>
