@@ -30,7 +30,7 @@ const sessionStore = new MySQLStore({
   }
 }, pool);
 
-// app.set('trust proxy', 1);
+app.set('trust proxy', 1);
 
 app.use(session({
     secret: process.env.SECRET_KEY || 'fallback-secret-key-for-development-only',
@@ -52,25 +52,6 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error');     // array
     next();
 });
-
-
-  // Flash middleware
-
-
-// Make flash messages available to all views
-// Replace your current flash middleware with this:
-// app.use((req, res, next) => {
-//     // Store the flash messages before they're consumed
-//     const flashMsgs = {
-//         success: req.flash('success'),
-//         error: req.flash('error')
-//     };
-    
-//     // Make available to templates
-//     res.locals.success_msg = flashMsgs.success;
-//     res.locals.error_msg = flashMsgs.error;
-//     next();
-// });
 
 app.set('public', path.join(__dirname, 'public'));
 app.set('views', path.join(__dirname, 'views'));

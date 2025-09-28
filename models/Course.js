@@ -42,10 +42,39 @@ class Course {
         return rows.length ? rows[0].total_lectures : 0; // Ensure it returns a number
     }
 
+    // static async findByUserId(userId) {
+    //     const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
+    //     return rows;
+    // }
+
     static async findByUserId(userId) {
-        const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
-        return rows;
-    }
+    const [rows] = await db.query(
+        `
+        SELECT 
+            c.*,
+            COUNT(DISTINCT CASE 
+                WHEN (qa.correct_answers / qa.total_questions) * 100 >= 50 
+                THEN l.id 
+            END) AS completed_lectures
+        FROM courses c
+        JOIN user_courses uc 
+            ON uc.course_id = c.id
+        LEFT JOIN lectures l 
+            ON l.course_id = c.id
+        LEFT JOIN quiz_attempts qa 
+            ON qa.lecture_id = l.id 
+            AND qa.course_id = c.id
+            AND qa.user_id = uc.user_id
+        WHERE uc.user_id = ?
+        GROUP BY c.id
+        ORDER BY c.id
+        `,
+        [userId]
+    );
+
+    return rows;
+}
+
 
     static async findCourse(userId, courseId) {
         const [rows] = await db.query(`

@@ -3,8 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const { PDFDocument } = require('pdf-lib');
 const fetch = (...args) =>
-  import("node-fetch").then(({ default: fetch }) => fetch(...args));
-
+    import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 class Lecture {
     static async create({ title, courseId, startPage, endPage }) {
@@ -30,7 +29,6 @@ class Lecture {
         );
         return result.affectedRows;
     }
-
 
     static async getLectureWithContent(lectureId) {
         const lecture = await this.findById(lectureId);
@@ -60,7 +58,6 @@ class Lecture {
         return rows[0];
     }
 
-
     static async getQuizAttemptCount(lectureId) {
         const [rows] = await db.query(
             "SELECT COUNT(*) AS attempt_count FROM quiz_results WHERE quiz_id = ?",
@@ -80,28 +77,20 @@ class Lecture {
         };
     }
 
-
-
-
-
-
-
-
     static async extractLecturePDF(lecture) {
         const course = await this.getCourse(lecture.course_id);
         if (!course || !course.handout_pdf) return null;
         try {
-              const fileUrl = `https://drive.google.com/uc?export=download&id=${course.handout_pdf}`;
-        console.log("Fetching PDF from:", fileUrl);
-        // Fetch PDF from Google Drive
-      const response = await fetch(fileUrl);
-      if (!response.ok) {
-        console.error("Google Drive fetch failed:", response.statusText);
-        return null;
-      }
+            const fileUrl = `https://drive.google.com/uc?export=download&id=${course.handout_pdf}`;
+            // Fetch PDF from Google Drive
+            const response = await fetch(fileUrl);
+            if (!response.ok) {
+                console.error("Google Drive fetch failed:", response.statusText);
+                return null;
+            }
 
 
-      const existingPdfBytes = Buffer.from(await response.arrayBuffer());
+            const existingPdfBytes = Buffer.from(await response.arrayBuffer());
             const pdfDoc = await PDFDocument.load(existingPdfBytes);
             const newPdf = await PDFDocument.create();
 
@@ -126,13 +115,18 @@ class Lecture {
     static async extractLecturesPDF(start_lecture, end_lecture) {
         const course = await this.getCourse(start_lecture.course_id);
         if (!course || !course.handout_pdf) return null;
-
-        const coursePdfPath = path.join(__dirname, '..', 'public', course.handout_pdf);
-        console.log(coursePdfPath);
-        if (!fs.existsSync(coursePdfPath)) return null;
-
         try {
-            const existingPdfBytes = fs.readFileSync(coursePdfPath);
+            
+            const fileUrl = `https://drive.google.com/uc?export=download&id=${course.handout_pdf}`;
+            // Fetch PDF from Google Drive
+            const response = await fetch(fileUrl);
+            if (!response.ok) {
+                console.error("Google Drive fetch failed:", response.statusText);
+                return null;
+            }
+
+
+            const existingPdfBytes = Buffer.from(await response.arrayBuffer());
             const pdfDoc = await PDFDocument.load(existingPdfBytes);
             const newPdf = await PDFDocument.create();
 
@@ -170,6 +164,32 @@ class Lecture {
             return [];
         }
     }
+
+   static async getLecturesByUserCourse(userId, courseId) {
+    const [rows] = await db.query(
+        `
+        SELECT 
+            l.*,
+            CASE 
+                WHEN MAX((qa.correct_answers / qa.total_questions) * 100) >= 50 
+                THEN 1 
+                ELSE 0 
+            END AS is_completed
+        FROM lectures l
+        LEFT JOIN quiz_attempts qa 
+            ON qa.lecture_id = l.id 
+            AND qa.course_id = l.course_id
+            AND qa.user_id = ?
+        WHERE l.course_id = ?
+        GROUP BY l.id
+        ORDER BY l.id
+        `,
+        [userId, courseId]
+    );
+
+    return rows;
+}
+
 
     static async getCourse(courseId) {
         const [rows] = await db.query(

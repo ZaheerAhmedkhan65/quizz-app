@@ -27,19 +27,25 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                           <li>
+                           <a class="dropdown-item text-reset fw-semibold"  href="https://drive.google.com/uc?export=download&id=<%= course.handout_pdf %>" download>
+                              <i class="bi bi-download me-1"></i> Download PDF
+                           </a>
+                          </li>
+                          <li>
                             <form class="delete-course-btn" data-course-id="<%= course.id %>" action="/courses/<%= course.id %>/leave" method="POST">
-                              <button type="submit" class="dropdown-item text-reset fw-semibold">
-                                <i class="bi bi-door-open me-1"></i> Left
+                              <button type="submit" class="dropdown-item text-reset fw-semibold" onclick="return confirm('Are you sure you want to leave this course?')">
+                                <i class="bi bi-door-open me-1"></i> Leave Course
                               </button>
                             </form>
                           </li>
                         </ul>
                       </div>
+
                     </div>
                     
                     <% if(courseProgress) { %>
                     <a href="/courses/<%= course.id %>" class="text-decoration-none text-reset">
-                      <div class="progress-container mb-3" style="width: 100%;">
+                      <div class="progress-container mb-1" style="width: 100%;">
                         <div class="d-flex justify-content-between mb-1">
                           <small class="text-muted">Progress</small>
                           <small class="text-primary fw-bold"><%= courseProgress.course_progress %>%</small>
@@ -55,6 +61,10 @@
                       </div>
                     </a>  
                     <% } %>
+                    <div class="d-flex justify-content-between">
+                      <small class="text-muted"><%= course.total_lectures %> lectures</small>
+                      <small class="text-muted"><%= course.completed_lectures||0 %> completed</small>
+                    </div>
                   </div>
                 </div>
               </div>

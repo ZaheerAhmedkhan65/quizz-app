@@ -92,7 +92,6 @@ const submitQuiz = async (req, res) => {
         let questions;
         if (lecture_id) {
             questions = await Question.findByLectureId(lecture_id);
-            await UserCourse.updateCourseProgress(user_id, course_id);
         } else {
             // For course quiz, we need to get all questions that were in the quiz
             const questionIds = Object.keys(answers).map(id => parseInt(id));
@@ -154,9 +153,9 @@ const submitQuiz = async (req, res) => {
                 ...response
             });
         }
-
+        await UserCourse.updateCourseProgress(user_id, course_id);
         delete req.session[`quiz_${course_id}_${lecture_id || "course"}`];
-        
+
         req.flash('success', 'The quiz has been submitted successfully!');
         // Redirect to results page
         res.redirect(`/quiz/results/${attemptId}`);

@@ -1,10 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     let currentQuestionIndex = 0;
     let selectedAnswers = {};
-    let backBtn = document.getElementById("back-btn");
     let nextBtn = document.getElementById("next-btn");
     let questionIndexContainer = document.getElementById("question-index");
-    let questionsNavigationContainer = document.querySelector("#questions-navigation-container");
     let quizForm = document.getElementById("quiz-form");
 
     let totalTime = questions.length * 60;
@@ -19,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const { answers, index, timeLeft } = JSON.parse(savedState);
             selectedAnswers = answers || {};
             currentQuestionIndex = index || 0;
+            console.log(currentQuestionIndex)
             totalTime = timeLeft > 0 ? timeLeft : totalTime;
 
             // 🔹 Recreate hidden inputs for answers so form submits correctly
@@ -70,33 +69,9 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.removeItem(STORAGE_KEY);
     }
 
-    function updateQuestionNavigation() {
-        questionsNavigationContainer.innerHTML = "";
-        questions.forEach((question, index) => {
-            let questionLink = document.createElement("div");
-            questionLink.classList.add("btn", "rounded-circle", "btn-primary");
-
-            if (index === currentQuestionIndex) {
-                questionLink.classList.add("btn-warning");
-            }
-            if (selectedAnswers[question.id]) {
-                questionLink.classList.add("btn-success");
-            }
-
-            questionLink.innerText = index + 1;
-            questionLink.addEventListener("click", () => {
-                currentQuestionIndex = index;
-                loadQuestion();
-                saveState(); // 🔹 save progress
-            });
-
-            questionsNavigationContainer.appendChild(questionLink);
-        });
-    }
-
     function loadQuestion() {
         let question = questions[currentQuestionIndex];
-        document.getElementById("question-text").innerText = question.question_text;
+        document.getElementById("question-text").innerHTML = `${question.question_text}`;
 
         let optionsContainer = document.getElementById("options-container");
         optionsContainer.innerHTML = "";
@@ -104,79 +79,73 @@ document.addEventListener("DOMContentLoaded", function () {
         questionIndexContainer.innerText =
             "Question " + (currentQuestionIndex + 1) + " of " + questions.length;
 
-        backBtn.disabled = currentQuestionIndex === 0;
+        // Default disable Next until user selects
+        nextBtn.disabled = true;
 
-        if (currentQuestionIndex < questions.length - 1) {
-            nextBtn.textContent = "Next";
-            nextBtn.disabled = false;
-        } else {
+        // If last question, change Next to Submit
+        if (currentQuestionIndex === questions.length - 1) {
             nextBtn.textContent = "Submit";
-            nextBtn.disabled = !allQuestionsAnswered();
+        } else {
+            nextBtn.textContent = "Save & Load Next Question";
         }
 
-        question.options.forEach((option) => {
-            let listItem = document.createElement("li");
-            listItem.classList.add(
-                "list-group-item",
-                "p-3",
-                "rounded-0",
-                "d-flex",
-                "align-items-center",
-                "gap-1"
-            );
+       question.options.forEach((option) => {
+    let listItem = document.createElement("li");
+    listItem.classList.add(
+        "list-group-item",
+        "p-3",
+        "rounded-0",
+        "d-flex",
+        "align-items-start",
+        "gap-2"
+    );
 
-            let radioInput = document.createElement("input");
-            radioInput.type = "radio";
-            radioInput.name = `question_${question.id}`;
-            radioInput.id = "option_" + option.id;
-            radioInput.value = option.id;
-            radioInput.classList.add("form-check-input");
+    let radioInput = document.createElement("input");
+    radioInput.type = "radio";
+    radioInput.name = `question_${question.id}`;
+    radioInput.id = "option_" + option.id;
+    radioInput.value = option.id;
+    radioInput.style.width = "25px";
+    radioInput.style.height = "25px";
+    radioInput.classList.add("form-check-input", "mt-2");
 
-            // 🔹 Restore checked state if previously selected
-            if (selectedAnswers[question.id] == option.id) {
-                radioInput.checked = true;
-            }
-
-            radioInput.addEventListener("change", () => {
-                selectedAnswers[question.id] = option.id;
-
-                // 🔹 update or create hidden input
-                let existingHidden = quizForm.querySelector(`input[name="answers[${question.id}]"]`);
-                if (existingHidden) {
-                    existingHidden.value = option.id;
-                } else {
-                    let hiddenInput = document.createElement("input");
-                    hiddenInput.type = "hidden";
-                    hiddenInput.name = `answers[${question.id}]`;
-                    hiddenInput.value = option.id;
-                    quizForm.appendChild(hiddenInput);
-                }
-
-                saveState();
-                updateQuestionNavigation();
-
-                if (allQuestionsAnswered()) {
-                    nextBtn.disabled = false;
-                }
-                if (currentQuestionIndex === questions.length - 1) {
-                    nextBtn.disabled = !allQuestionsAnswered();
-                }
-            });
-
-            let label = document.createElement("label");
-            label.setAttribute("for", "option_" + option.id);
-            label.innerText = option.option_text;
-
-            listItem.appendChild(radioInput);
-            listItem.appendChild(label);
-            optionsContainer.appendChild(listItem);
-        });
-
-        updateQuestionNavigation();
+    // 🔹 Restore checked state if previously selected
+    if (selectedAnswers[question.id] == option.id) {
+        radioInput.checked = true;
+        nextBtn.disabled = false; // allow Next if already answered
     }
 
-    function allQuestionsAnswered() {
-        return questions.every((question) => selectedAnswers[question.id]);
+    radioInput.addEventListener("change", () => {
+        selectedAnswers[question.id] = option.id;
+
+        // 🔹 update or create hidden input
+        let existingHidden = quizForm.querySelector(`input[name="answers[${question.id}]"]`);
+        if (existingHidden) {
+            existingHidden.value = option.id;
+        } else {
+            let hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = `answers[${question.id}]`;
+            hiddenInput.value = option.id;
+            quizForm.appendChild(hiddenInput);
+        }
+
+        saveState();
+        nextBtn.disabled = false; // enable Next after selection
+    });
+
+    // ✅ Use a textarea only for option text (resizable, readonly)
+    let optionTextArea = document.createElement("textarea");
+    optionTextArea.rows = 1;
+    optionTextArea.readOnly = true;
+    optionTextArea.value = option.option_text;
+    optionTextArea.classList.add("form-control", "flex-grow-1");
+
+    listItem.appendChild(radioInput);
+    listItem.appendChild(optionTextArea);
+    optionsContainer.appendChild(listItem);
+});
+
     }
 
     nextBtn.addEventListener("click", () => {
@@ -185,32 +154,8 @@ document.addEventListener("DOMContentLoaded", function () {
             loadQuestion();
             saveState();
         } else {
-            if (allQuestionsAnswered() && confirm("Are you sure you want to submit the quiz?")) {
+            if (confirm("Are you sure you want to submit the quiz?")) {
                 submitQuiz();
-            }
-        }
-    });
-
-    backBtn.addEventListener("click", () => {
-        if (currentQuestionIndex > 0) {
-            currentQuestionIndex--;
-            loadQuestion();
-            saveState();
-        }
-    });
-
-    document.addEventListener("keydown", function (event) {
-        if (event.key === "ArrowRight") {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                loadQuestion();
-                saveState();
-            }
-        } else if (event.key === "ArrowLeft") {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                loadQuestion();
-                saveState();
             }
         }
     });
@@ -223,7 +168,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Initial load
     loadQuestion();
-    updateQuestionNavigation();
     document.getElementById("timer").textContent = calculateTime();
     startTimer();
 });

@@ -30,7 +30,7 @@ const showCourse = async (req, res) => {
             return res.status(200).render('admin/courses/show', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
           } else if(req.user){
             course = await Course.findCourse(req.user.userId, req.params.id)
-            lectures = await Lecture.findByCourseId(req.params.id)
+            lectures = await Lecture.getLecturesByUserCourse(req.user.userId, req.params.id);
             return res.status(200).render('course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
           }
           course = await Course.findById(req.params.id)

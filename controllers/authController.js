@@ -97,23 +97,23 @@ const login = async (req, res) => {
         const user = await User.findByEmail(email);
         if (!user) {
             req.flash('error', 'Invalid email or password!');
-            res.redirect('/auth/login');
+            return res.redirect('/auth/login');
         }
 
         //Check if email is verified
         if (!user.email_verified) {
             req.flash('error', 'Your account was created, but your email is not verified. Please check your gmail inbox for verification instructions.');
-            res.redirect('/auth/verify-email');
+            return res.redirect('/auth/verify-email');
         }
 
         if (user.status === 'blocked') {
             req.flash('error', 'Your account has been blocked. Please contact support.');
-            res.redirect('/auth/login');  
+            return res.redirect('/auth/login');  
         }
 
         if (user.status === 'deleted') {
             req.flash('error', 'Your account has been deleted. Please contact support.');
-            res.redirect('/auth/login');  
+            return res.redirect('/auth/login');  
         }
 
         // Compare passwords
@@ -121,7 +121,7 @@ const login = async (req, res) => {
 
         if (!isPasswordValid) {
             req.flash('error', 'Invalid email or password!');
-            res.redirect('/auth/login');
+            return res.redirect('/auth/login');
         }
         
         // Generate JWT with role
@@ -146,14 +146,14 @@ const login = async (req, res) => {
 
         req.flash('success', 'Login successfully!');
         if(user.role === 'admin') {
-            res.redirect('/admin/dashboard');
+           return res.redirect('/admin/dashboard');
         }else{
-            res.redirect('/api/dashboard');
+            return res.redirect('/api/dashboard');
         }
     } catch (error) {
         console.error(error);
         req.flash('error', 'Error logging in!');
-        res.redirect('/auth/login');
+        return res.redirect('/auth/login');
     }
 }
 
@@ -163,7 +163,7 @@ const forgotPassword = async (req, res) => {
         const user = await User.findByEmail(email);
         if (!user) {
             req.flash('error', 'The user with this Email not found.Please try other email.');
-            res.redirect('/auth/forgot-password');
+           return res.redirect('/auth/forgot-password');
         }
         
         // Generate reset token
@@ -174,6 +174,7 @@ const forgotPassword = async (req, res) => {
 
         // Send reset email
         const resetUrl = `${req.protocol}://${req.get('host')}/auth/reset-password?token=${resetToken}`;
+       
         await sendEmail({
           email: user.email,
           subject: 'Password Reset Request',
@@ -197,7 +198,7 @@ const forgotPassword = async (req, res) => {
         });
 
         req.flash('success', 'Password reset email sent successfully!');
-        res.redirect('/auth/forgot-password');
+        return res.redirect('/auth/forgot-password');
     } catch (error) {
         console.error(error);
         req.flash('error', 'Error sending password reset email!');
@@ -212,7 +213,7 @@ const resetPassword = async (req, res) => {
         const user = await User.findByResetToken(token);
         if (!user) {
             req.flash('success', 'Invalid or expired token');
-            res.status(400).redirect('/auth/forgot-password');
+           return res.status(400).redirect('/auth/forgot-password');
         }
         
         // Hash new password
@@ -221,7 +222,7 @@ const resetPassword = async (req, res) => {
         // Update password and clear reset token
         await User.updatePassword(user.id, hashedPassword);
         req.flash('success', 'Password reset successfully!');
-        res.redirect('/auth/login');
+       return res.redirect('/auth/login');
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error resetting password' });

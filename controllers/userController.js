@@ -7,6 +7,7 @@ const userDashboard = async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);
         const courses = await Course.findByUserId(req.user.userId);
+        
         let progress = await UserCourse.getProgressByUserId(req.user.userId);
         
         // Get stats using the new methods
