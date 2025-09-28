@@ -1,0 +1,39 @@
+<%- include('partials/_header') %>
+<nav class="p-0" style="--bs-breadcrumb-divider: '&gt;';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <%if(user){%>
+    <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+    <%}else{%>
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <%}%>
+    <li class="breadcrumb-item active" aria-current="page"><%= path == "/final-term" ? "finalterm pastpapers" : "midterm pastpapers" %></li>
+  </ol>
+</nav>
+
+<div class="table-responsive">
+  <table class="table table-hover table-bordered align-middle">
+    <thead>
+      <tr>
+        <th scope="col">Course</th>
+        <th scope="col">Past Paper</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% courses.forEach(course => { %>
+      <tr>
+         <td>
+              <a class="fw-semibold hover-underline text-reset" href="/courses/<%=course.id%>">
+                <%=course.title%>
+              </a>
+            </td>
+            <td>
+              <a class="fw-semibold hover-underline text-reset" href="/courses/<%=course.id%>/pastpaper/download">
+                Download
+              </a>
+            </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+<%- include('partials/_footer') %>

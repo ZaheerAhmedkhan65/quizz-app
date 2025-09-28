@@ -2,6 +2,7 @@ const Question = require('../models/Question');
 const Option = require('../models/Option');
 const QuizAttempt = require('../models/QuizAttempt');
 const QuizResponse = require('../models/QuizResponse');
+const UserCourse = require('../models/UserCourse');
 const { formateCreatedAt } = require('../utils/dateFormat');
 const db = require('../config/db');
 
@@ -13,7 +14,6 @@ const startQuiz = async (req, res) => {
 
         // 🔹 Build a session key for uniqueness (per user per quiz)
         const sessionKey = `quiz_${course_id}_${lecture_id || "course"}`;
-        console.log("sessionKey : ", sessionKey);
         // If we already stored questions, reuse them
         if (req.session[sessionKey]) {
             const savedQuestions = req.session[sessionKey];
@@ -23,7 +23,6 @@ const startQuiz = async (req, res) => {
                 lecture_id: lecture_id || null,
                 user: req.user || null,
                 path: req.path,
-                messages: req.flash(),
                 title: "Start Quiz",
             });
         }
@@ -74,7 +73,6 @@ const startQuiz = async (req, res) => {
             lecture_id: lecture_id || null,
             user: req.user || null,
             path: req.path,
-            messages: req.flash(),
             title: "Start Quiz",
         });
     } catch (error) {
@@ -90,11 +88,11 @@ const submitQuiz = async (req, res) => {
         const { course_id, lecture_id } = req.params;
         const user_id = req.user.userId;
         const { answers } = req.body; // { question_id: selected_option_id }
-
         // Get all questions for this quiz (to verify correct answers)
         let questions;
         if (lecture_id) {
             questions = await Question.findByLectureId(lecture_id);
+            await UserCourse.updateCourseProgress(user_id, course_id);
         } else {
             // For course quiz, we need to get all questions that were in the quiz
             const questionIds = Object.keys(answers).map(id => parseInt(id));
@@ -158,7 +156,8 @@ const submitQuiz = async (req, res) => {
         }
 
         delete req.session[`quiz_${course_id}_${lecture_id || "course"}`];
-
+        
+        req.flash('success', 'The quiz has been submitted successfully!');
         // Redirect to results page
         res.redirect(`/quiz/results/${attemptId}`);
 
@@ -177,7 +176,6 @@ const showResults = async (req, res) => {
         // Get the attempt
         let attempt = await QuizAttempt.findById(attempt_id);
 
-
         if (!attempt || attempt.user_id !== user_id) {
             return res.status(404).render('error', { message: 'Quiz attempt not found' });
         }
@@ -187,14 +185,16 @@ const showResults = async (req, res) => {
 
         // Get all responses with question and option details
         const responses = await QuizResponse.getAttemptResults(attempt_id);
+        // Get all attempts for this lecture (progress graph)
+        const lectureAttempts = await QuizAttempt.findByUserAndLecture(user_id, attempt.lecture_id);
         res.render('quiz/results', {
             attempt,
             responses,
+            lectureAttempts,
             course_id: attempt.course_id,
             lecture_id: attempt.lecture_id,
             user: req.user || null,
             path: req.path,
-            messages: req.flash(),
             title: 'Quiz Results'
         });
 
@@ -209,7 +209,7 @@ const getQuizHistory = async (req, res) => {
     try {
         const user_id = req.user.userId;
         const { course_id, lecture_id } = req.query;
-
+        
         let attempts;
 
         if (lecture_id) {
@@ -218,9 +218,26 @@ const getQuizHistory = async (req, res) => {
             attempts = await QuizAttempt.findByUserAndCourse(user_id, course_id);
         } else {
             attempts = await QuizAttempt.findByUser(user_id);
-        }
+        }        
 
-        res.render('quiz/history', { attempts, user: req.user || null, path: req.path, messages: req.flash(), title: 'Quiz History' });
+         // Group by course and lecture
+        const groupedAttempts = attempts.reduce((acc, attempt) => {
+            if (!acc[attempt.course_id]) {
+                acc[attempt.course_id] = { lectures: {}, attempts: [] };
+            }
+            acc[attempt.course_id].attempts.push(attempt);
+
+            if (attempt.lecture_id) {
+                if (!acc[attempt.course_id].lectures[attempt.lecture_id]) {
+                    acc[attempt.course_id].lectures[attempt.lecture_id] = [];
+                }
+                acc[attempt.course_id].lectures[attempt.lecture_id].push(attempt);
+            }
+
+            return acc;
+        }, {});
+
+        res.render('quiz/history', { attempts,groupedAttempts, user: req.user || null, path: req.path,  title: 'Quiz History' });
 
     } catch (error) {
         console.error(error);

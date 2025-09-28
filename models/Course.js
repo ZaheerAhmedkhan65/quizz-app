@@ -6,9 +6,30 @@ class Course {
         return rows;
     }
 
-    static async getAllCourses(userId) {
-        const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
-        return rows[0].count;
+    // static async getAllCourses(userId) {
+    //     const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
+    //     return rows[0].count;
+    // }
+
+    static async getAllCourses(user_id) {
+        try {
+            const [rows] = await db.execute(`
+            SELECT 
+                c.id, 
+                c.title,
+                c.slug,
+                c.handout_pdf,
+                c.handout_original_filename,
+                uc.course_progress 
+            FROM courses c
+            LEFT JOIN user_courses uc ON c.id = uc.course_id AND uc.user_id = ?
+            ORDER BY c.id ASC
+        `, [user_id]);
+            return rows;
+        } catch (error) {
+            console.error("Database query error:", error);
+            throw error;
+        }
     }
 
     static async findById(id) {
@@ -26,14 +47,33 @@ class Course {
         return rows;
     }
 
-    static async create({ title, slug, user_id, handout_pdf = null, handout_original_filename = null}) {
+    static async findCourse(userId, courseId) {
+        const [rows] = await db.query(`
+        SELECT 
+            c.id, 
+            c.title,
+            c.slug,
+            c.handout_pdf,
+            c.handout_original_filename,
+            uc.course_progress 
+        FROM courses c
+        LEFT JOIN user_courses uc 
+            ON c.id = uc.course_id 
+           AND uc.user_id = ?
+        WHERE c.id = ?
+        ORDER BY c.id ASC
+    `, [userId, courseId]);
+
+        return rows[0];
+    }
+
+    static async create({ title, slug, user_id, handout_pdf = null, handout_original_filename = null }) {
         const [result] = await db.query('INSERT INTO courses (title, slug, handout_pdf, handout_original_filename, created_by) VALUES (?, ?, ?, ?, ?)', [title, slug, handout_pdf, handout_original_filename, user_id]);
         const [course] = await db.query('SELECT * FROM courses WHERE id = ?', [result.insertId]); // Get full course
         return course[0]; // Return course object
         // return result.insertId;
     }
 
-   
     static async update(id, { title, slug, handout_pdf, handout_original_filename }) {
         const [result] = await db.query('UPDATE courses SET title = ?, slug = ?, handout_pdf = ?, handout_original_filename = ? WHERE id = ?', [title, slug, handout_pdf, handout_original_filename, id]);
         return result.affectedRows;
@@ -58,8 +98,6 @@ class Course {
         const [rows] = await db.query('SELECT * FROM courses WHERE title = ? AND created_by = ?', [title, userId]);
         return rows[0];
     }
-
-    // Course.js - Add these new methods to your Course class
 
     static async getCourseCount(userId) {
         const [rows] = await db.query('SELECT COUNT(*) as count FROM courses WHERE created_by = ?', [userId]);

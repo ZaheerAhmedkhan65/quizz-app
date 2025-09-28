@@ -8,7 +8,12 @@ const fetch = (...args) =>
 
 const getAll = async (req, res) => {
     try {
-        const courses = await Course.getAll();
+        let courses;
+        if(req.user){
+          courses = await Course.getAllCourses(req.user.userId);
+        }else{
+          courses = await Course.getAll();
+        }
         res.status(200).json(courses);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -17,11 +22,19 @@ const getAll = async (req, res) => {
 
 const showCourse = async (req, res) => {
     try {
-          const course = await Course.findById(req.params.id);
-          const lectures = await Lecture.findByCourseId(req.params.id);
+          let course;
+          let lectures;
           if(req.user && req.user.role=='admin'){
+            course = await Course.findById(req.params.id)
+            lectures = await Lecture.findByCourseId(req.params.id)
             return res.status(200).render('admin/courses/show', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
+          } else if(req.user){
+            course = await Course.findCourse(req.user.userId, req.params.id)
+            lectures = await Lecture.findByCourseId(req.params.id)
+            return res.status(200).render('course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
           }
+          course = await Course.findById(req.params.id)
+          lectures = await Lecture.findByCourseId(req.params.id)
           res.status(200).render('course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -30,8 +43,24 @@ const showCourse = async (req, res) => {
 
 const joinCourse = async (req, res) => {
   try {
+    const userCourse = await UserCourse.findByUserIdAndCourseId(req.user.userId, req.params.id);
+    if(userCourse) {
+      req.flash('success', 'You are already enrolled in this course!');
+      return res.status(400).redirect('/dashboard');
+    }
     const course = await Course.findById(req.params.id);
     await UserCourse.create(req.user.userId, course.id);
+    req.flash('success', 'You have joined the course successfully!');
+    res.status(200).redirect('/dashboard');
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const leaveCourse = async (req, res) => {
+  try {
+    await UserCourse.delete(req.user.userId, req.params.id);
+    req.flash('success', 'You have left the course successfully!');
     res.status(200).redirect('/dashboard');
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -48,11 +77,11 @@ const edit = async (req, res) => {
   }
 };
 
-const https = require('https');
-const pipeline = require('stream').pipeline;
-const promisify = require('util').promisify;
+// const https = require('https');
+// const pipeline = require('stream').pipeline;
+// const promisify = require('util').promisify;
 
-const streamPipeline = promisify(pipeline);
+// const streamPipeline = promisify(pipeline);
 
 
 const downloadPDF = async (req, res) => {
@@ -99,9 +128,7 @@ const create = async (req, res) => {
     if (existingCourse) {
       return res.status(400).json({ message: 'Course already exists' });
     }
-
-    console.log(req.body);
-
+    
     const course = await Course.create({
       title,
       user_id: req.user.userId,
@@ -120,13 +147,12 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { title, slug, handout_pdf,pdfUrl, handout_original_filename } = req.body;
-    console.log(title, slug, handout_pdf,pdfUrl, handout_original_filename);
     const course = await Course.findById(req.params.id);
     if(!course) {
       return res.status(404).json({ message: 'Course not found' });
     }
     
-    await Course.update(req.params.id, { title, slug, handout_pdf: handout_pdf || pdfUrl, handout_original_filename });
+    // await Course.update(req.params.id, { title, slug, handout_pdf: handout_pdf || pdfUrl, handout_original_filename });
     res.status(200).json({ message: 'Course updated successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -150,4 +176,4 @@ const deleteCourse = async (req, res) => {
   }
 };
 
-module.exports = { getAll, showCourse, edit, joinCourse, downloadPDF, create, update, deleteCourse };
+module.exports = { getAll, showCourse, edit, joinCourse, leaveCourse, downloadPDF, create, update, deleteCourse };

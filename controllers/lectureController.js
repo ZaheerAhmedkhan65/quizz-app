@@ -70,7 +70,7 @@ const create = async (req, res) => {
 
         // Update progress in `user_courses`
         await UserCourse.updateProgress(req.user.userId, req.params.course_id, courseProgress);
-
+        req.flash('success', 'The lecture is created successfully!');
         res.status(201).redirect('/admin/courses/' + course_id );
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -89,7 +89,7 @@ const update = async (req, res) => {
             startPage: start_page, 
             endPage: end_page
         });
-
+        req.flash('success', 'The lecture is updated successfully!');
         res.status(200).redirect('/admin/courses/' + course_id);
     } catch (err) {
         res.status(500).json({ 
@@ -418,7 +418,6 @@ const downloadQuestionPDF = async (req, res) => {
 const downloadLecturePDF = async (req, res) => {
     try {
         const lecture = await Lecture.findById(req.params.id);
-        console.log(lecture);
         if (!lecture) {
             return res.status(404).json({ message: "Lecture not found" });
         }

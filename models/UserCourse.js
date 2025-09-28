@@ -18,6 +18,36 @@ class UserCourse {
         return result; // Return the full array of results
     }
 
+    static async updateCourseProgress(userId, courseId) {
+        // Get total lectures of this course
+        const [course] = await db.query(
+            "SELECT total_lectures FROM courses WHERE id = ?",
+            [courseId]
+        );
+        if (!course.length || !course[0].total_lectures) return 0;
+        const totalLectures = course[0].total_lectures;
+
+        // Get all lecture quizzes with >= 50% score
+        const [passedLectures] = await db.query(
+            `SELECT DISTINCT qa.lecture_id 
+         FROM quiz_attempts qa
+         WHERE qa.user_id = ? AND qa.course_id = ? AND qa.lecture_id IS NOT NULL AND qa.score >= 50`,
+            [userId, courseId]
+        );
+
+        const completedCount = passedLectures.length;
+        const progress = Math.round((completedCount / totalLectures) * 100);
+
+        // Update user_courses
+        await db.query(
+            "UPDATE user_courses SET course_progress = ? WHERE user_id = ? AND course_id = ?",
+            [progress, userId, courseId]
+        );
+
+        return progress;
+    }
+
+
     static async create(userId, courseId) {
         const [result] = await db.query('INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)', [userId, courseId]);
         return result.insertId;
@@ -39,7 +69,6 @@ class UserCourse {
     }
 
     // UserCourse.js - Add these new methods to your UserCourse class
-
     static async getAverageProgress(userId) {
         const [rows] = await db.query(`
         SELECT AVG(course_progress) as average 

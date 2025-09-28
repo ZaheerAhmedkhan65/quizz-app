@@ -14,7 +14,6 @@ router.get('/courses', (req, res)=>{
     res.render('admin/courses/index', { 
         title: "Courses",
         user: req.user || null,
-        messages: req.flash(),
         path: req.path ,
         token: req.cookies.token
     });
@@ -24,7 +23,6 @@ router.get('/courses/new', (req, res)=>{
     res.render('admin/courses/new', { 
         title: "New Course",
         user: req.user || null,
-        messages: req.flash(),
         path: req.path ,
         token: req.cookies.token
     });
@@ -44,7 +42,6 @@ router.get('/:course_id/lectures/new', async (req, res)=>{
         user: req.user || null,
         courses,
         currentCourse,
-        messages: req.flash(),
         path: req.path 
     });
 });

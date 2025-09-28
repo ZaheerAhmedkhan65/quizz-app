@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="col-md-6">
-    <h2>Handouts</h2>
+    <h2>Courses</h2>
   </div>
 </div>
 
@@ -19,7 +19,6 @@
     <thead>
       <tr>
         <th scope="col">Course</th>
-        <th scope="col">Handout</th>
         <th scope="col">Enroll</th>
       </tr>
     </thead>
@@ -34,7 +33,6 @@
   No courses found matching your criteria.
 </div>
 
-<script src="/js/download.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     fetchCourses();
@@ -76,27 +74,6 @@
               <a class="fw-semibold hover-underline text-reset" href="/courses/${course.id}">
                 ${course.title}
               </a>
-            </td>
-            <td>
-              ${course.handout_pdf ? `
-                <div class="download-container">
-                  <button class="action-btn download-btn" data-href="/courses/${course.id}/handout/download">
-                    <div class="icon-container">
-                      <svg class="circular-progress" viewBox="0 0 26 26">
-                        <circle class="progress-circle" cx="13" cy="13" r="11"></circle>
-                      </svg>
-                      <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                           stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                      </svg>
-                    </div>
-                    <span class="btn-text">Download PDF</span>
-                  </button>
-                </div>
-              ` : 'No PDF Available'}
             </td>
             <td>
               ${course.course_progress == null ?`

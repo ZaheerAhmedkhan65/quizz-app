@@ -7,7 +7,6 @@ router.get('/handouts', (req, res)=>{
     res.render('handouts', { 
         title: "Handouts",
         user: req.user || null,
-        messages: req.flash(),
         path: req.path
     });
 })

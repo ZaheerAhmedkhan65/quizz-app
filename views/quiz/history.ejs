@@ -1,39 +1,270 @@
 <%- include('../partials/_header') %>
 
-    <div class="container">
-        <h1>Your Quiz History</h1>
-        
-        <% if (attempts.length === 0) { %>
-            <p>No quiz attempts found.</p>
-        <% } else { %>
-            <table class="table">
-                <thead>
+<div class="container">
+    <h1>Your Quiz History</h1>
+
+    <% if (attempts.length === 0) { %>
+        <p>No quiz attempts found.</p>
+    <% } else { %>
+        <div class="row">
+            <% Object.keys(groupedAttempts).forEach(courseId => { 
+                const courseData = groupedAttempts[courseId]; %>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="card mb-4 rounded-0">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <strong class="fs-4 fw-semibold text-truncate" style="max-width: 100%;"><%= courseData.attempts[0].course_title %></strong>
+                                <button class="btn p-1 outline-0 border-0 bg-transparent expand-course-btn"
+                                    data-course-id="<%= courseId %>"
+                                    data-course-title="<%= courseData.attempts[0].course_title %>"
+                                    >
+                                    <i class="bi bi-arrows-fullscreen"></i>
+                                </button>
+                            </div>
+                            <canvas id="courseChart-<%= courseId %>" height="200"></canvas>
+                            <!-- Lectures inside this course -->
+                            <% if (Object.keys(courseData.lectures).length > 0) { %>
+                                <div class="mt-3">
+                                    <h5>Lecture Progress</h5>
+                                    <% Object.keys(courseData.lectures).forEach(lecId => { %>
+                                        <div class="mb-1">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#lec-<%= courseId %>-<%= lecId %>">
+                                                <%= courseData.lectures[lecId][0].lecture_title %> ▼
+                                            </button>
+                                            <button class="btn p-1 btn-sm outline-none bg-transparent expand-lecture-btn"
+                                                data-course-id="<%= courseId %>" 
+                                                data-lecture-id="<%= lecId %>"
+                                                data-course-title="<%= courseData.attempts[0].course_title %>"
+                                                data-lecture-title="<%= courseData.lectures[lecId][0].lecture_title %>"
+                                                >
+                                                
+                                                <i class="bi bi-arrows-fullscreen"></i>
+                                            </button>
+                                            </div>
+                                            <div id="lec-<%= courseId %>-<%= lecId %>" class="collapse">
+                                                <canvas id="lectureChart-<%= courseId %>-<%= lecId %>" height="150"></canvas>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+
+    <% if (attempts.length > 0) { %>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Score</th>
+                    <th>Correct</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% attempts.forEach(attempt => { %>
                     <tr>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Score</th>
-                        <th>Correct</th>
-                        <th>Total</th>
-                        <th>Actions</th>
+                        <td><%= new Date(attempt.created_at).toLocaleString() %></td>
+                        <td><%= attempt.lecture_id ? 'Lecture Quiz' : 'Course Quiz' %></td>
+                        <td><%= attempt.score %>%</td>
+                        <td><%= attempt.correct_answers %></td>
+                        <td><%= attempt.total_questions %></td>
+                        <td>
+                            <a href="/quiz/results/<%= attempt.id %>" class="btn btn-sm btn-info">
+                                View Details
+                            </a>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <% attempts.forEach(attempt => { %>
-                        <tr>
-                            <td><%= new Date(attempt.created_at).toLocaleString() %></td>
-                            <td><%= attempt.lecture_id ? 'Lecture Quiz' : 'Course Quiz' %></td>
-                            <td><%= attempt.score %>%</td>
-                            <td><%= attempt.correct_answers %></td>
-                            <td><%= attempt.total_questions %></td>
-                            <td>
-                                <a href="/quiz/results/<%= attempt.id %>" class="btn btn-sm btn-info">
-                                    View Details
-                                </a>
-                            </td>
-                        </tr>
-                    <% }); %>
-                </tbody>
-            </table>
-        <% } %>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } %>
+</div>
+
+<!-- Chart Expand Modal -->
+<div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="chartModalLabel">Expanded Chart</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <canvas id="expandedChart"></canvas>
+      </div>
     </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const groupedAttempts = <%- JSON.stringify(groupedAttempts) %>;
+    let expandedChartInstance = null;
+    function createInteractiveChart(ctx, labels, datasets, attemptIds) {
+        return new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } },
+                onClick: (evt, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const attemptId = attemptIds[index];
+                        if (attemptId) {
+                            window.location.href = `/quiz/results/${attemptId}`;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize charts
+    Object.keys(groupedAttempts).forEach(courseId => {
+        const courseData = groupedAttempts[courseId];
+
+        // Course-level chart
+        const labels = courseData.attempts.map(a => new Date(a.created_at).toLocaleDateString());
+        const scores = courseData.attempts.map(a => Math.round(a.score));
+        const correct = courseData.attempts.map(a => a.correct_answers);
+        const totals = courseData.attempts.map(a => a.total_questions);
+        const attemptIds = courseData.attempts.map(a => a.id);
+
+        createInteractiveChart(
+            document.getElementById(`courseChart-${courseId}`),
+            labels,
+            [
+                { label: 'Score (%)', data: scores, borderColor: 'blue', backgroundColor: 'rgba(0,0,255,0.1)', tension: 0.3, fill: true },
+                { label: 'Correct', data: correct, borderColor: 'green', tension: 0.3 },
+                { label: 'Total', data: totals, borderColor: 'gray', borderDash: [5,5], tension: 0.3 }
+            ],
+            attemptIds
+        );
+
+        // Lecture-level charts
+        Object.keys(courseData.lectures).forEach(lecId => {
+            const attempts = courseData.lectures[lecId];
+            const labels = attempts.map(a => new Date(a.created_at).toLocaleDateString());
+            const scores = attempts.map(a => Math.round(a.score));
+            const correct = attempts.map(a => a.correct_answers);
+            const totals = attempts.map(a => a.total_questions);
+            const attemptIds = attempts.map(a => a.id);
+
+            createInteractiveChart(
+                document.getElementById(`lectureChart-${courseId}-${lecId}`),
+                labels,
+                [
+                    { label: 'Score (%)', data: scores, borderColor: 'purple', backgroundColor: 'rgba(128,0,128,0.1)', tension: 0.3, fill: true },
+                    { label: 'Correct', data: correct, borderColor: 'orange', tension: 0.3 },
+                    { label: 'Total', data: totals, borderColor: 'gray', borderDash: [5,5], tension: 0.3 }
+                ],
+                attemptIds
+            );
+        });
+    });
+
+    // Expand Course Charts
+    document.querySelectorAll(".expand-course-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const courseId = this.dataset.courseId;
+            const courseTitle = this.dataset.courseTitle;
+            
+            const courseData = groupedAttempts[courseId];
+            if (!courseData || courseData.attempts.length === 0) return;
+
+            if (expandedChartInstance) expandedChartInstance.destroy();
+
+            const labels = courseData.attempts.map(a => new Date(a.created_at).toLocaleDateString());
+            const scores = courseData.attempts.map(a => Math.round(a.score));
+            const correct = courseData.attempts.map(a => a.correct_answers);
+            const totals = courseData.attempts.map(a => a.total_questions);
+            const attemptIds = courseData.attempts.map(a => a.id);
+
+            expandedChartInstance = new Chart(document.getElementById("expandedChart"), {
+                type: "line",
+                data: {
+                    labels,
+                    datasets: [
+                        { label: "Score (%)", data: scores, borderColor: "blue", backgroundColor: "rgba(0,0,255,0.1)", tension: 0.3, fill: true },
+                        { label: "Correct", data: correct, borderColor: "green", tension: 0.3 },
+                        { label: "Total", data: totals, borderColor: "gray", borderDash: [5,5], tension: 0.3 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: "bottom" } },
+                    onClick: (evt, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const attemptId = attemptIds[index];
+                            if (attemptId) {
+                                window.location.href = `/quiz/results/${attemptId}`;
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById("chartModalLabel").innerText = `Course ${courseTitle} Progress`;
+            new bootstrap.Modal(document.getElementById("chartModal")).show();
+        });
+    });
+
+    // Expand Lecture Charts
+    document.querySelectorAll(".expand-lecture-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const courseId = this.dataset.courseId;
+            const courseTitle = this.dataset.courseTitle;
+            const lecId = this.dataset.lectureId;
+            const lecTitle = this.dataset.lectureTitle;
+            const attempts = groupedAttempts[courseId].lectures[lecId];
+            if (!attempts || attempts.length === 0) return;
+
+            if (expandedChartInstance) expandedChartInstance.destroy();
+
+            const labels = attempts.map(a => new Date(a.created_at).toLocaleDateString());
+            const scores = attempts.map(a => Math.round(a.score));
+            const correct = attempts.map(a => a.correct_answers);
+            const totals = attempts.map(a => a.total_questions);
+            const attemptIds = attempts.map(a => a.id);
+
+            expandedChartInstance = new Chart(document.getElementById("expandedChart"), {
+                type: "line",
+                data: {
+                    labels,
+                    datasets: [
+                        { label: "Score (%)", data: scores, borderColor: "purple", backgroundColor: "rgba(128,0,128,0.1)", tension: 0.3, fill: true },
+                        { label: "Correct", data: correct, borderColor: "orange", tension: 0.3 },
+                        { label: "Total", data: totals, borderColor: "gray", borderDash: [5,5], tension: 0.3 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: "bottom" } },
+                    onClick: (evt, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const attemptId = attemptIds[index];
+                            if (attemptId) {
+                                window.location.href = `/quiz/results/${attemptId}`;
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById("chartModalLabel").innerText = `Course ${courseTitle} -  ${lecTitle}'s Progress`;
+            new bootstrap.Modal(document.getElementById("chartModal")).show();
+        });
+    });
+</script>
+
 <%- include('../partials/_footer') %>

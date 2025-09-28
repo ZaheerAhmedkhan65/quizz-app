@@ -7,7 +7,6 @@ router.get('/create-account', (req, res) => {
     res.render('auth/signup', { 
         title: "Create an account",
         user: req.user || null,
-        messages: req.flash(),
         path: req.path 
     });
 });
@@ -16,7 +15,6 @@ router.get('/login', (req, res) => {
     res.render('auth/signin', { 
         title: "Log in",
         user: req.user || null,
-        messages: req.flash(),
         path: req.path 
     });
 });
@@ -25,7 +23,6 @@ router.get('/forgot-password', (req, res) => {
     res.render('auth/forgot-password', {
         title: "Forgot Password",
         user: req.user || null,
-        messages: req.flash(),
         path: req.path 
     });
 });
@@ -36,7 +33,6 @@ router.get('/reset-password', (req, res) => {
         title: "Reset Password",
         token,
         user: req.user || null,
-        messages: req.flash(),
         path: req.path
     });
 });

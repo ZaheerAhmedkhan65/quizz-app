@@ -29,6 +29,7 @@
 </head>
 
 <body>
+    <%- include('../../shared/_alerts') %>
     <div class="container-scroller">
         <%- include('_sidebar') %>
          <!-- partial -->
@@ -153,7 +154,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
                                 <div class="navbar-profile">
-                                    <img class="img-xs rounded-circle" src="<%= user.avatar %>" alt="images" />
+                                    <span class="border border-primary border-2 p-2 fs-4 rounded-circle"><%= user.username.split('')[0].charAt(0).toUpperCase() %></span>
                                     <p class="mb-0 d-none d-sm-block navbar-profile-name">
                                         <%= user.username %>
                                     </p>

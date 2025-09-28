@@ -13,7 +13,7 @@
             <div class="profile-desc">
                 <div class="profile-pic">
                     <div class="count-indicator">
-                        <img class="img-xs rounded-circle " src="<%= user.avatar %>" alt="image" />
+                        <span class="border border-primary border-2 px-2 py-1 fs-4 rounded-circle"><%= user.username.split('')[0].charAt(0).toUpperCase() %></span>
                         <span class="count bg-success"></span>
                     </div>
                     <div class="profile-name">

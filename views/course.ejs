@@ -32,9 +32,11 @@
             </div>
             
             <div class="d-flex gap-2 align-items-center">
+                <% if (course.course_progress == null) { %>
                 <form action="/courses/<%= course.id %>/join" method="post">
-                    <button type="submit" class="action-btn bg-primary">Join Course</button>
+                  <button type="submit" class="action-btn bg-primary">Join Course</button>
                 </form>
+                <% } %>
                 <a href="/quiz/start/<%= course.id %>" class="action-btn bg-primary text-decoration-none text-reset">Take Quiz</a>
             </div>
         </div>

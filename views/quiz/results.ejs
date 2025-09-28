@@ -9,6 +9,12 @@
         <p>Date: <%= attempt.created_at %></p>
     </div>
 
+    <!-- Progress Chart -->
+    <div class="mb-5">
+        <h2>Your Progress in this Lecture</h2>
+        <canvas id="lectureChart" height="150"></canvas>
+    </div>
+
     <div class="detailed-results">
         <h2>Detailed Results</h2>
 
@@ -46,4 +52,62 @@
         Back to <%= lecture_id ? 'Lecture' : 'Course' %>
     </a>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const lectureAttempts = <%- JSON.stringify(lectureAttempts) %>;
+
+    if (lectureAttempts.length > 0) {
+        const labels = lectureAttempts.map(a => new Date(a.created_at).toLocaleDateString());
+        const scores = lectureAttempts.map(a => Math.round(a.score));
+        const correct = lectureAttempts.map(a => a.correct_answers);
+        const totals = lectureAttempts.map(a => a.total_questions);
+
+        const ctx = document.getElementById('lectureChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: 'Score (%)',
+                        data: scores,
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(0,0,255,0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Correct Answers',
+                        data: correct,
+                        borderColor: 'green',
+                        backgroundColor: 'rgba(0,255,0,0.1)',
+                        tension: 0.3,
+                        fill: false
+                    },
+                    {
+                        label: 'Total Questions',
+                        data: totals,
+                        borderColor: 'gray',
+                        backgroundColor: 'rgba(200,200,200,0.1)',
+                        borderDash: [5, 5],
+                        tension: 0.3,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    title: { display: true, text: 'Progress Over Attempts' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+</script>
+
 <%- include('../partials/_footer') %>

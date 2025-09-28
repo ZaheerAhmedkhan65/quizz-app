@@ -12,7 +12,7 @@ const signup = async (req, res) => {
         const existingUser = await User.findByEmail(email);
         if (existingUser) {
             req.flash('error', 'User already exists with this email! Please choose a different email.');
-            return res.redirect('/auth/create-account');
+            res.redirect('/auth/create-account');
         }
 
         // Hash the password
@@ -56,11 +56,11 @@ const signup = async (req, res) => {
          `
        });
         req.flash('success', 'Your account has been created! Please check your gmail inbox to verify your account.');
-        return res.redirect('/auth/login');
+        res.redirect('/auth/login');
     } catch (error) {
         console.error(error);
         req.flash('error', 'Error creating your account!');
-        return res.redirect('/auth/create-account');
+        res.redirect('/auth/create-account');
     }
 }
 
@@ -72,20 +72,20 @@ const verifyEmail = async (req, res) => {
         
         if (!user) {
             req.flash('error', 'Invalid or expired token!');
-            return res.redirect('/auth/login');
+            res.redirect('/auth/login');
         }
         
         // Mark email as verified and clear the token
         await User.verifyEmail(user.id);
         
         req.flash('success', 'Email verified successfully!');
-        return res.redirect('/auth/login');
+        res.redirect('/auth/login');
         
     } catch (error) {
         console.error('Email verification error:', error);        
         // Or if you prefer JSON response:
         req.flash('error', 'Error verifying email!');
-        return res.redirect('/auth/login');
+        res.redirect('/auth/login');
     }
 }
 
@@ -97,23 +97,23 @@ const login = async (req, res) => {
         const user = await User.findByEmail(email);
         if (!user) {
             req.flash('error', 'Invalid email or password!');
-            return res.redirect('/auth/login');
+            res.redirect('/auth/login');
         }
 
         //Check if email is verified
         if (!user.email_verified) {
             req.flash('error', 'Your account was created, but your email is not verified. Please check your gmail inbox for verification instructions.');
-            return res.redirect('/auth/verify-email');
+            res.redirect('/auth/verify-email');
         }
 
         if (user.status === 'blocked') {
             req.flash('error', 'Your account has been blocked. Please contact support.');
-            return res.redirect('/auth/login');  
+            res.redirect('/auth/login');  
         }
 
         if (user.status === 'deleted') {
             req.flash('error', 'Your account has been deleted. Please contact support.');
-            return res.redirect('/auth/login');  
+            res.redirect('/auth/login');  
         }
 
         // Compare passwords
@@ -121,7 +121,7 @@ const login = async (req, res) => {
 
         if (!isPasswordValid) {
             req.flash('error', 'Invalid email or password!');
-            return res.redirect('/auth/login');
+            res.redirect('/auth/login');
         }
         
         // Generate JWT with role
@@ -140,38 +140,36 @@ const login = async (req, res) => {
         res.cookie('token', token, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
             maxAge: 7 * 24 * 60 * 60 * 1000 
         });
+
         req.flash('success', 'Login successfully!');
         if(user.role === 'admin') {
-            return res.redirect('/admin/dashboard');
+            res.redirect('/admin/dashboard');
+        }else{
+            res.redirect('/api/dashboard');
         }
-        return res.redirect('/api/dashboard');
     } catch (error) {
         console.error(error);
         req.flash('error', 'Error logging in!');
-        return res.redirect('/auth/login');
+        res.redirect('/auth/login');
     }
 }
 
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
-    console.log(email);
     try {
         const user = await User.findByEmail(email);
         if (!user) {
             req.flash('error', 'The user with this Email not found.Please try other email.');
-            return res.redirect('/auth/forgot-password');
+            res.redirect('/auth/forgot-password');
         }
-
-        console.log("user : ",user);
         
         // Generate reset token
         const resetToken = crypto.randomBytes(32).toString('hex');
         const resetTokenExpires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
-        console.log("resetTokenExpires : ",resetTokenExpires);
-        console.log("resetToken : ",resetToken);
+        
         await User.setResetToken(user.email, resetToken, resetTokenExpires);
 
         // Send reset email
@@ -199,7 +197,7 @@ const forgotPassword = async (req, res) => {
         });
 
         req.flash('success', 'Password reset email sent successfully!');
-        return res.redirect('/auth/forgot-password');
+        res.redirect('/auth/forgot-password');
     } catch (error) {
         console.error(error);
         req.flash('error', 'Error sending password reset email!');
@@ -213,7 +211,8 @@ const resetPassword = async (req, res) => {
     try {
         const user = await User.findByResetToken(token);
         if (!user) {
-            return res.status(400).json({ message: 'Invalid or expired token' });
+            req.flash('success', 'Invalid or expired token');
+            res.status(400).redirect('/auth/forgot-password');
         }
         
         // Hash new password
@@ -222,7 +221,7 @@ const resetPassword = async (req, res) => {
         // Update password and clear reset token
         await User.updatePassword(user.id, hashedPassword);
         req.flash('success', 'Password reset successfully!');
-        return res.redirect('/auth/login');
+        res.redirect('/auth/login');
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error resetting password' });
@@ -259,7 +258,7 @@ const refreshToken = async (req, res) => {
         res.cookie('token', newToken, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
             maxAge: 7 * 24 * 60 * 60 * 1000 
         });
         
@@ -272,7 +271,7 @@ const refreshToken = async (req, res) => {
 const logout = (req, res) => {
     res.clearCookie('token');
     req.flash('success', 'Logout successfully!');
-    return res.redirect('/auth/login');
+    res.redirect('/auth/login');
 }
 
 module.exports = { 

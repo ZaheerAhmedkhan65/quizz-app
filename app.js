@@ -30,6 +30,8 @@ const sessionStore = new MySQLStore({
   }
 }, pool);
 
+// app.set('trust proxy', 1);
+
 app.use(session({
     secret: process.env.SECRET_KEY || 'fallback-secret-key-for-development-only',
     resave: false,  // Changed from false to true
@@ -38,33 +40,37 @@ app.use(session({
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
         maxAge: 24 * 60 * 60 * 1000
     }
 }));
 
+app.use(flash());
+
 app.use((req, res, next) => {
-    // console.log('Session ID:', req.sessionID);
-    // console.log('Session data:', req.session);
+    res.locals.success = req.flash('success'); // array
+    res.locals.error = req.flash('error');     // array
     next();
 });
 
+
   // Flash middleware
-app.use(flash());
+
 
 // Make flash messages available to all views
 // Replace your current flash middleware with this:
-app.use((req, res, next) => {
-    // Store the flash messages before they're consumed
-    const flashMsgs = {
-        success: req.flash('success'),
-        error: req.flash('error')
-    };
+// app.use((req, res, next) => {
+//     // Store the flash messages before they're consumed
+//     const flashMsgs = {
+//         success: req.flash('success'),
+//         error: req.flash('error')
+//     };
     
-    // Make available to templates
-    res.locals.success_msg = flashMsgs.success;
-    res.locals.error_msg = flashMsgs.error;
-    next();
-});
+//     // Make available to templates
+//     res.locals.success_msg = flashMsgs.success;
+//     res.locals.error_msg = flashMsgs.error;
+//     next();
+// });
 
 app.set('public', path.join(__dirname, 'public'));
 app.set('views', path.join(__dirname, 'views'));
@@ -80,6 +86,8 @@ const geminiRoutes = require("./routes/geminiRoute");
 const todoRoutes = require("./routes/todoRoutes")
 const notificationRoutes = require("./routes/notificationRoutes")
 const lectureRoutes = require("./routes/lectureRoutes");
+const pastpaperRoutes = require("./routes/pastpaperRoutes");
+const userCourseRoutes = require("./routes/userCourseRoutes.js");
 
 const {bindUser, authenticate, isAdmin} = require('./middleware/authenticate');
 
@@ -96,7 +104,9 @@ app.use("/auth",authRoutes);
 app.use("/", userRoutes);
 app.use("/", lectureRoutes);
 app.use("/courses",courseRoutes);
+app.use("/past-papers",pastpaperRoutes);
 app.use(authenticate);
+app.use("/courses", userCourseRoutes);
 app.use("/",quizRoutes);
 app.use("/api/gemini", geminiRoutes);
 app.use("/api/todo",todoRoutes);
