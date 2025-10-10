@@ -69,13 +69,20 @@ const notificationRoutes = require("./routes/notificationRoutes")
 const lectureRoutes = require("./routes/lectureRoutes");
 const pastpaperRoutes = require("./routes/pastpaperRoutes");
 const userCourseRoutes = require("./routes/userCourseRoutes.js");
+const gdbRoutes = require("./routes/gdbRoutes.js");
+const assignmentRoutes = require("./routes/assignmentRoutes.js");
 
 const {bindUser, authenticate, isAdmin} = require('./middleware/authenticate');
 
 app.use(bindUser);
+app.use((req, res, next) => {
+    res.locals.user = req.user || null;
+    res.locals.path = req.path;
+    next();
+});
 
 app.get('/',(req,res) => { 
-    res.render('index', { title: "Home", user: req.user || null, path: req.path }); 
+    res.render('index', { title: "Home" }); 
 });
 
 app.use("/",publicRoutes);
@@ -86,6 +93,8 @@ app.use("/", userRoutes);
 app.use("/", lectureRoutes);
 app.use("/courses",courseRoutes);
 app.use("/past-papers",pastpaperRoutes);
+app.use("/gdb", gdbRoutes);
+app.use("/assignments", assignmentRoutes);
 app.use(authenticate);
 app.use("/courses", userCourseRoutes);
 app.use("/",quizRoutes);
@@ -94,6 +103,10 @@ app.use("/api/todo",todoRoutes);
 app.use("/api/notifications",notificationRoutes);
 app.use(isAdmin)
 app.use("/admin",adminRoutes);
+
+app.use((req, res) => {
+    res.status(404).render('404', { title: "404" });
+});
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on http://localhost:${process.env.PORT}`);

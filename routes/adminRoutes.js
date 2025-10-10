@@ -13,8 +13,6 @@ router.get('/dashboard', userController.adminDashboard);
 router.get('/courses', (req, res)=>{
     res.render('admin/courses/index', { 
         title: "Courses",
-        user: req.user || null,
-        path: req.path ,
         token: req.cookies.token
     });
 });
@@ -22,8 +20,6 @@ router.get('/courses', (req, res)=>{
 router.get('/courses/new', (req, res)=>{
     res.render('admin/courses/new', { 
         title: "New Course",
-        user: req.user || null,
-        path: req.path ,
         token: req.cookies.token
     });
 });
@@ -39,10 +35,8 @@ router.get('/:course_id/lectures/new', async (req, res)=>{
     const currentCourse = await Course.findById(req.params.course_id);
     res.render('admin/lectures/new', { 
         title: "New Lecture",
-        user: req.user || null,
         courses,
-        currentCourse,
-        path: req.path 
+        currentCourse
     });
 });
 router.post('/lectures/create', lectureController.create);

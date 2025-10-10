@@ -2,10 +2,23 @@ const User = require('../models/User');
 const Course = require('../models/Course');
 const UserCourse = require('../models/UserCourse');
 const ChatHistory = require('../models/ChatHistory');
+const Semester = require('../models/Semester');
 
 const userDashboard = async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId);
+        if(!req.user) {
+            return res.status(404).render('error', { 
+                message: "User not found",
+                error: "User not found" 
+            });
+        }
+        const currentSemester = await Semester.findByStatus('active');
+        if(!currentSemester) {
+            return res.status(500).render('error', { 
+                message: "Error loading dashboard",
+                error: "Error loading dashboard" 
+            });
+        }
         const courses = await Course.findByUserId(req.user.userId);
         
         let progress = await UserCourse.getProgressByUserId(req.user.userId);
@@ -15,15 +28,14 @@ const userDashboard = async (req, res) => {
         const completedCourses = await Course.getCompletedCourseCount(req.user.userId);
 
         progress = progress.map(p => ({ ...p, course_progress: Math.round(p.course_progress) }));
-        res.render('user/dashboard', { 
-            user, 
+        res.render('user/dashboard', {
+            currentSemester,
             courses, 
             progress, 
             title: "Dashboard",
             overallProgress: Math.round(overallProgress),
             completedCourses,
-            message: null ,
-            path: req.path 
+            message: null 
         });
     } catch (err) {
         console.error(err);
@@ -70,4 +82,13 @@ const updateUserStatus = async (req, res) => {
     }
 };
 
-module.exports = { userDashboard, adminDashboard, updateUserStatus };
+const userProfile = async (req, res) => {
+    try {
+        const userInfo = await User.findById(req.user.userId);
+        res.status(200).render('user/profile', { userInfo, title: "Profile" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports = { userDashboard, adminDashboard, updateUserStatus, userProfile };

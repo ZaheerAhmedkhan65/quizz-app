@@ -1,3 +1,5 @@
+
+
 const submitButton = document.getElementById("predefined-questions-button");
 const data = [];
 const questionDataMap = new Map();
@@ -6,7 +8,7 @@ const questionDataMap = new Map();
 submitButton.addEventListener("click", () => {
    
     const predefinedQuestionsText = document.getElementById("predefined-questions").value;
-    if(predefinedQuestionsText === '') return showNotification('Please enter some questions data in JSON format.');
+    if(predefinedQuestionsText === '') return showAlert('Please enter some questions data in JSON format.');
     const predefinedQuestionsContainer = document.getElementById("predefined-questions-container");
     predefinedQuestionsContainer.remove();
     try {
@@ -47,7 +49,7 @@ function displayJsonQuestions() {
         const buttonId = `question-btn-${question.id}`;
 
         questionDiv.innerHTML = `
-            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <div class="card-header text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">${index + 1}. ${question.question_text}</h5>
                 <button class="btn btn-sm btn-primary create-question-btn" 
                          id="${buttonId}" >
@@ -57,7 +59,7 @@ function displayJsonQuestions() {
             <div class="card-body">
                 <ul class="list-group list-group-flush">
                     ${question.options.map(option => `
-                        <li class="list-group-item d-flex align-items-center">
+                        <li class="list-group-item d-flex align-items-center bg-transparent">
                             <input type="radio" class="form-check-input me-2" 
                                    ${option.is_correct ? 'checked' : ''} disabled>
                             ${option.option_text}
@@ -83,16 +85,14 @@ function displayJsonQuestions() {
 
 async function createQuestionWithOptions(questionData, buttonId) {
     try {
-        // Get courseId and quizzId from the existing question form
-        const questionForm = document.getElementById("question-form");
 
         // 1. Create the question
-        const questionResponse = await fetch(questionForm.action, {
+        const questionResponse = await fetch(`/admin/questions/create`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
                 question_text: questionData.question_text,
-                quiz_id: quizzId 
+                lecture_id: lectureId 
             })
         });
         
@@ -108,7 +108,7 @@ async function createQuestionWithOptions(questionData, buttonId) {
             }
             // 2. Create the question UI element
             let li = document.createElement("li");
-            li.classList.add("list-group-item", "bg-primary-subtle", "rounded-0", "mb-2");
+            li.classList.add("list-group-item", "rounded-0", "mb-2", "bg-transparent", "border-0", "px-0");
             li.innerHTML = `
                 <div id="question_${questionResult.question.id}" class="border border-1 border-dark p-3 d-flex align-items-center justify-content-between">
                     <strong>${questionResult.question.index} : ${questionResult.question.question_text}</strong>
@@ -117,7 +117,7 @@ async function createQuestionWithOptions(questionData, buttonId) {
                 <ul class="list-group" id="options-container-${questionResult.question.id}" data-option-count="0"></ul>
                 
                 <!-- Form to create an option -->
-                <form class="option-form" action="/api/courses/${courseId}/quizzes/${quizzId}/questions/${questionResult.question.id}/options" method="post">
+                <form class="option-form" action="/admin/questions/${questionResult.question.id}/options/create" method="post">
                     <input type="text" name="option_text" class="form-control mt-3" placeholder="Enter Option text" required>
                     <select name="is_correct" class="form-select mt-3">
                         <option value="0">Incorrect</option>
@@ -156,7 +156,7 @@ async function createQuestionWithOptions(questionData, buttonId) {
                     let optionCount = parseInt(optionsContainer.getAttribute("data-option-count")) || 0;
                     
                     let optionLi = document.createElement("li");
-                    optionLi.classList.add("list-group-item", "rounded-0", "d-flex", "align-items-center", "gap-1");
+                    optionLi.classList.add("list-group-item", "rounded-0", "d-flex", "align-items-center", "bg-transparent", "gap-1");
                     optionLi.innerHTML = `
                         <input type="radio" name="question_${questionResult.question.id}" id="option_${optionResult.option.id}" 
                                value="${optionResult.option.id}" class="form-check-input" ${option.is_correct ? 'checked' : ''}>
@@ -233,7 +233,7 @@ function copyToClipboard() {
     const text = document.getElementById('predefined-questions-formate').value;
     navigator.clipboard.writeText(text)
       .then(() => {
-        showNotification('Text copied to clipboard!')
+        showAlert('Text copied to clipboard!')
       })
       .catch(err => {
         console.error('Failed to copy text: ', err);

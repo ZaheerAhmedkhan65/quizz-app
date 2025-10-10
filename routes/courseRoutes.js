@@ -6,10 +6,8 @@ const courseController = require('../controllers/courseController');
 
 // THEN GENERAL ROUTES
 router.get('/', (req, res)=>{
-    res.render('courses', { 
-        title: "Courses",
-        user: req.user || null,
-        path: req.path
+    res.render('public/courses', { 
+        title: "Courses"
     });
 });
 router.get('/all', courseController.getAll);

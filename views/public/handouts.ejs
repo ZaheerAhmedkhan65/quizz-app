@@ -1,0 +1,166 @@
+<%- include('../partials/_header') %>
+
+<div class="row">
+  <div class="col-md-6">
+    <h2>Handouts</h2>
+  </div>
+</div>
+
+<!-- Spinner -->
+<div id="loadingSpinner" class="text-center my-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="sr-only"></span>
+  </div>
+</div>
+
+<!-- Table (hidden initially) -->
+<div id="coursesTableWrapper" class="table-responsive" style="display: none;">
+  <table class="table table-hover table-bordered align-middle">
+    <thead>
+      <tr>
+        <th scope="col">Course</th>
+        <th scope="col">Handout</th>
+        <th scope="col">Enroll</th>
+      </tr>
+    </thead>
+    <tbody id="coursesContainer"></tbody>
+  </table>
+</div>
+
+<!-- No Courses Message -->
+<div id="noCoursesMessage" class="alert alert-warning text-center" style="display: none;">
+  No courses found.
+</div>
+
+<!-- Sentinel element for lazy loading -->
+<div id="loadMoreTrigger" class="text-center my-4" style="display: none;">
+  <div class="spinner-border text-secondary" role="status"></div>
+</div>
+
+<script src="/js/download.js"></script>
+<script>
+  let currentPage = 1;
+  const limit = 25;
+  let loading = false;
+  let hasMore = true;
+  const cache = new Map();
+
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchCourses();
+  });
+
+  function fetchCourses(searchTerm = '') {
+    if (loading || !hasMore) return;
+    loading = true;
+
+    const container = document.getElementById('coursesContainer');
+    const spinner = document.getElementById('loadingSpinner');
+    const noCoursesMsg = document.getElementById('noCoursesMessage');
+    const tableWrapper = document.getElementById('coursesTableWrapper');
+    const loadMoreTrigger = document.getElementById('loadMoreTrigger');
+
+    spinner.style.display = currentPage === 1 ? 'block' : 'none';
+    loadMoreTrigger.style.display = currentPage > 1 ? 'block' : 'none';
+    noCoursesMsg.style.display = 'none';
+
+    const cacheKey = `page_${currentPage}_${searchTerm}`;
+    if (cache.has(cacheKey)) {
+      renderCourses(cache.get(cacheKey));
+      spinner.style.display = 'none';
+      loadMoreTrigger.style.display = 'none';
+      loading = false;
+      return;
+    }
+
+    fetch(`/courses-list?page=${currentPage}&limit=${limit}&search=${encodeURIComponent(searchTerm)}`)
+      .then(res => res.json())
+      .then(courses => {
+        spinner.style.display = 'none';
+        loadMoreTrigger.style.display = 'none';
+        tableWrapper.style.display = 'block';
+
+        if (courses.length === 0) {
+          if (currentPage === 1) noCoursesMsg.style.display = 'block';
+          hasMore = false;
+          return;
+        }
+
+        cache.set(cacheKey, courses);
+        renderCourses(courses);
+        currentPage++;
+        observeLoadMore();
+      })
+      .catch(err => {
+        console.error('Error loading courses:', err);
+        spinner.style.display = 'none';
+        noCoursesMsg.style.display = 'block';
+        noCoursesMsg.textContent = 'Error loading courses. Please try again later.';
+      })
+      .finally(() => {
+        loading = false;
+      });
+  }
+
+  function renderCourses(courses) {
+    const container = document.getElementById('coursesContainer');
+    const fragment = document.createDocumentFragment();
+
+    courses.forEach(course => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <a class="fw-semibold hover-underline text-reset" href="/courses/${course.id}">
+            ${course.title}
+          </a>
+        </td>
+        <td>
+          ${course.handout_pdf
+            ? `<div class="download-container">
+                <button class="action-btn download-btn" data-href="/courses/${course.id}/handout/download">
+                  <div class="icon-container">
+                    <svg class="circular-progress" viewBox="0 0 26 26">
+                      <circle class="progress-circle" cx="13" cy="13" r="11"></circle>
+                    </svg>
+                    <svg class="download-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </div>
+                  <span class="btn-text">Download PDF</span>
+                </button>
+              </div>`
+            : 'No PDF Available'}
+        </td>
+        <td>
+          ${course.course_progress == null 
+            ? `<form action="/courses/${course.id}/join" method="post">
+                <button type="submit" class="action-btn bg-primary">Join Course</button>
+              </form>`
+            : '<span class="fw-semibold bg-success text-white px-2 py-1 rounded">Enrolled</span>'}
+        </td>
+      `;
+      fragment.appendChild(row);
+    });
+
+    container.appendChild(fragment);
+  }
+
+  function observeLoadMore() {
+    const loadMoreTrigger = document.getElementById('loadMoreTrigger');
+    loadMoreTrigger.style.display = 'block';
+
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !loading && hasMore) {
+        observer.disconnect(); // prevent multiple triggers
+        fetchCourses();
+      }
+    }, { threshold: 1 });
+
+    observer.observe(loadMoreTrigger);
+  }
+</script>
+
+<%- include('../partials/_footer') %>

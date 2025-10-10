@@ -148,7 +148,7 @@ const login = async (req, res) => {
         if(user.role === 'admin') {
            return res.redirect('/admin/dashboard');
         }else{
-            return res.redirect('/api/dashboard');
+            return res.redirect('/dashboard');
         }
     } catch (error) {
         console.error(error);

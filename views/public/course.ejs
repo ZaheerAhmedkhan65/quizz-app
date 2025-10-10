@@ -1,4 +1,4 @@
-<%- include('partials/_header') %>
+<%- include('../partials/_header') %>
 <nav class="p-0" style="--bs-breadcrumb-divider: '&gt;';" aria-label="breadcrumb">
   <ol class="breadcrumb">
     <%if(user){%>
@@ -70,7 +70,7 @@
     <div class="col-12 p-0">
         <ul class="list-group">
             <% lectures.forEach((lecture, index) => { %>
-                <a href="/courses/<%= course.slug %>/lectures/<%= lecture.id %>" class="text-decoration-none text-dark" style="width: fit-content;">
+                <a href="/courses/<%= course.slug %>/<%= lecture.id %>" class="text-decoration-none text-dark" style="width: fit-content;">
                     <li class="list-group-item bg-transparent border-0 px-0 <%= lecture.is_completed ? 'text-success' : '' %>">
                         <span class="fw-semibold">(<%= index + 1 %>) &nbsp;</span>
                         <strong style="width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-title = "lecture-title"> <%= lecture.title %> </strong>
@@ -86,4 +86,4 @@
         </ul>
     </div>
     <script src="/js/download.js"></script>
-<%- include('partials/_footer') %>
+<%- include('../partials/_footer') %>

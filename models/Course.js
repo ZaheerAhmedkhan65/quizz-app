@@ -1,36 +1,55 @@
 const db = require('../config/db');
 
 class Course {
-    static async getAll() {
-        const [rows] = await db.query('SELECT * FROM courses');
-        return rows;
+    // models/Course.js
+    static async getAllCourses(user_id, limit, offset) {
+  try {
+    limit = parseInt(limit, 10);
+    offset = parseInt(offset, 10);
+
+    if (isNaN(limit) || isNaN(offset)) {
+      throw new Error("Invalid pagination values");
     }
 
-    // static async getAllCourses(userId) {
-    //     const [rows] = await db.query('SELECT * FROM courses WHERE id IN (SELECT course_id FROM user_courses WHERE user_id = ?)', [userId]);
-    //     return rows[0].count;
-    // }
+    const query = `
+      SELECT 
+        c.id, 
+        c.title,
+        c.slug,
+        c.handout_pdf,
+        c.handout_original_filename,
+        uc.course_progress 
+      FROM courses c
+      LEFT JOIN user_courses uc ON c.id = uc.course_id AND uc.user_id = ?
+      ORDER BY c.id ASC
+      LIMIT ${limit} OFFSET ${offset}
+    `;
 
-    static async getAllCourses(user_id) {
+    const [rows] = await db.execute(query, [user_id]);
+    return rows;
+  } catch (error) {
+    console.error("Database query error:", error);
+    throw error;
+  }
+}
+
+    static async getAll(limit, offset) {
         try {
-            const [rows] = await db.execute(`
-            SELECT 
-                c.id, 
-                c.title,
-                c.slug,
-                c.handout_pdf,
-                c.handout_original_filename,
-                uc.course_progress 
-            FROM courses c
-            LEFT JOIN user_courses uc ON c.id = uc.course_id AND uc.user_id = ?
-            ORDER BY c.id ASC
-        `, [user_id]);
+            limit = parseInt(limit, 10);
+            offset = parseInt(offset, 10);
+
+            if (isNaN(limit) || isNaN(offset)) {
+                throw new Error("Invalid pagination values");
+            }
+
+            const [rows] = await db.query('SELECT * FROM courses ORDER BY id ASC LIMIT ? OFFSET ?', [limit, offset]);
             return rows;
         } catch (error) {
             console.error("Database query error:", error);
             throw error;
         }
     }
+
 
     static async findById(id) {
         const [rows] = await db.query('SELECT * FROM courses WHERE id = ?', [id]);
@@ -52,13 +71,18 @@ class Course {
         `
         SELECT 
             c.*,
+            s. status AS semester_status,
             COUNT(DISTINCT CASE 
                 WHEN (qa.correct_answers / qa.total_questions) * 100 >= 50 
                 THEN l.id 
-            END) AS completed_lectures
-        FROM courses c
-        JOIN user_courses uc 
+            END) AS completed_lectures,
+            COUNT(DISTINCT l.id) AS total_lectures,
+            uc.course_progress
+        FROM user_courses uc
+        JOIN courses c 
             ON uc.course_id = c.id
+        JOIN semesters s
+            ON uc.semester_id = s.id
         LEFT JOIN lectures l 
             ON l.course_id = c.id
         LEFT JOIN quiz_attempts qa 
@@ -66,7 +90,8 @@ class Course {
             AND qa.course_id = c.id
             AND qa.user_id = uc.user_id
         WHERE uc.user_id = ?
-        GROUP BY c.id
+          AND s.status = 'active'
+        GROUP BY c.id, s.status, uc.course_progress
         ORDER BY c.id
         `,
         [userId]
@@ -74,6 +99,7 @@ class Course {
 
     return rows;
 }
+
 
 
     static async findCourse(userId, courseId) {

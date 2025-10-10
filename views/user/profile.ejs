@@ -1,0 +1,25 @@
+<%- include('../partials/_header') %>
+
+<div class="container-fluid">
+    <div class="row align-items-center">
+        <div class="col-6 d-flex align-items-center gap-2">
+            <h2 class="my-2">Your Profile</h2>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col-6 d-flex align-items-center gap-2">
+            <h3 class="my-2">User Name: <%= user.username %></h3>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col-6 d-flex align-items-center gap-2">
+            <h3 class="my-2">Email: <%= user.email %></h3>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="col-6 d-flex align-items-center gap-2">
+            <h3 class="my-2">Account Created: <%= userInfo.created_at.toDateString() %></h3>
+        </div>
+    </div>
+</div>
+<%- include('../partials/_footer') %>

@@ -1,0 +1,138 @@
+<%- include('../partials/_header') %>
+
+<div class="row">
+  <div class="col-md-6">
+    <h2>Courses</h2>
+  </div>
+</div>
+
+<div id="loadingSpinner" class="text-center my-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="sr-only"></span>
+  </div>
+</div>
+
+<div id="coursesTableWrapper" class="table-responsive" style="display: none;">
+  <table class="table table-hover table-bordered align-middle">
+    <thead>
+      <tr>
+        <th scope="col">Course</th>
+        <th scope="col">Enroll</th>
+      </tr>
+    </thead>
+    <tbody id="coursesContainer"></tbody>
+  </table>
+</div>
+
+<div id="noCoursesMessage" class="alert alert-warning text-center" style="display: none;">
+  No courses found.
+</div>
+
+<!-- Sentinel element for lazy loading -->
+<div id="loadMoreTrigger" class="text-center my-4" style="display: none;">
+  <div class="spinner-border text-secondary" role="status"></div>
+</div>
+
+<script>
+  let currentPage = 1;
+  const limit = 25;
+  let loading = false;
+  let hasMore = true;
+  const cache = new Map(); // Local JS cache
+
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchCourses();
+  });
+
+  function fetchCourses() {
+    if (loading || !hasMore) return;
+    loading = true;
+
+    const container = document.getElementById('coursesContainer');
+    const spinner = document.getElementById('loadingSpinner');
+    const noCoursesMsg = document.getElementById('noCoursesMessage');
+    const tableWrapper = document.getElementById('coursesTableWrapper');
+    const loadMoreTrigger = document.getElementById('loadMoreTrigger');
+
+    spinner.style.display = currentPage === 1 ? 'block' : 'none';
+    loadMoreTrigger.style.display = currentPage > 1 ? 'block' : 'none';
+    noCoursesMsg.style.display = 'none';
+
+    const cacheKey = `page_${currentPage}`;
+
+    if (cache.has(cacheKey)) {
+      renderCourses(cache.get(cacheKey));
+      spinner.style.display = 'none';
+      loadMoreTrigger.style.display = 'none';
+      loading = false;
+      return;
+    }
+
+    fetch(`/courses-list?page=${currentPage}&limit=${limit}`)
+      .then(res => res.json())
+      .then(courses => {
+        spinner.style.display = 'none';
+        loadMoreTrigger.style.display = 'none';
+        tableWrapper.style.display = 'block';
+
+        if (courses.length === 0) {
+          if (currentPage === 1) noCoursesMsg.style.display = 'block';
+          hasMore = false;
+          return;
+        }
+
+        cache.set(cacheKey, courses);
+        renderCourses(courses);
+        currentPage++;
+        observeLoadMore();
+      })
+      .catch(err => {
+        console.error('Error loading courses:', err);
+        spinner.style.display = 'none';
+        noCoursesMsg.style.display = 'block';
+        noCoursesMsg.textContent = 'Error loading courses. Please try again later.';
+      })
+      .finally(() => {
+        loading = false;
+      });
+  }
+
+  function renderCourses(courses) {
+    const container = document.getElementById('coursesContainer');
+    courses.forEach(course => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <a class="fw-semibold hover-underline text-reset" href="/courses/${course.id}">
+            ${course.title}
+          </a>
+        </td>
+        <td>
+          ${course.course_progress == null 
+            ? `<form action="/courses/${course.id}/join" method="post">
+                <button type="submit" class="action-btn bg-primary">Join Course</button>
+              </form>` 
+            : '<span class="fw-semibold bg-success text-white px-2 py-1 rounded">Enrolled</span>'
+          }
+        </td>
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  function observeLoadMore() {
+    const loadMoreTrigger = document.getElementById('loadMoreTrigger');
+    loadMoreTrigger.style.display = 'block';
+
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !loading && hasMore) {
+        observer.disconnect(); // prevent duplicate triggers
+        fetchCourses();
+      }
+    }, { threshold: 1 });
+
+    observer.observe(loadMoreTrigger);
+  }
+</script>
+
+<%- include('../partials/_footer') %>

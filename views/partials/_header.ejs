@@ -52,6 +52,11 @@
         }
     </style>
     <div class="container">
+            <% if (
+  !path.includes('login') &&
+  !path.includes('create-account') &&
+  !path.includes('forgot-password')
+) { %>
         <!-- Desktop Header (visible on lg screens and above) -->
         <header class="border-bottom lh-1 py-3 d-none d-lg-block">
             <div class="row flex-nowrap justify-content-between align-items-center">
@@ -167,34 +172,31 @@
             <div class="nav nav-underline justify-content-between">
                 <div>
                     <% if(user) { %>
-                    <a class="nav-item nav-link link-body-emphasis" href="/dashboard">dashboard</a>
+                    <a class="nav-item nav-link link-body-emphasis <%= path.includes('dashboard') ? 'active' : '' %>" href="/dashboard">dashboard</a>
                     <% } else { %>
-                    <a class="nav-item nav-link link-body-emphasis" href="/">home</a>
+                    <a class="nav-item nav-link link-body-emphasis <%= path.includes('/') ? 'active' : '' %>" href="/">home</a>
                     <% } %>
                 </div>
                 <div>
-                    <a class="nav-item nav-link link-body-emphasis" href="/handouts">handouts</a>
+                    <a class="nav-item nav-link link-body-emphasis <%= path.includes('handouts') ? 'active' : '' %>" href="/handouts">handouts</a>
                 </div>
                 <div>
-                    <a class="nav-item nav-link link-body-emphasis" href="/courses">courses</a>
+                    <a class="nav-item nav-link link-body-emphasis <%= path.includes('courses') ? 'active' : '' %>" href="/courses">courses</a>
                 </div>
                 <div class="dropdown">
                     <button class="btn border-0 outline-0 dropdown dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         PAST PAPERS
                     </button>
                     <ul class="dropdown-menu">
-                        <li class="text-start"><a class="dropdown-item" href="/past-papers/mid-term">mid term</a></li>
-                        <li class="text-start"><a class="dropdown-item" href="/past-papers/final-term">final term</a></li>
+                        <li class="text-start"><a class="dropdown-item <%= path.includes('mid-term') ? 'active' : '' %>" href="/past-papers/mid-term">mid term</a></li>
+                        <li class="text-start"><a class="dropdown-item <%= path.includes('final-term') ? 'active' : '' %>" href="/past-papers/final-term">final term</a></li>
                     </ul>
                 </div>
                 <div>
-                    <a class="nav-item nav-link link-body-emphasis" href="/assignments">assignment's</a>
+                    <a class="nav-item nav-link link-body-emphasis <%= path.includes('assignments') ? 'active' : '' %>" href="/assignments">assignment's</a>
                 </div>
                 <div>
-                    <a class="nav-item nav-link link-body-emphasis" href="/quizes">quiz's</a>
-                </div>
-                <div>
-                    <a class="nav-item nav-link link-body-emphasis" href="/gdb"> gdb's</a>
+                    <a class="nav-item nav-link link-body-emphasis <%= path.includes('gdb') ? 'active' : '' %>" href="/gdb"> gdb's</a>
                 </div>
 
                 <div class="dropdown">
@@ -219,13 +221,7 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li>
-                            <a class="dropdown-item" href="/dashboard">Dashboard</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/quiz/history">quiz history</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/auth/logout">logout</a>
+                            <a class="dropdown-item" href="/auth/logout" onclick="return confirm('Are you sure you want to logout?')">logout</a>
                         </li>
                     </ul>
                 </div>
@@ -236,24 +232,25 @@
                 <%}%>
             </div>
         </div>
+        <% } %>
     </div>
 
     <!-- Offcanvas Sidebar for Mobile -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title blog-header-logo" id="offcanvasRightLabel">VU Empire</h5>
+            <h5 class="offcanvas-title blog-header-logo text-uppercase" id="offcanvasRightLabel">VU Empire</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body pt-0">
             <!-- Navigation Links -->
             <div class="nav nav-underline d-flex flex-column gap-3">
                  <% if(user) { %>
-                    <a class="nav-item nav-link link-body-emphasis text-start" href="/dashboard">Dashboard</a>
+                    <a class="nav-item nav-link link-body-emphasis text-start <%= path.includes('dashboard')?'active':''%>" href="/dashboard">Dashboard</a>
                     <% } else { %>
-                    <a class="nav-item nav-link link-body-emphasis text-start" href="/">Home</a>
+                    <a class="nav-item nav-link link-body-emphasis text-start <%= path.includes('/')?'active':''%>" href="/">Home</a>
                 <% } %>
-                <a class="nav-item nav-link link-body-emphasis text-start" href="/handouts">Handouts</a>
-                <a class="nav-item nav-link link-body-emphasis text-start" href="/courses">Courses</a>
+                <a class="nav-item nav-link link-body-emphasis text-start <%= path.includes('handouts')?'active':''%>" href="/handouts">Handouts</a>
+                <a class="nav-item nav-link link-body-emphasis text-start <%= path.includes('courses')?'active':''%>" href="/courses">Courses</a>
                 
                 <!-- Past Papers Dropdown -->
                 <div class="accordion" id="accordionPastPapers">
@@ -266,17 +263,16 @@
                         <div id="collapsePastPapers" class="accordion-collapse collapse" data-bs-parent="#accordionPastPapers">
                             <div class="accordion-body p-0">
                                 <div class="d-flex flex-column">
-                                    <a class="p-3 ps-4 text-decoration-none text-reset" href="/past-papers/mid-term">Mid Term</a>
-                                    <a class="p-3 ps-4 text-decoration-none text-reset" href="/past-papers/final-term">Final Term</a>
+                                    <a class="p-3 ps-4 text-decoration-none text-reset <%= path.includes('mid-term')?'active':''%>" href="/past-papers/mid-term">Mid Term</a>
+                                    <a class="p-3 ps-4 text-decoration-none text-reset <%= path.includes('final-term')?'active':''%>" href="/past-papers/final-term">Final Term</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <a class="nav-item nav-link link-body-emphasis text-start" href="/assignments">Assignment's</a>
-                <a class="nav-item nav-link link-body-emphasis text-start" href="/quizes">Quiz's</a>
-                <a class="nav-item nav-link link-body-emphasis text-start" href="/gdb">GDB's</a>
+                <a class="nav-item nav-link link-body-emphasis text-start <%= path.includes('assignments')?'active':''%>" href="/assignments">Assignment's</a>
+                <a class="nav-item nav-link link-body-emphasis text-start <%= path.includes('gdb')?'active':''%>" href="/gdb">GDB's</a>
                 
                 <!-- Community Dropdown -->
                 <div class="accordion" id="accordionCommunity">
@@ -409,9 +405,7 @@
                             <div id="collapseUserProfile" class="accordion-collapse collapse" data-bs-parent="#accordionUserProfile">
                                 <div class="accordion-body p-0">
                                     <div class="d-flex flex-column">
-                                        <a class="p-3 ps-4 text-decoration-none text-reset" href="/dashboard">Dashboard</a>
-                                        <a class="p-3 ps-4 text-decoration-none text-reset" href="/quiz/history">Quiz History</a>
-                                        <a class="p-3 ps-4 text-decoration-none text-reset" href="/auth/logout">Logout</a>
+                                        <a class="p-3 ps-4 text-decoration-none text-reset" href="/auth/logout" onclick="return confirm('Are you sure you want to logout?')">Logout</a>
                                     </div>
                                 </div>
                             </div>

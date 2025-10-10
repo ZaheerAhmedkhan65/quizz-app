@@ -7,6 +7,12 @@
 1. CS301
 2. CS304
 3. CS403
+4. CS726
+5. CS201
+6. CS101
+7. cs432
+8. cs 
+
 
 =======================COURSES WHICH HAVE COMPLETED LECTURES MCQS===========================================
 

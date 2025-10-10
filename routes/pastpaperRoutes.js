@@ -5,22 +5,14 @@ const router = express.Router();
 
 
 router.get('/mid-term', async (req, res) => {
-    const courses = await Course.getAll();
-    res.render("pastpaper", {
-        title: "Mid Term Past Papers",
-        user: req.user || null,
-        path: req.path,
-        courses
+    res.render("public/pastpaper", {
+        title: "Mid Term Past Papers"
     })
 });
 
 router.get('/final-term', async (req, res) => {
-    const courses = await Course.getAll();
-    res.render("pastpaper", {
-        title: "Final Term Past Papers",
-        user: req.user || null,
-        path: req.path,
-        courses
+    res.render("public/pastpaper", {
+        title: "Final Term Past Papers"
     })
 });
 

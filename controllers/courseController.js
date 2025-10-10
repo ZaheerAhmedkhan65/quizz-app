@@ -5,19 +5,37 @@ const UserCourse = require('../models/UserCourse');
 const path = require('path');
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
+// controllers/courseController.js
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 300 }); // cache for 5 minutes
 
 const getAll = async (req, res) => {
-    try {
-        let courses;
-        if(req.user){
-          courses = await Course.getAllCourses(req.user.userId);
-        }else{
-          courses = await Course.getAll();
-        }
-        res.status(200).json(courses);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 25;
+    const offset = (page - 1) * limit;
+    const cacheKey = `courses_${req.user ? req.user.userId : 'public'}_${page}_${limit}`;
+
+    // Check cache first
+    if (cache.has(cacheKey)) {
+      return res.status(200).json(cache.get(cacheKey));
     }
+
+    let courses;
+    if (req.user) {
+      courses = await Course.getAllCourses(req.user.userId, limit, offset);
+    } else {
+      courses = await Course.getAll(limit, offset);
+    }
+
+    // Store in cache
+    cache.set(cacheKey, courses);
+
+    res.status(200).json(courses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
 };
 
 const showCourse = async (req, res) => {
@@ -35,7 +53,7 @@ const showCourse = async (req, res) => {
           }
           course = await Course.findById(req.params.id)
           lectures = await Lecture.findByCourseId(req.params.id)
-          res.status(200).render('course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
+          res.status(200).render('public/course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -123,7 +141,7 @@ const downloadPDF = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { title, slug, handout_pdf,pdfUrl, handout_original_filename } = req.body;
+    const { title, slug, handout_pdf, pdfUrl, handout_original_filename } = req.body;
     const existingCourse = await Course.findByTitle(req.user.userId, req.body.title);
     if (existingCourse) {
       return res.status(400).json({ message: 'Course already exists' });
@@ -133,11 +151,11 @@ const create = async (req, res) => {
       title,
       user_id: req.user.userId,
       slug,
-      handout_pdf: handout_pdf || pdfUrl,
-      handout_original_filename
+      handout_pdf: handout_pdf || pdfUrl || null,
+      handout_original_filename: handout_original_filename||null
     });
 
-    res.status(201).json(course, { message: 'Course created successfully' });
+    res.json({ message: 'Course created successfully', course });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -152,8 +170,8 @@ const update = async (req, res) => {
       return res.status(404).json({ message: 'Course not found' });
     }
     
-    // await Course.update(req.params.id, { title, slug, handout_pdf: handout_pdf || pdfUrl, handout_original_filename });
-    res.status(200).json({ message: 'Course updated successfully' });
+    await Course.update(req.params.id, { title, slug, handout_pdf: handout_pdf || pdfUrl, handout_original_filename });
+    res.status(200).json({ message: 'Course updated successfully', course });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

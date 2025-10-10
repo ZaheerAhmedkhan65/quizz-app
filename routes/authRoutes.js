@@ -5,25 +5,19 @@ const authController = require('../controllers/authController');
 // Authentication pages
 router.get('/create-account', (req, res) => {
     res.render('auth/signup', { 
-        title: "Create an account",
-        user: req.user || null,
-        path: req.path 
+        title: "Create an account"
     });
 });
 
 router.get('/login', (req, res) => {
     res.render('auth/signin', { 
-        title: "Log in",
-        user: req.user || null,
-        path: req.path 
+        title: "Log in" 
     });
 });
 
 router.get('/forgot-password', (req, res) => {
     res.render('auth/forgot-password', {
-        title: "Forgot Password",
-        user: req.user || null,
-        path: req.path 
+        title: "Forgot Password"
     });
 });
 
@@ -31,9 +25,7 @@ router.get('/reset-password', (req, res) => {
     const { token } = req.query;
     res.render('auth/reset-password', {
         title: "Reset Password",
-        token,
-        user: req.user || null,
-        path: req.path
+        token
     });
 });
 

@@ -21,8 +21,6 @@ const startQuiz = async (req, res) => {
                 questions: savedQuestions,
                 course_id,
                 lecture_id: lecture_id || null,
-                user: req.user || null,
-                path: req.path,
                 title: "Start Quiz",
             });
         }
@@ -71,8 +69,6 @@ const startQuiz = async (req, res) => {
             questions: questionsWithOptions,
             course_id,
             lecture_id: lecture_id || null,
-            user: req.user || null,
-            path: req.path,
             title: "Start Quiz",
         });
     } catch (error) {
@@ -192,8 +188,6 @@ const showResults = async (req, res) => {
             lectureAttempts,
             course_id: attempt.course_id,
             lecture_id: attempt.lecture_id,
-            user: req.user || null,
-            path: req.path,
             title: 'Quiz Results'
         });
 
@@ -236,7 +230,7 @@ const getQuizHistory = async (req, res) => {
             return acc;
         }, {});
 
-        res.render('quiz/history', { attempts,groupedAttempts, user: req.user || null, path: req.path,  title: 'Quiz History' });
+        res.render('quiz/history', { attempts, groupedAttempts, title: 'Quiz History' });
 
     } catch (error) {
         console.error(error);

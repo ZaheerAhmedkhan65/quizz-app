@@ -196,7 +196,6 @@
 
             // collect all form data
             const formData = new FormData(newCourseForm);
-            console.log("formData: ", formData);
             try {
                 const response = await fetch(newCourseForm.action, {
                     method: newCourseForm.method,
@@ -212,12 +211,11 @@
 
                 const result = await response.json();
                 setTimeout(() => {
-                    window.location.href = '/admin/courses';
+                    window.location.href = '/admin/courses/' + result.course.id;
                 }, 1000);
-                // optionally show success message or redirect
             } catch (err) {
                 setTimeout(() => {
-                    window.location.href = '/admin/courses';
+                    window.location.href = '/admin/courses/';
                 }, 1000);
                 console.error("Failed to create course:", err);
             }

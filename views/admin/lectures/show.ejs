@@ -11,6 +11,10 @@
           <br>
           <a href="<%= course.handout_pdf %>" class="text-decoration-none text-muted fw-semibold" download>Download <%=
               course.handout_original_filename %></a>
+          <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal"
+            data-bs-target="#exampleModal">
+            Bulk Create
+          </button>
           <button type="button" class="btn btn-primary float-end mx-2" data-bs-toggle="modal"
             data-bs-target="#newquestion">New Question</button>
           <a href="/admin/lectures/<%= lecture.id %>/edit" class="btn btn-primary float-end">Edit Lecture</a>
@@ -124,7 +128,8 @@
                     <!-- Second row: question image (if any) -->
                     <% if(question.question_image) { %>
                       <div class="mt-2">
-                        <img id="question-<%= question.id %>-image"  src="https://pdf-files-production.up.railway.app<%= question.question_image %>"
+                        <img id="question-<%= question.id %>-image"
+                          src="https://pdf-files-production.up.railway.app<%= question.question_image %>"
                           alt="question image" class="img-fluid rounded" style="max-height:150px;">
                       </div>
                       <% } %>
@@ -221,61 +226,108 @@
 
 
 
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="editModalLabel">Edit</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <!-- Edit Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="editModalLabel">Edit</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form id="editForm" enctype="multipart/form-data">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="editText" class="form-label">Text</label>
+              <textarea id="editText" name="text" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="editFile" class="form-label">Upload Image</label>
+              <input type="file" id="editFile" name="image" class="form-control" accept="image/*">
+            </div>
+
+            <div class="text-center position-relative">
+              <img id="editPreview" class="img-fluid rounded d-none" width="100%" height="100%"
+                style="max-height:150px; max-width: 280px;" alt="Preview">
+              <button type="button" id="removeImageBtn" style="top: -10px; right: 60px;"
+                class="btn btn-sm btn-danger rounded-circle position-absolute d-none">
+                <i class="mdi mdi-close"></i>
+              </button>
+            </div>
+
+            <!-- Correct/Incorrect toggle (only for options) -->
+            <div id="correctToggleWrapper" class="form-check mt-3 d-none">
+              <input class="form-check-input" type="checkbox" id="editIsCorrect">
+              <label class="form-check-label" for="editIsCorrect">Mark as Correct</label>
+            </div>
+
+            <!-- Hidden values -->
+            <input type="hidden" id="removeImage" value="false">
+            <input type="hidden" id="editId">
+            <input type="hidden" id="editType">
+            <input type="hidden" id="existingImage">
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </div>
+        </form>
       </div>
-
-      <form id="editForm" enctype="multipart/form-data">
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="editText" class="form-label">Text</label>
-            <textarea id="editText" name="text" class="form-control" rows="3" required></textarea>
-          </div>
-
-          <div class="mb-3">
-            <label for="editFile" class="form-label">Upload Image</label>
-            <input type="file" id="editFile" name="image" class="form-control" accept="image/*">
-          </div>
-
-          <div class="text-center position-relative">
-            <img id="editPreview" class="img-fluid rounded d-none" width="100%" height="100%" style="max-height:150px; max-width: 280px;" alt="Preview">
-            <button type="button" id="removeImageBtn" style="top: -10px; right: 60px;" class="btn btn-sm btn-danger rounded-circle position-absolute d-none">
-              <i class="mdi mdi-close"></i>
-            </button>
-          </div>
-
-          <!-- Correct/Incorrect toggle (only for options) -->
-          <div id="correctToggleWrapper" class="form-check mt-3 d-none">
-            <input class="form-check-input" type="checkbox" id="editIsCorrect">
-            <label class="form-check-label" for="editIsCorrect">Mark as Correct</label>
-          </div>
-
-          <!-- Hidden values -->
-          <input type="hidden" id="removeImage" value="false">
-          <input type="hidden" id="editId">
-          <input type="hidden" id="editType">
-          <input type="hidden" id="existingImage">
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Update</button>
-        </div>
-      </form>
     </div>
   </div>
-</div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Import Questions</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="predefined-questions-container">
+            <textarea class="form-control" style="height: 55vh;" id="predefined-questions" placeholder='Enter questions data in JSON format, e.g.:
+[
+    {
+        "id": 250001,
+        "question_text": "Sample question",
+        "options": [
+            {"option_text": "Option 1", "is_correct": false},
+            {"option_text": "Option 2", "is_correct": true}
+        ]
+    }
+]'></textarea>
+            <div class="modal-footer">
+              <input type="hidden" id="predefined-questions-formate" value='
+                    [
+                        {
+                            "id": 250001,
+                            "question_text": "Sample question",
+                            "options": [
+                                {"option_text": "Option 1", "is_correct": false},
+                                {"option_text": "Option 2", "is_correct": true}
+                            ]
+                        }
+                    ]'>
+              <button id="copyFormate" type="button" class="btn btn-success">
+                Copy Text Format
+              </button>
+              <button id="predefined-questions-button" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+          <div id="json-questions-container" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <script src="/js/createQuestionAndOptions.js"></script>
   <script src="/js/editAndDeleteQuestion.js"></script>
-
+  <script src="/js/quizzDataCreation.js"></script>
   <script>
+    const lectureId = '<%= lecture.id %>';
     const token = "<%= token %>";
     const imageInput = document.getElementById('question_image');
     const preview = document.getElementById('image-preview');
@@ -321,4 +373,4 @@
     });
   </script>
 
-  <%- include('../partials/_footer') %>
+<%- include('../partials/_footer') %>
