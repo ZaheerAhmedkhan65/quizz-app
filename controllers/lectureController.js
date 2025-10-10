@@ -34,7 +34,7 @@ const show = async (req, res) => {
             });
         }
 
-        res.status(200).render('lecture', {
+        res.status(200).render('public/lecture', {
             lecture,
             title: lecture.title,
             questions,

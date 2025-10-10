@@ -48,8 +48,8 @@ class UserCourse {
     }
 
 
-    static async create(userId, courseId) {
-        const [result] = await db.query('INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)', [userId, courseId]);
+    static async create(userId, courseId, semesterId) {
+        const [result] = await db.query('INSERT INTO user_courses (user_id, course_id, semester_id) VALUES (?, ?, ?)', [userId, courseId, semesterId]);
         return result.insertId;
     }
 
@@ -63,8 +63,8 @@ class UserCourse {
         return result.affectedRows;
     }
 
-    static async findByUserIdAndCourseId(userId, courseId) {
-        const [result] = await db.query('SELECT * FROM user_courses WHERE user_id = ? AND course_id = ?', [userId, courseId]);
+    static async findByUserIdAndCourseId(userId, courseId, semesterId) {
+        const [result] = await db.query('SELECT * FROM user_courses WHERE user_id = ? AND course_id = ? AND semester_id = ?', [userId, courseId, semesterId]);
         return result[0];
     }
 

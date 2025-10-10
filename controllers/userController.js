@@ -85,6 +85,7 @@ const updateUserStatus = async (req, res) => {
 const userProfile = async (req, res) => {
     try {
         const userInfo = await User.findById(req.user.userId);
+        const semesters = await Semester.findByStatus('closed');
         res.status(200).render('user/profile', { userInfo, title: "Profile" });
     } catch (err) {
         res.status(500).json({ message: err.message });

@@ -2,6 +2,7 @@ const Course = require('../models/Course');
 const Lecture = require('../models/Lecture');
 const Question = require('../models/Question');
 const UserCourse = require('../models/UserCourse');
+const Semester = require('../models/Semester');
 const path = require('path');
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
@@ -49,7 +50,7 @@ const showCourse = async (req, res) => {
           } else if(req.user){
             course = await Course.findCourse(req.user.userId, req.params.id)
             lectures = await Lecture.getLecturesByUserCourse(req.user.userId, req.params.id);
-            return res.status(200).render('course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
+            return res.status(200).render('public/course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
           }
           course = await Course.findById(req.params.id)
           lectures = await Lecture.findByCourseId(req.params.id)
@@ -61,13 +62,17 @@ const showCourse = async (req, res) => {
 
 const joinCourse = async (req, res) => {
   try {
-    const userCourse = await UserCourse.findByUserIdAndCourseId(req.user.userId, req.params.id);
+    const currentSemester = await Semester.findByStatus('active');
+    console.log(currentSemester);
+    if(!currentSemester) {
+      return res.status(500).render('error', { message: "Error Joining Course", error: "Error Joining Course" });
+    }
+    const userCourse = await UserCourse.findByUserIdAndCourseId(req.user.userId, req.params.id, currentSemester.id);
     if(userCourse) {
       req.flash('success', 'You are already enrolled in this course!');
       return res.status(400).redirect('/dashboard');
     }
-    const course = await Course.findById(req.params.id);
-    await UserCourse.create(req.user.userId, course.id);
+    await UserCourse.create(req.user.userId, req.params.id, currentSemester.id);
     req.flash('success', 'You have joined the course successfully!');
     res.status(200).redirect('/dashboard');
   } catch (err) {

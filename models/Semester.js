@@ -13,7 +13,7 @@ class Semester {
 
     static async findByStatus(status='active') {
         const [rows] = await db.query('SELECT * FROM semesters WHERE status = ?', [status]);
-        return rows[0];
+        return rows.length > 0 && rows.length <= 1 ? rows[0] : rows;
     }
 
     static async create({ title, start_date, end_date }) {

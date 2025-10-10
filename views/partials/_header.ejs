@@ -221,6 +221,9 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li>
+                            <a class="dropdown-item <%= path.includes('profile') ? 'active' : '' %>" href="/profile">Profile</a>
+                        </li>
+                        <li>
                             <a class="dropdown-item" href="/auth/logout" onclick="return confirm('Are you sure you want to logout?')">logout</a>
                         </li>
                     </ul>
@@ -404,6 +407,9 @@
                             </h2>
                             <div id="collapseUserProfile" class="accordion-collapse collapse" data-bs-parent="#accordionUserProfile">
                                 <div class="accordion-body p-0">
+                                    <div class="d-flex flex-column">
+                                        <a class="p-3 ps-4 text-decoration-none text-reset <%= path.includes('profile')?'active':''%>" href="/profile">Profile</a>
+                                    </div>
                                     <div class="d-flex flex-column">
                                         <a class="p-3 ps-4 text-decoration-none text-reset" href="/auth/logout" onclick="return confirm('Are you sure you want to logout?')">Logout</a>
                                     </div>
