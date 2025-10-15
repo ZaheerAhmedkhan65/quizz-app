@@ -5,7 +5,7 @@
     // Load notifications on page load
     function loadNotifications() {
       $.ajax({
-        url: '/api/notifications/get-notifications', // Replace with your actual endpoint
+        url: '/notifications/get-notifications', // Replace with your actual endpoint
         method: 'GET',
         success: function (notifications) {
           $('#notification-container').empty(); // Clear existing content

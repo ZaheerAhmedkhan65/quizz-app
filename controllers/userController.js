@@ -65,7 +65,7 @@ const updateUserStatus = async (req, res) => {
             'block': 'blocked',
             'approve': 'approved'
         };
-        
+        console.log(statusMap[action]);
         if (!statusMap[action]) {
             return res.status(400).json({ success: false, message: "Invalid action" });
         }

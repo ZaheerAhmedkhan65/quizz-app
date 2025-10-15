@@ -10,6 +10,7 @@ router.get('/', (req, res)=>{
         title: "Courses"
     });
 });
+router.get('/search', courseController.searchCourses);
 router.get('/all', courseController.getAll);
 router.get('/:id', courseController.showCourse);
 router.get('/:id/handout/download', courseController.downloadPDF);

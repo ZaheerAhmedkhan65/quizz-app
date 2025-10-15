@@ -9,13 +9,32 @@ const getNotification = async (req, res) => {
     } else {
       notifications = await Notification.findByUserId(req.user.userId);
     }
-    
     res.json(notifications); // Send response once
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch notifications' });
   }
 };
+
+const markAsRead = async (req, res) => {
+  try {
+    await Notification.markAsRead(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark as read' });
+  }
+};
+
+const markAllRead = async (req, res) => {
+  try {
+    await Notification.markAllRead(req.user.userId);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark all as read' });
+  }
+};
+
+
 
 // Create
 const createNotification = async (req, res) => {
@@ -57,5 +76,7 @@ module.exports = {
   getNotification,
   createNotification,
   updateNotification,
-  deleteNotification
+  deleteNotification,
+  markAsRead, 
+  markAllRead 
 };

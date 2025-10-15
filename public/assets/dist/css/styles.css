@@ -802,3 +802,55 @@ code {
   text-decoration: underline !important; 
   text-decoration-color: currentColor !important; 
 }
+
+
+.notifications-container {
+    height: calc(100dvh - 3rem);
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 400px;
+    border-radius: 10px;
+    max-width: 100%;
+    z-index: 1046;
+    transform: translateX(calc(100% + 3rem));
+    opacity: 0;
+    visibility: hidden;
+    transition: transform ease-in-out 300ms, opacity ease-in-out 300ms, width ease-in-out 300ms, visibility 0s linear 300ms;
+    margin: 1.5rem;
+    margin-top: 1.5rem !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+#notifications-menu li {
+  transition: border-color 0.2s ease;
+  cursor: pointer;
+}
+
+#notifications-menu li:hover {
+  border: 1px solid #0d6efd !important;
+}
+
+#notifications-container.open {
+   opacity: 1;
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform ease-in-out 300ms,
+        opacity ease-in-out 300ms,
+        width ease-in-out 300ms,
+        visibility 0s linear 0s;
+}
+
+
+@media (max-width: 576px) {
+  .notifications-container {
+    height: 100vh !important;
+    width: 100% !important;
+    margin: 0 !important;
+    margin-top: 0 !important;
+    border-radius: 0 !important;
+  }
+}

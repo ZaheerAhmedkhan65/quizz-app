@@ -7,13 +7,13 @@
                     <form action="/admin/lectures/<%= lecture.id %>/update" method="POST">
                         <div class="form-group  mb-4">
                             <label for="course_id">Course</label>
-                            <select name="course_id" id="course_id" class="form-control">
-                                <% courses.forEach(course=> { %>
-                                    <option value="<%= course.id %>" <%= course.id == lecture.course_id ? 'selected' : '' %>
-                                        ><%= course.title %>
-                                    </option>
-                                    <% }) %>
-                            </select>
+                            <div class="position-relative">
+                                <input type="search" name="course_id" id="course_id" class="form-control"
+                                    placeholder="Search Course by Title" value="<%= lecture.course_id %>" autocomplete="off" required>
+                                <div id="courseList" class="list-group position-absolute w-100"
+                                    style="z-index: 1000; max-height: 200px; overflow-y: auto;">
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group  mb-4">
                             <label for="title">Title</label>
@@ -38,6 +38,56 @@
             </div>
         </div>
     </div>
+    <script>
+  const course_idInput = document.getElementById('course_id');
+  const courseList = document.getElementById('courseList');
+
+  course_idInput.addEventListener('input', async function () {
+    const query = this.value.trim();
+    if (!query) {
+      courseList.innerHTML = '';
+      return;
+    }
+
+    try {
+      const response = await fetch(`/courses/search?query=${encodeURIComponent(query)}`);
+      const courses = await response.json();
+
+      courseList.innerHTML = '';
+
+      if (courses.length === 0) {
+        const noItem = document.createElement('li');
+        noItem.classList.add('list-group-item', 'text-muted');
+        noItem.textContent = 'No courses found';
+        courseList.appendChild(noItem);
+        return;
+      }
+
+      courses.forEach(course => {
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item', 'list-group-item-action', 'cursor-pointer', 'text-dark');
+        listItem.textContent = `${course.id} - ${course.title}`;
+
+        // When user clicks a result
+        listItem.addEventListener('click', () => {
+          course_idInput.value = course.id; // set ID as the value
+          courseList.innerHTML = '';        // hide list
+        });
+
+        courseList.appendChild(listItem);
+      });
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+    }
+  });
+
+  // Optional: hide list if user clicks outside
+  document.addEventListener('click', (e) => {
+    if (!courseList.contains(e.target) && e.target !== course_idInput) {
+      courseList.innerHTML = '';
+    }
+  });
+</script>
 
     
 <%- include('../partials/_footer') %>

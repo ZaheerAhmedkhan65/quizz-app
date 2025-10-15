@@ -39,6 +39,23 @@ const getAll = async (req, res) => {
   }
 };
 
+const searchCourses = async (req, res) => {
+  try {
+    const query = req.query.query || '';
+    console.log("Search query:", query);
+    if (!query.trim()) {
+      return res.status(400).json({ message: 'Search query cannot be empty' });
+    }
+    const courses = await Course.search(query);
+    console.log("Search results:", courses);
+    res.status(200).json(courses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
 const showCourse = async (req, res) => {
     try {
           let course;
@@ -199,4 +216,4 @@ const deleteCourse = async (req, res) => {
   }
 };
 
-module.exports = { getAll, showCourse, edit, joinCourse, leaveCourse, downloadPDF, create, update, deleteCourse };
+module.exports = { getAll, showCourse, edit, joinCourse, leaveCourse, downloadPDF, create, update, deleteCourse, searchCourses };

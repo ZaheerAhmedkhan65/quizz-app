@@ -13,6 +13,16 @@ class Notification {
         `);
         return rows;
     }
+
+    static async markAsRead(id) {
+        const [result] = await db.query('UPDATE notifications SET status = "read", updated_at = NOW() WHERE id = ?', [id]);
+        return result.affectedRows;
+    }
+
+    static async markAllRead(userId) {
+        const [result] = await db.query('UPDATE notifications SET status = "read", updated_at = NOW() WHERE user_id = ?', [userId]);
+        return result.affectedRows;
+    }
     
 
     static async findByUserId(userId) {

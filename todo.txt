@@ -2,60 +2,17 @@
 /2/CREATE LECTURES OF EACH COURSE ACCORDING TO ITS HANDOUT PDF
 /3/CREATE MCQS,SHORT AND LONG QUESTIONS WITH THEIR OPTIONS, AND ANSWERS
 ------------------------------------------------------------------------------------------------------------------------------------------
-
-=======================COURSES WHICH HAVE COMPLETED LECTURES===========================================
-1. CS301
-2. CS304
-3. CS403
-4. CS726
-5. CS201
-6. CS101
-7. cs432
-8. cs 
-
-
-=======================COURSES WHICH HAVE COMPLETED LECTURES MCQS===========================================
+=============(ToDo)=============
+//show user courses of each semester which have been closed/completed in profile.
+//when result announced and user login again after mid term && final term result show a popup for getting user experice feed back and his gpa scored in the semester. 
+//handle history according to the semester. user can see history of his all the semesters by visiting the history page of each semester.
+//in default history page show history of current semester's user courses.
+=============(End)=============
+//add blog 
+//add games like typereacer.
+//integrate it with codewithinfinitidev.online for learnig courses of web
 
 
 
-
-=======================COURSES WHICH HAVE COMPLETED LECTURES SHORT QUESTIONS===========================================
-
-
-
-=======================COURSES WHICH HAVE COMPLETED LECTURES LONG QUESTIONS===========================================
-
-
-//pdf download link from drive https://drive.google.com/uc?export=download&id=ID_OF_THE_PDF_FILE_ON_DRIVE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-sta301 - 45
-mth202 - 45
-cs201 - 45
-cs504 - 45
-cs304 - 45
+===============Specs===============
+//handout-pdf download link from (zaheer ahmed's) google drive : https://drive.google.com/uc?export=download&id=ID_OF_THE_PDF_FILE_ON_DRIVE

@@ -31,11 +31,9 @@ router.post('/courses/:id/delete', courseController.deleteCourse);
 
 // Lectures
 router.get('/:course_id/lectures/new', async (req, res)=>{
-    const courses = await Course.getAll();
     const currentCourse = await Course.findById(req.params.course_id);
     res.render('admin/lectures/new', { 
         title: "New Lecture",
-        courses,
         currentCourse
     });
 });

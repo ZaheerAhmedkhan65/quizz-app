@@ -112,8 +112,7 @@ const deleteLecture = async (req, res) => {
 const edit = async (req, res) => {
   try {
     const lecture = await Lecture.findById(req.params.id);
-    const courses = await Course.getAll();
-    res.status(200).render('admin/lectures/edit', { lecture, title: "Edit Lecture", courses, user: req.user || null, path: req.path });
+    res.status(200).render('admin/lectures/edit', { lecture, title: "Edit Lecture", user: req.user || null, path: req.path });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

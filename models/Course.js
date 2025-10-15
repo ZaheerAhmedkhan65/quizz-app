@@ -3,15 +3,15 @@ const db = require('../config/db');
 class Course {
     // models/Course.js
     static async getAllCourses(user_id, limit, offset) {
-  try {
-    limit = parseInt(limit, 10);
-    offset = parseInt(offset, 10);
+        try {
+            limit = parseInt(limit, 10);
+            offset = parseInt(offset, 10);
 
-    if (isNaN(limit) || isNaN(offset)) {
-      throw new Error("Invalid pagination values");
-    }
+            if (isNaN(limit) || isNaN(offset)) {
+                throw new Error("Invalid pagination values");
+            }
 
-    const query = `
+            const query = `
       SELECT 
         c.id, 
         c.title,
@@ -25,13 +25,23 @@ class Course {
       LIMIT ${limit} OFFSET ${offset}
     `;
 
-    const [rows] = await db.execute(query, [user_id]);
-    return rows;
-  } catch (error) {
-    console.error("Database query error:", error);
-    throw error;
-  }
-}
+            const [rows] = await db.execute(query, [user_id]);
+            return rows;
+        } catch (error) {
+            console.error("Database query error:", error);
+            throw error;
+        }
+    }
+
+    static async search(query) {
+        try {
+            const [rows] = await db.query('SELECT * FROM courses WHERE title LIKE ? ORDER BY id ASC', [`%${query}%`]);
+            return rows;
+        } catch (error) {
+            console.error("Database query error:", error);
+            throw error;
+        }
+    }
 
     static async getAll(limit, offset) {
         try {
@@ -67,8 +77,8 @@ class Course {
     // }
 
     static async findByUserId(userId) {
-    const [rows] = await db.query(
-        `
+        const [rows] = await db.query(
+            `
         SELECT 
             c.*,
             s. status AS semester_status,
@@ -94,11 +104,11 @@ class Course {
         GROUP BY c.id, s.status, uc.course_progress
         ORDER BY c.id
         `,
-        [userId]
-    );
+            [userId]
+        );
 
-    return rows;
-}
+        return rows;
+    }
 
 
 

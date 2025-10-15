@@ -82,6 +82,9 @@ app.use((req, res, next) => {
 });
 
 app.get('/',(req,res) => { 
+    if(req.user){
+        return res.redirect('/dashboard');
+    }
     res.render('index', { title: "Home" }); 
 });
 
@@ -100,7 +103,7 @@ app.use("/courses", userCourseRoutes);
 app.use("/",quizRoutes);
 app.use("/api/gemini", geminiRoutes);
 app.use("/api/todo",todoRoutes);
-app.use("/api/notifications",notificationRoutes);
+app.use("/notifications",notificationRoutes);
 app.use(isAdmin)
 app.use("/admin",adminRoutes);
 

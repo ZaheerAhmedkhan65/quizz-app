@@ -1,7 +1,7 @@
 // Generic function to handle all status changes
 async function handleStatusChange(action, id, row, newStatus, successMessage) {
     try {
-        const response = await fetch(`/api/users/${id}/${action}`, {
+        const response = await fetch(`/admin/users/${id}/${action}`, {
             method: "POST",
         });
         
