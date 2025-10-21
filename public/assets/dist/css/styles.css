@@ -821,7 +821,6 @@ code {
     margin-top: 1.5rem !important;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     overflow: hidden;
 }
 
@@ -831,7 +830,9 @@ code {
 }
 
 #notifications-menu li:hover {
-  border: 1px solid #0d6efd !important;
+  background-color:  var(--bs-primary) !important;
+  opacity: 0.8;
+  color: white; 
 }
 
 #notifications-container.open {

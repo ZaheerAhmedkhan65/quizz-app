@@ -39,6 +39,97 @@
     <script src="/admin/js/notificationResource.js"></script>
     <script src="/admin/js/courses.js"></script>
     <!-- End custom js for this page -->
+
+    <script>
+        // Toggle user selection based on notification type
+        function toggleUserSelection() {
+            const type = document.getElementById('type').value;
+            const userSelection = document.getElementById('userSelection');
+            
+            if (type === 'global') {
+                userSelection.style.display = 'none';
+                document.getElementById('user_id').removeAttribute('required');
+            } else {
+                userSelection.style.display = 'block';
+                document.getElementById('user_id').setAttribute('required', 'required');
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleUserSelection();
+        });
+        
+        // Handle form submission with AJAX
+        document.getElementById('notificationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const formData = {
+                type: document.getElementById('type').value,
+                user_id: document.getElementById('user_id').value,
+                title: document.getElementById('title').value,
+                subtitle: document.getElementById('subtitle').value,
+                notification_text: document.getElementById('notification_text').value
+            };
+            
+            // For global notifications, set user_id to null
+            if (formData.type === 'global') {
+                formData.user_id = null;
+            }
+
+            fetch('/notifications/add-notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showAlert(data.error, 'error');
+                } else {
+                    showAlert('Notification sent successfully!', 'success');
+                    this.reset();
+                    toggleUserSelection();
+                    loadNotifications(); // Refresh the notifications list
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Failed to send notification', 'error');
+            });
+        });
+        
+        // Global showAlert function
+        function showAlert(message, type = 'success') {
+            // Remove existing alerts
+            const existingAlert = document.querySelector('.custom-alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                              type === 'error' ? 'alert-danger' : 
+                              'alert-info';
+            
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass} alert-dismissible fade show custom-alert position-fixed`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alert.innerHTML = `
+                <strong>${type.charAt(0).toUpperCase() + type.slice(1)}!</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alert);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        </script>
 </body>
 
 </html>

@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById('filter-all').addEventListener('click', () => renderNotifications(allNotifications));
-  document.getElementById('filter-unread').addEventListener('click', () => renderNotifications(allNotifications.filter(n => n.status === 'unread')));
+  document.getElementById('filter-unread').addEventListener('click', () => renderNotifications(allNotifications.filter(n => n.is_read == 0)));
   document.getElementById('reload').addEventListener('click', getNotifications);
   document.getElementById('mark-all-read').addEventListener('click', markAllAsRead);
 
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(response => response.json())
       .then(data => {
         allNotifications = data;
-        renderNotifications(allNotifications.filter(n => n.status === 'unread'));
+        renderNotifications(allNotifications.filter(n => n.is_read == 0));
         updateUnreadCount();
       })
       .catch(error => console.error('Error fetching notifications:', error));
@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Render notifications in the menu
   function renderNotifications(data) {
+    console.log("data : ", data);
     notificationsMenu.innerHTML = '';
     if (data.length === 0) {
       notificationsMenu.innerHTML = `
@@ -65,28 +66,42 @@ document.addEventListener("DOMContentLoaded", () => {
       li.innerHTML = `
         <div class="d-flex align-items-start mb-2">
           <div class="me-3 position-relative">
-            ${notification.status === 'unread'
-              ? `<div class="bg-primary-subtle rounded-circle p-1 position-absolute" style="width: 10px; height: 10px; top: 35%; left: -13px;"></div>`
-              : ``}
-            <i class="bi bi-bell bg-primary-subtle text-primary rounded px-2 py-1 fw-bold"></i>
+            ${
+              notification.is_read == 0 ?
+              `<div class="bg-primary rounded-circle p-1 position-absolute" style="width: 10px; height: 10px; top: 35%; left: -13px;"></div>`
+              : 
+              ``
+            }
+            ${
+              notification.type === "user" ?
+              `<div class="bg-primary-subtle rounded px-2 py-1 fw-bold"><i class="bi bi-bell text-primary"></i></div>` :
+              `<div class="bg-success-subtle rounded px-2 py-1 fw-bold"><i class="bi bi-megaphone text-success"></i></div>`
+            }
           </div>
           <div class="flex-grow-1">
             <strong>${notification.title}</strong>
-            <p class="text-muted mt-1 mb-0">${notification.notification_text}</p>
+            <p class="text-muted mt-1 mb-0">${notification.subtitle || ''}</p>
             <small class="text-muted">${formatTimeAgo(notification.created_at)}</small>
           </div>
         </div>
       `;
-
+    
       // Mark as read on click
       li.addEventListener('click', () => {
-        if (notification.status === 'unread') {
+        if (notification.is_read == 0) {
           markAsRead(notification.id);
-          notification.status = 'read';
-          li.querySelector('.bg-primary-subtle').remove();
+          
+          // Remove the unread indicator
+          const unreadIndicator = li.querySelector('.bg-primary.rounded-circle');
+          if (unreadIndicator) {
+            unreadIndicator.remove();
+          }
+          
+          // Update the notification object to mark as read
+          notification.is_read = 1;
         }
       });
-
+    
       notificationsMenu.appendChild(li);
     });
   }
@@ -129,7 +144,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Update unread badge count
   function updateUnreadCount() {
-    const unreadCount = allNotifications.filter(n => n.status === 'unread').length;
+    const unreadCount = allNotifications.filter(n => n.is_read == 0).length;
+    console.log("unreadCount : ", unreadCount);
     unreadCount > 0 ? unreadCountBadges.forEach(badge => badge.classList.remove('d-none')) : unreadCountBadges.forEach(badge => badge.classList.add('d-none'));
     unreadCountBadges.forEach(badge => badge.textContent = unreadCount > 0 ? unreadCount : 0);
   }
