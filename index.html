@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎤 Voice Search</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 50px;
+      padding: 10px 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 400px;
+      max-width: 90%;
+      transition: box-shadow 0.3s;
+    }
+
+    .search-box.active {
+      box-shadow: 0 0 10px #4CAF50;
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 18px;
+      background: transparent;
+      padding: 10px;
+    }
+
+    .mic-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+    }
+
+    .mic-btn.listening {
+      background: #ff5252;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 82, 82, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
+    }
+
+    .result-area {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎙️ Voice Search</h1>
+
+  <div class="search-box" id="searchBox">
+    <input type="text" id="searchInput" placeholder="Say something..." />
+    <button class="mic-btn" id="micBtn">🎤</button>
+  </div>
+
+  <div class="result-area" id="result"></div>
+
+  <script>
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!window.SpeechRecognition) {
+      alert("Your browser does not support the Web Speech API. Try Chrome or Edge!");
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      const micBtn = document.getElementById("micBtn");
+      const searchInput = document.getElementById("searchInput");
+      const resultDiv = document.getElementById("result");
+      const searchBox = document.getElementById("searchBox");
+
+      let listening = false;
+
+      micBtn.onclick = () => {
+        if (!listening) {
+          recognition.start();
+          micBtn.classList.add("listening");
+          searchBox.classList.add("active");
+          resultDiv.textContent = "Listening...";
+          listening = true;
+        } else {
+          recognition.stop();
+        }
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        searchInput.value = transcript;
+      };
+
+      recognition.onend = () => {
+        micBtn.classList.remove("listening");
+        searchBox.classList.remove("active");
+        listening = false;
+        const query = searchInput.value.trim();
+
+        if (query) {
+          resultDiv.innerHTML = `🔎 Searching for: <b>${query}</b>...`;
+          // Example: perform search (Google in a new tab)
+          window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank");
+        } else {
+          resultDiv.textContent = "No voice input detected.";
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        resultDiv.textContent = "Error: " + event.error;
+        micBtn.classList.remove("listening");
+        searchBox.classList.remove("active");
+        listening = false;
+      };
+    }
+  </script>
+</body>
+</html>

@@ -437,16 +437,19 @@
         <button class="btn bg-secondary-subtle px-2 py-0 border-0 outline-0" id="hide-container">✕</button>
       </div>
       <div class="p-3">
-        <div class="btn-group">
+        <div class="d-flex align-items-center gap-3">
           <button class="btn btn-sm btn-outline-secondary" id="filter-unread">Unread</button>
           <button class="btn btn-sm btn-outline-secondary" id="filter-all">All</button>
           <button class="btn btn-sm btn-outline-primary" id="mark-all-read">Mark all as read</button>
           <button class="btn btn-sm btn-outline-success" id="reload">↻</button>
         </div>
       </div>
-    
-      <ul class="list-group list-group-flush" id="notifications-menu" style="max-height: 100%; height: 80%; overflow-y: auto; scrollbar-width: thin;"></ul>
+ 
+      <div class="accordion" id="notifications-menu" style="max-height: 100%; height: 80%; overflow-y: auto; scrollbar-width: thin;"></div>
     </div>
     <%}%>
+    <script type="application/json" id="user">
+        <%- JSON.stringify(user || {}) %>
+      </script>        
     <%- include('../shared/_alerts') %>
   <main class="container">

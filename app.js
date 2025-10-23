@@ -89,16 +89,14 @@ app.get('/',(req,res) => {
 });
 
 app.use("/",publicRoutes);
-
 app.use("/auth",authRoutes);
-
-app.use("/", userRoutes);
 app.use("/", lectureRoutes);
 app.use("/courses",courseRoutes);
 app.use("/past-papers",pastpaperRoutes);
 app.use("/gdb", gdbRoutes);
 app.use("/assignments", assignmentRoutes);
 app.use(authenticate);
+app.use("/", userRoutes);
 app.use("/courses", userCourseRoutes);
 app.use("/",quizRoutes);
 app.use("/api/gemini", geminiRoutes);
@@ -108,7 +106,7 @@ app.use(isAdmin)
 app.use("/admin",adminRoutes);
 
 app.use((req, res) => {
-    res.status(404).render('404', { title: "404" });
+    res.status(404).render('notfound', { title: "404" });
 });
 
 app.listen(process.env.PORT, () => {

@@ -9,7 +9,6 @@ const getNotification = async (req, res) => {
     } else {
       notifications = await Notification.findByUserId(req.user.userId);
     }
-    
     res.json(notifications);
   } catch (err) {
     console.error(err);

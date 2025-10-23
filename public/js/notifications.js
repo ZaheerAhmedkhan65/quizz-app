@@ -1,4 +1,4 @@
-
+const userScript = document.querySelector('#user');
 function showNotification(message, type = 'success') {
     let notification = document.createElement('div');
     notification.classList.add('notification', type);
@@ -8,11 +8,22 @@ function showNotification(message, type = 'success') {
         notification.remove();
     }, 3000);
 }
+
 document.addEventListener("DOMContentLoaded", () => {
+  const currentUser = JSON.parse(userScript.textContent || '{}');
+
+// 🧠 Skip notifications if user is not logged in
+if (!currentUser || Object.keys(currentUser).length === 0 || !currentUser.userId) {
+  console.log("No logged-in user — skipping notifications.");
+  return;
+}
   const notificationsBtns = document.querySelectorAll('.notifications-btn');
   const notificationsContainer = document.getElementById('notifications-container');
-  const notificationsMenu = document.getElementById('notifications-menu');
   const unreadCountBadges = document.querySelectorAll('.unread-count');
+  const allBtn = document.getElementById('filter-all');
+  const unreadBtn = document.getElementById('filter-unread');
+  const reloadBtn = document.getElementById('reload');
+  const markAllReadBtn = document.getElementById('mark-all-read');
 
   let allNotifications = [];
 
@@ -22,16 +33,35 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   })
 
+  function setActiveButton(activeBtn) {
+    [allBtn, unreadBtn].forEach(btn => btn.classList.remove('active'));
+    activeBtn.classList.add('active');
+  }
+
+  setActiveButton(unreadBtn);
+
   getNotifications();
 
   document.getElementById('hide-container').addEventListener('click', () => {
     notificationsContainer.classList.remove('open');
   });
 
-  document.getElementById('filter-all').addEventListener('click', () => renderNotifications(allNotifications));
-  document.getElementById('filter-unread').addEventListener('click', () => renderNotifications(allNotifications.filter(n => n.is_read == 0)));
-  document.getElementById('reload').addEventListener('click', getNotifications);
-  document.getElementById('mark-all-read').addEventListener('click', markAllAsRead);
+  allBtn.addEventListener('click', () => {
+    renderNotifications(allNotifications);
+    setActiveButton(allBtn);
+  });
+  unreadBtn.addEventListener('click', () => {
+    renderNotifications(allNotifications.filter(n => n.is_read == 0));
+    setActiveButton(allBtn);
+  });
+  reloadBtn.addEventListener('click', ()=>{
+    getNotifications();
+    setActiveButton(unreadBtn);
+  });
+  markAllReadBtn.addEventListener('click', ()=>{
+    markAllAsRead();
+    setActiveButton(unreadBtn);
+  });
 
   // Fetch notifications
   function getNotifications() {
@@ -45,67 +75,75 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(error => console.error('Error fetching notifications:', error));
   }
 
-  // Render notifications in the menu
   function renderNotifications(data) {
-    console.log("data : ", data);
-    notificationsMenu.innerHTML = '';
+    const menu = document.getElementById('notifications-menu');
+    menu.innerHTML = '';
+  
     if (data.length === 0) {
-      notificationsMenu.innerHTML = `
+      menu.innerHTML = `
         <div class="text-center my-auto">
-            <strong class="fw-bold">No new notifications yet</strong>
-            <p class="p-3 text-muted">Enjoy a quiet moment for now.</p>
-            <i class="bi bi-bell-slash fs-1 text-muted"></i>
-        </div>
-      `
-      return;
-    }
-
-    data.forEach(notification => {
-      const li = document.createElement('li');
-      li.classList.add('list-group-item', 'border-0', 'py-2', 'px-3', 'bg-transparent');
-      li.innerHTML = `
-        <div class="d-flex align-items-start mb-2">
-          <div class="me-3 position-relative">
-            ${
-              notification.is_read == 0 ?
-              `<div class="bg-primary rounded-circle p-1 position-absolute" style="width: 10px; height: 10px; top: 35%; left: -13px;"></div>`
-              : 
-              ``
-            }
-            ${
-              notification.type === "user" ?
-              `<div class="bg-primary-subtle rounded px-2 py-1 fw-bold"><i class="bi bi-bell text-primary"></i></div>` :
-              `<div class="bg-success-subtle rounded px-2 py-1 fw-bold"><i class="bi bi-megaphone text-success"></i></div>`
-            }
-          </div>
-          <div class="flex-grow-1">
-            <strong>${notification.title}</strong>
-            <p class="text-muted mt-1 mb-0">${notification.subtitle || ''}</p>
-            <small class="text-muted">${formatTimeAgo(notification.created_at)}</small>
-          </div>
+          <strong class="fw-bold">No new notifications yet</strong>
+          <p class="p-3 text-muted">Enjoy a quiet moment for now.</p>
+          <i class="bi bi-bell-slash fs-1 text-muted"></i>
         </div>
       `;
+      return;
+    }
+  
+    data.forEach((notification, index) => {
+      const isUnread = notification.is_read == 0;
+      const icon = notification.type === "user"
+        ? `<div class="bg-primary-subtle rounded p-2"><i class="bi bi-bell text-primary"></i></div>`
+        : `<div class="bg-success-subtle rounded p-2"><i class="bi bi-megaphone text-success"></i></div>`;
+  
+      const item = document.createElement('div');
+      item.classList.add('accordion-item', 'bg-transparent', 'border-0', 'mb-2');
+  
+      item.innerHTML = `
+      <h2 class="accordion-header position-relative" id="heading-${index}">
+        <button class="accordion-button ${isUnread ? 'fw-bold' : 'fw-semibold'}" 
+                type="button" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#collapse-${index}" 
+                aria-expanded="false" 
+                aria-controls="collapse-${index}">
+          ${icon}
+          <div class="flex-grow-1 ms-2 overflow-hidden">
+            <strong class="mb-0">${notification.title}</strong>
+            <span class="text-truncate d-block" 
+                  style="font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${notification.subtitle || ''}
+            </span>
+          </div>
+          ${isUnread ? `<span class="bg-primary position-absolute translate-middle rounded" style="top: 50%; left: 15px; width: 10px; height: 10px;"></span>` : ''}
+        </button>
+      </h2>
+      <div id="collapse-${index}" class="accordion-collapse collapse" aria-labelledby="heading-${index}" data-bs-parent="#notifications-menu">
+        <div class="accordion-body">
+          <p class="mb-1 fw-bold">${notification.title || 'No details provided.'}</p>
+          <p class="mb-0">${notification.notification_text}</p>
+          <small class="text-muted">${formatTimeAgo(notification.created_at)}</small>
+        </div>
+      </div>
+    `;
     
-      // Mark as read on click
-      li.addEventListener('click', () => {
-        if (notification.is_read == 0) {
+  
+      // Mark as read when expanded
+      item.querySelector('.accordion-button').addEventListener('click', () => {
+        if (isUnread) {
           markAsRead(notification.id);
-          
-          // Remove the unread indicator
-          const unreadIndicator = li.querySelector('.bg-primary.rounded-circle');
-          if (unreadIndicator) {
-            unreadIndicator.remove();
-          }
-          
-          // Update the notification object to mark as read
           notification.is_read = 1;
+      
+          // safely remove unread dot
+          const dot = item.querySelector('.accordion-button .bg-primary');
+          if (dot) dot.remove();
         }
       });
-    
-      notificationsMenu.appendChild(li);
+  
+      menu.appendChild(item);
     });
   }
-
+  
   // Format time ago
   function formatTimeAgo(dateStr) {
     const date = new Date(dateStr);
@@ -145,7 +183,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Update unread badge count
   function updateUnreadCount() {
     const unreadCount = allNotifications.filter(n => n.is_read == 0).length;
-    console.log("unreadCount : ", unreadCount);
     unreadCount > 0 ? unreadCountBadges.forEach(badge => badge.classList.remove('d-none')) : unreadCountBadges.forEach(badge => badge.classList.add('d-none'));
     unreadCountBadges.forEach(badge => badge.textContent = unreadCount > 0 ? unreadCount : 0);
   }

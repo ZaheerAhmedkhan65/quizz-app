@@ -56,23 +56,22 @@ class Notification {
 
     static async findByUserId(userId, includeRead = true) {
         const query = `
-            SELECT 
-                n.*,
-                u.username,
-                u.avatar,
-                u.email,
-                CASE WHEN nr.notification_id IS NOT NULL THEN 1 ELSE 0 END as is_read
-            FROM notifications n
-            LEFT JOIN users u ON n.user_id = u.id
-            LEFT JOIN notification_reads nr ON n.id = nr.notification_id AND nr.user_id = ?
-            WHERE (n.user_id = ? OR n.type = 'global')
-            ${includeRead ? '' : 'AND nr.notification_id IS NULL'}
-            ORDER BY n.created_at DESC
+          SELECT 
+              n.*,
+              u.username,
+              u.avatar,
+              u.email,
+              CASE WHEN nr.notification_id IS NOT NULL THEN 1 ELSE 0 END as is_read
+          FROM notifications n
+          LEFT JOIN users u ON n.user_id = u.id
+          LEFT JOIN notification_reads nr ON n.id = nr.notification_id AND nr.user_id = ?
+          WHERE (n.user_id = ? OR n.type = 'global')
+          ${includeRead ? '' : 'AND nr.notification_id IS NULL'}
+          ORDER BY n.created_at DESC
         `;
-        
         const [rows] = await db.query(query, [userId, userId]);
         return rows;
-    }
+      }
 
     static async getUnreadCount(userId) {
         const [rows] = await db.query(`

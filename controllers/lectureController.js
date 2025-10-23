@@ -19,7 +19,7 @@ const show = async (req, res) => {
         const lecture = await Lecture.findById(req.params.id);
         const course = await Course.findById(lecture.course_id);
         const questions = await Lecture.getQuestionsWithDetails(req.params.id);
-
+        
         if(req.user && req.user.role=='admin'){
             return res.status(200).render('admin/lectures/show', {
                 lecture,
