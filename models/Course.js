@@ -6,25 +6,27 @@ class Course {
         try {
             limit = parseInt(limit, 10);
             offset = parseInt(offset, 10);
-
+    
             if (isNaN(limit) || isNaN(offset)) {
                 throw new Error("Invalid pagination values");
             }
-
+    
             const query = `
-      SELECT 
-        c.id, 
-        c.title,
-        c.slug,
-        c.handout_pdf,
-        c.handout_original_filename,
-        uc.course_progress 
-      FROM courses c
-      LEFT JOIN user_courses uc ON c.id = uc.course_id AND uc.user_id = ?
-      ORDER BY c.id ASC
-      LIMIT ${limit} OFFSET ${offset}
-    `;
-
+                SELECT 
+                    c.id, 
+                    c.title,
+                    c.slug,
+                    c.handout_pdf,
+                    c.handout_original_filename,
+                    uc.course_progress 
+                FROM courses c
+                LEFT JOIN user_courses uc ON c.id = uc.course_id AND uc.user_id = ?
+                WHERE c.handout_pdf IS NOT NULL 
+                    AND c.handout_pdf != ''
+                ORDER BY c.id ASC
+                LIMIT ${limit} OFFSET ${offset}
+            `;
+    
             const [rows] = await db.execute(query, [user_id]);
             return rows;
         } catch (error) {
@@ -35,31 +37,38 @@ class Course {
 
     static async search(query) {
         try {
-            const [rows] = await db.query('SELECT * FROM courses WHERE title LIKE ? ORDER BY id ASC', [`%${query}%`]);
+            const [rows] = await db.execute(
+                'SELECT * FROM courses WHERE title LIKE ? AND handout_pdf IS NOT NULL AND handout_pdf != "" ORDER BY id ASC', 
+                [`%${query}%`]
+            );
             return rows;
         } catch (error) {
             console.error("Database query error:", error);
             throw error;
         }
     }
-
     static async getAll(limit, offset) {
         try {
             limit = parseInt(limit, 10);
             offset = parseInt(offset, 10);
-
-            if (isNaN(limit) || isNaN(offset)) {
+    
+            if (isNaN(limit) || isNaN(offset) || limit < 0 || offset < 0) {
                 throw new Error("Invalid pagination values");
             }
-
-            const [rows] = await db.query('SELECT * FROM courses ORDER BY id ASC LIMIT ? OFFSET ?', [limit, offset]);
+    
+            // Ensure values are positive integers
+            const safeLimit = Math.max(0, limit);
+            const safeOffset = Math.max(0, offset);
+    
+            const [rows] = await db.execute(
+                `SELECT * FROM courses WHERE handout_pdf IS NOT NULL AND handout_pdf != "" ORDER BY id ASC LIMIT ${safeLimit} OFFSET ${safeOffset}`
+            );
             return rows;
         } catch (error) {
             console.error("Database query error:", error);
             throw error;
         }
     }
-
 
     static async findById(id) {
         const [rows] = await db.query('SELECT * FROM courses WHERE id = ?', [id]);

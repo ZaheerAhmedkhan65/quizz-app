@@ -1,158 +1,87 @@
+// upload.js
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const uploadBase = path.join('/data', 'uploads');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
-// Configure storage
-const storage = multer.diskStorage({
+const uploadBase = path.join(__dirname, '..', 'uploads');
+
+// Temporary local storage (for Cloudinary upload)
+const tempStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(uploadBase, 'courses/handouts');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
+    const tmpDir = path.join(uploadBase, 'temp');
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+    cb(null, tmpDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
-    cb(null, `course-${req.params.id || uniqueSuffix}-handout${ext}`);
+    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
   }
 });
-
-// Configure storage for question images
-const questionStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir =  path.join(uploadBase, 'questions');
-
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `question-${uniqueSuffix}${ext}`);
-  }
-});
-
-// Configure storage for option images
-const optionStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir =  path.join(uploadBase, 'options');
-
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `option-${uniqueSuffix}${ext}`);
-  }
-});
-
-// File filter to allow only PDFs
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'application/pdf') {
-    cb(null, true);
-  } else {
-    cb(new Error('Only PDF files are allowed!'), false);
-  }
-};
-
-// File filter to allow only image files
-const imageFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only image files (JPEG, PNG, GIF, WEBP) are allowed!'), false);
-  }
-};
 
 const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: {
-    fileSize: 100 * 1024 * 1024 // 100MB limit
-  }
+  storage: tempStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for images
 });
 
-// Create separate upload instances
-const uploadQuestionImage = multer({
-  storage: questionStorage,
-  fileFilter: imageFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit for question images
-  }
-}).single('question_image');
-
-const uploadOptionImage = multer({
-  storage: optionStorage,
-  fileFilter: imageFilter,
-  limits: {
-    fileSize: 2 * 1024 * 1024 // 2MB limit for option images
-  }
-}).single('option_image');
-// Middleware for single file upload
-const uploadHandout = upload.single('handout_pdf');
-
-// Middleware to handle upload errors
-const handleUploadErrors = (err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    return res.status(400).json({
-      success: false,
-      message: err.code === 'LIMIT_FILE_SIZE'
-        ? 'File size too large (max 100MB)'
-        : 'File upload error'
-    });
-  } else if (err) {
-    return res.status(400).json({
-      success: false,
-      message: err.message || 'Error uploading file'
-    });
-  }
-  next();
+// File type filter
+const imageFilter = (req, file, cb) => {
+  const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  if (allowed.includes(file.mimetype)) cb(null, true);
+  else cb(new Error('Only image files (JPEG, PNG, GIF, WEBP) are allowed!'), false);
 };
 
-// Middleware to handle upload errors
+// Middlewares
+const uploadQuestionImage = upload.single('question_image');
+const uploadOptionImage = upload.single('option_image');
+const uploadProfileImage = upload.single('profile_image');
+
+// Cloudinary upload helper middleware
+const uploadToCloudinaryMiddleware = async (req, res, next) => {
+  try {
+    if (!req.file) return next();
+
+    let folder = 'uploads';
+    if (req.file.fieldname === 'question_image') folder = 'questions';
+    if (req.file.fieldname === 'option_image') folder = 'options';
+    if (req.file.fieldname === 'profile_image') folder = 'profiles';
+
+    const cloudinaryResult = await uploadToCloudinary(req.file.path, folder);
+
+    // Attach Cloudinary result to request object
+    req.cloudinaryResult = cloudinaryResult;
+
+    next();
+  } catch (error) {
+    console.error('Cloudinary upload failed:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error uploading to Cloudinary',
+      error: error.message
+    });
+  }
+};
+
+// Error handler middleware
 const handleImageUploadErrors = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     return res.status(400).json({
       success: false,
       message: err.code === 'LIMIT_FILE_SIZE'
-        ? 'Image size too large'
+        ? 'Image too large (max 10MB)'
         : 'Image upload error'
     });
   } else if (err) {
-    return res.status(400).json({
-      success: false,
-      message: err.message || 'Error uploading image'
-    });
-  }
-  next();
-};
-
-// Middleware to get the uploaded image path
-const getUploadedImagePath = (req, res, next) => {
-  if (req.file) {
-    // Remove 'public/' from the path for client-side access
-    req.imagePath = req.file.path.replace('public/', '');
+    return res.status(400).json({ success: false, message: err.message });
   }
   next();
 };
 
 module.exports = {
-  uploadHandout,
-  handleUploadErrors,
   uploadQuestionImage,
   uploadOptionImage,
-  handleImageUploadErrors,
-  getUploadedImagePath
+  uploadProfileImage,
+  uploadToCloudinaryMiddleware,
+  handleImageUploadErrors
 };

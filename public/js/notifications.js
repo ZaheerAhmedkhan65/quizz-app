@@ -52,7 +52,7 @@ if (!currentUser || Object.keys(currentUser).length === 0 || !currentUser.userId
   });
   unreadBtn.addEventListener('click', () => {
     renderNotifications(allNotifications.filter(n => n.is_read == 0));
-    setActiveButton(allBtn);
+    setActiveButton(unreadBtn);
   });
   reloadBtn.addEventListener('click', ()=>{
     getNotifications();
@@ -81,7 +81,7 @@ if (!currentUser || Object.keys(currentUser).length === 0 || !currentUser.userId
   
     if (data.length === 0) {
       menu.innerHTML = `
-        <div class="text-center my-auto">
+        <div class="text-center py-5">
           <strong class="fw-bold">No new notifications yet</strong>
           <p class="p-3 text-muted">Enjoy a quiet moment for now.</p>
           <i class="bi bi-bell-slash fs-1 text-muted"></i>

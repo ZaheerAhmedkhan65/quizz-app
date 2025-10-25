@@ -3,15 +3,10 @@ const Course = require('../models/Course');
 const UserCourse = require('../models/UserCourse');
 const ChatHistory = require('../models/ChatHistory');
 const Semester = require('../models/Semester');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 const userDashboard = async (req, res) => {
     try {
-        if(!req.user) {
-            return res.status(404).render('error', { 
-                message: "User not found",
-                error: "User not found" 
-            });
-        }
         const currentSemester = await Semester.findByStatus('active');
         if(!currentSemester) {
             return res.status(500).render('error', { 
@@ -57,6 +52,7 @@ const adminDashboard = async (req, res) => {
         console.error(err); 
     }
 };
+
 const updateUserStatus = async (req, res) => {
     try {
         const { action } = req.params;
@@ -65,7 +61,7 @@ const updateUserStatus = async (req, res) => {
             'block': 'blocked',
             'approve': 'approved'
         };
-        console.log(statusMap[action]);
+
         if (!statusMap[action]) {
             return res.status(400).json({ success: false, message: "Invalid action" });
         }
@@ -86,10 +82,48 @@ const userProfile = async (req, res) => {
     try {
         const userInfo = await User.findById(req.user.userId);
         const semesters = await Semester.findByStatus('closed');
-        res.status(200).render('user/profile', { userInfo, title: "Profile" });
+        res.status(200).render('user/profile', { userInfo, semesters, title: "Profile" });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-module.exports = { userDashboard, adminDashboard, updateUserStatus, userProfile };
+const userProfileUpdate = async (req, res) => {
+    try {
+      const userId = req.user.userId;
+      let updates = {};
+    
+      // Parse updates JSON (if sent)
+      if (req.body.updates) {
+        updates = JSON.parse(req.body.updates);
+      }
+  
+      // Upload avatar to Cloudinary
+      if (req.cloudinaryResult) {
+        updates.avatar = req.cloudinaryResult.secure_url;
+        updates.avatar_public_id = req.cloudinaryResult.public_id;
+      }
+    
+      // Update user
+      await User.updateUser(userId, updates);
+  
+      // Fetch updated record
+      const updatedUser = await User.findById(userId);
+  
+      res.json({
+        success: true,
+        message: 'Profile updated successfully',
+        data: {
+          avatar: updatedUser.avatar,
+          program: updatedUser.program,
+          degree: updatedUser.degree,
+          cgpa: updatedUser.cgpa
+        }
+      });
+    } catch (err) {
+      console.error('Profile update error:', err);
+      res.status(500).json({ success: false, message: err.message });
+    }
+  };
+
+module.exports = { userDashboard, adminDashboard, updateUserStatus, userProfile, userProfileUpdate };

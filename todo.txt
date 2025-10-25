@@ -16,3 +16,12 @@
 
 ===============Specs===============
 //handout-pdf download link from (zaheer ahmed's) google drive : https://drive.google.com/uc?export=download&id=ID_OF_THE_PDF_FILE_ON_DRIVE
+
+
+
+============past paper schema===========
+course_id
+year
+type(mid_term, final_term)
+file_url
+download_count

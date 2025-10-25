@@ -5,7 +5,7 @@ const courseController = require('../controllers/courseController');
 const lectureController = require('../controllers/lectureController');
 const questionController = require('../controllers/questionController');
 const Course = require('../models/Course');
-const { uploadHandout, handleUploadErrors, uploadQuestionImage, uploadOptionImage, handleImageUploadErrors } = require('../middleware/upload');
+const { uploadQuestionImage, uploadOptionImage, handleImageUploadErrors } = require('../middleware/upload');
 
 router.get('/dashboard', userController.adminDashboard);
 
@@ -23,10 +23,10 @@ router.get('/courses/new', (req, res)=>{
         token: req.cookies.token
     });
 });
-router.post('/courses/create', uploadHandout, handleUploadErrors, courseController.create);
+router.post('/courses/create', courseController.create);
 router.get('/courses/:id', courseController.showCourse);
 router.get('/courses/:id/edit', courseController.edit);
-router.post('/courses/:id/update', uploadHandout, handleUploadErrors, courseController.update);
+router.post('/courses/:id/update', courseController.update);
 router.post('/courses/:id/delete', courseController.deleteCourse);
 
 // Lectures

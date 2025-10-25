@@ -164,10 +164,21 @@ class User {
     }
 
     static async updateUser(id, updates) {
+        const allowedFields = ['username', 'program', 'degree', 'cgpa', 'avatar'];
+        const filteredUpdates = {};
+        
+        for (const [key, value] of Object.entries(updates)) {
+            if (allowedFields.includes(key)) {
+                filteredUpdates[key] = value;
+            }
+        }
+        
+        filteredUpdates.updated_at = new Date();
+        
         const fields = [];
         const values = [];
         
-        for (const [key, value] of Object.entries(updates)) {
+        for (const [key, value] of Object.entries(filteredUpdates)) {
             fields.push(`${key} = ?`);
             values.push(value);
         }

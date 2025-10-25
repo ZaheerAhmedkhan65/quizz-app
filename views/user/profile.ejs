@@ -1,25 +1,278 @@
 <%- include('../partials/_header') %>
 
-<div class="container-fluid">
-    <div class="row align-items-center">
-        <div class="col-6 d-flex align-items-center gap-2">
-            <h2 class="my-2">Your Profile</h2>
-        </div>
+<div class="container py-5">
+  <!-- Profile Header -->
+  <div class="text-center mb-5">
+    <div class="position-relative d-inline-block">
+      <img src="<%= userInfo.avatar || '/uploads/avatars/default.png' %>"
+           alt="Avatar"
+           id="avatarPreview"
+           class="rounded-circle border shadow-sm"
+           style="width:130px; height:130px; object-fit:cover;">
+      <label for="avatarUpload"
+             class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 shadow"
+             style="cursor:pointer;">
+        <i class="fas fa-camera"></i>
+      </label>
+      <input type="file" id="avatarUpload" class="d-none" accept="image/*">
     </div>
-    <div class="row align-items-center">
-        <div class="col-6 d-flex align-items-center gap-2">
-            <h3 class="my-2">User Name: <%= user.username %></h3>
+    <h3 class="mt-3 mb-1 fw-bold"><%= userInfo.username %></h3>
+    <p class="text-muted"><%= userInfo.email %></p>
+    <small class="text-secondary">Member since <%= userInfo.created_at.toDateString() %></small>
+  </div>
+
+  <!-- Inline Editable Info -->
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm p-4 rounded-4">
+        <h5 class="fw-semibold mb-4">Personal Information</h5>
+
+        <div class="list-group list-group-flush">
+          <!-- Program -->
+          <div class="list-group-item d-flex justify-content-between align-items-center py-3 gap-3 editable-row" data-field="program">
+            <span class="fw-medium text-secondary">Program</span>
+            <span class="editable-value" id="programValue">
+              <%= userInfo.program || '<span class="text-muted fst-italic">Add your program</span>' %>
+            </span>
+          </div>
+
+          <!-- Degree -->
+          <div class="list-group-item d-flex justify-content-between align-items-center py-3 gap-3 editable-row" data-field="degree">
+            <span class="fw-medium text-secondary">Degree</span>
+            <span class="editable-value" id="degreeValue">
+              <%= userInfo.degree || '<span class="text-muted fst-italic">Select your degree</span>' %>
+            </span>
+          </div>
+
+          <!-- CGPA -->
+          <div class="list-group-item d-flex justify-content-between align-items-center py-3 gap-3 editable-row" data-field="cgpa">
+            <span class="fw-medium text-secondary">CGPA</span>
+            <span class="editable-value" id="cgpaValue">
+              <%= userInfo.cgpa || '<span class="text-muted fst-italic">Enter your CGPA</span>' %>
+            </span>
+          </div>
         </div>
-    </div>
-    <div class="row align-items-center">
-        <div class="col-6 d-flex align-items-center gap-2">
-            <h3 class="my-2">Email: <%= user.email %></h3>
+      </div>
+
+      <!-- Profile Completion -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mt-4">
+        <h5 class="fw-semibold mb-3">Profile Completion</h5>
+        <div class="progress mb-2" style="height:8px;">
+          <div class="progress-bar bg-success" id="completionProgress" style="width: 0%;"></div>
         </div>
-    </div>
-    <div class="row align-items-center">
-        <div class="col-6 d-flex align-items-center gap-2">
-            <h3 class="my-2">Account Created: <%= userInfo.created_at.toDateString() %></h3>
+        <small id="completionText" class="text-muted">Complete your profile to unlock features</small>
+      </div>
+
+      <!-- Account Info -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mt-4">
+        <h5 class="fw-semibold mb-3">Account Info</h5>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Status</span>
+          <span class="badge bg-success"><%= userInfo.status %></span>
         </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted">Email Verified</span>
+          <span class="badge <%= userInfo.email_verified ? 'bg-success' : 'bg-warning' %>">
+            <%= userInfo.email_verified ? 'Verified' : 'Pending' %>
+          </span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span class="text-muted">Last Updated</span>
+          <span class="text-secondary">
+            <%= userInfo.updated_at ? new Date(userInfo.updated_at).toLocaleDateString() : 'Never' %>
+          </span>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
+
+<!-- Loading Spinner -->
+<div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content border-0 text-center py-4">
+      <div class="spinner-border text-primary mb-3" role="status"></div>
+      <p class="mb-0">Saving changes...</p>
+    </div>
+  </div>
+</div>
+
 <%- include('../partials/_footer') %>
+
+<style>
+.editable-row {
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+.editable-row:hover {
+  background-color: #f8f9fa;
+}
+.editable-input {
+  border: none;
+  border-bottom: 2px solid #007bff;
+  outline: none;
+  width: 100%;
+  background: transparent;
+  font-size: 1rem;
+}
+.progress {
+  border-radius: 10px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+  const avatarUpload = document.getElementById('avatarUpload');
+  const avatarPreview = document.getElementById('avatarPreview');
+
+  calculateCompletion();
+
+  // Inline editing
+  document.querySelectorAll('.editable-row').forEach(row => {
+    row.addEventListener('click', () => startInlineEdit(row));
+  });
+
+  // Avatar upload preview
+avatarUpload.addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showAlert('Image must be under 5MB', 'error');
+    return;
+  }
+
+  // Show preview immediately
+  const reader = new FileReader();
+  reader.onload = e => (avatarPreview.src = e.target.result);
+  reader.readAsDataURL(file);
+
+  // Prepare form data for upload
+  const formData = new FormData();
+  formData.append('profile_image', file);
+  formData.append('updates', JSON.stringify({})); // 👈 ensures backend parses it correctly
+
+  try {
+    loadingModal.show();
+    const res = await fetch('/profile/update', {
+      method: 'POST',
+      body: formData,
+    });
+    const result = await res.json();
+    if (!result.success) throw new Error(result.message || 'Failed to upload avatar');
+
+    // ✅ Update avatar preview from server (in case it returns URL)
+    if (result.data?.avatar) {
+      avatarPreview.src = result.data.avatar + '?t=' + new Date().getTime();
+    }
+
+    showAlert('Avatar updated successfully!', 'success');
+    calculateCompletion();
+  } catch (err) {
+    console.error(err);
+    showAlert(err.message, 'error');
+  } finally {
+    loadingModal.hide();
+  }
+});
+
+function startInlineEdit(row) {
+    const field = row.dataset.field;
+    const valueElement = row.querySelector('.editable-value');
+    const oldValue = valueElement.textContent.trim();
+
+    // Replace value with input/select
+    let input;
+    if (field === 'degree') {
+      input = document.createElement('select');
+      input.innerHTML = `
+        <option value="">Select Degree</option>
+        <option>Associate</option>
+        <option>Bachelor</option>
+        <option>Master</option>
+        <option>PhD</option>`;
+      input.value = oldValue;
+    } else {
+      input = document.createElement('input');
+      input.type = field === 'cgpa' ? 'number' : 'text';
+      input.min = 0;
+      input.max = 4.0;
+      input.step = 0.01;
+      input.placeholder = field === 'program' ? 'Enter your program' : 'Enter value';
+      input.value = oldValue === 'Add your program' ? '' : oldValue;
+    }
+
+    input.className = 'editable-input';
+    valueElement.replaceWith(input);
+    input.focus();
+
+    input.addEventListener('blur', async () => {
+      const newValue = input.value.trim();
+      await updateProfile({ field, value: newValue });
+      input.replaceWith(createValueElement(field, newValue));
+      calculateCompletion();
+    });
+  }
+
+  function createValueElement(field, value) {
+    const span = document.createElement('span');
+    span.className = 'editable-value';
+    span.innerHTML = value || `<span class="text-muted fst-italic">${
+      field === 'program'
+        ? 'Add your program'
+        : field === 'degree'
+        ? 'Select your degree'
+        : 'Enter your CGPA'
+    }</span>`;
+    return span;
+  }
+
+  async function updateProfile({ field, value, formData }) {
+    try {
+      loadingModal.show();
+      let body;
+      if (formData) {
+        body = formData;
+      } else {
+        body = new FormData();
+        const updates = {};
+        updates[field] = value;
+        body.append('updates', JSON.stringify(updates));
+      }
+
+      const res = await fetch('/profile/update', { method: 'POST', body });
+      const result = await res.json();
+      if (!result.success) throw new Error(result.message || 'Failed to update');
+      showAlert('Profile updated!', 'success');
+    } catch (err) {
+      showAlert(err.message, 'error');
+    } finally {
+      loadingModal.hide();
+    }
+  }
+
+  function calculateCompletion() {
+    const fields = ['program', 'degree', 'cgpa', 'avatar'];
+    let completed = 0;
+
+    if (!avatarPreview.src.includes('default.png')) completed++;
+    fields.slice(0, 3).forEach(f => {
+      const val = document.getElementById(f + 'Value')?.textContent.trim();
+      if (val && !val.includes('Add') && !val.includes('Select') && !val.includes('Enter')) completed++;
+    });
+
+    const percent = Math.round((completed / fields.length) * 100);
+    document.getElementById('completionProgress').style.width = percent + '%';
+    document.getElementById('completionText').textContent =
+      percent === 100 ? '🎉 Profile complete!' : `Complete ${fields.length - completed} more fields`;
+  }
+
+  function showAlert(msg, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : 'success'} text-center`;
+    alertDiv.textContent = msg;
+    document.body.appendChild(alertDiv);
+    setTimeout(() => alertDiv.remove(), 3000);
+  }
+});
+</script>

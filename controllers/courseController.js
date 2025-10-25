@@ -57,24 +57,50 @@ const searchCourses = async (req, res) => {
 
 
 const showCourse = async (req, res) => {
-    try {
-          let course;
-          let lectures;
-          if(req.user && req.user.role=='admin'){
-            course = await Course.findById(req.params.id)
-            lectures = await Lecture.findByCourseId(req.params.id)
-            return res.status(200).render('admin/courses/show', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
-          } else if(req.user){
-            course = await Course.findCourse(req.user.userId, req.params.id)
-            lectures = await Lecture.getLecturesByUserCourse(req.user.userId, req.params.id);
-            return res.status(200).render('public/course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
-          }
-          course = await Course.findById(req.params.id)
-          lectures = await Lecture.findByCourseId(req.params.id)
-          res.status(200).render('public/course', { course, title: course.title, user:req.user||null,lectures,path: req.path  });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+  try {
+      let course;
+      let lectures;
+      
+      course = await Course.findById(req.params.id);
+      
+      if ((!course.handout_pdf || course.handout_pdf === '') && (!req.user || req.user.role !== 'admin')) {
+          return res.redirect('back');
+      }
+      
+      if (req.user && req.user.role === 'admin') {
+          lectures = await Lecture.findByCourseId(req.params.id);
+          return res.status(200).render('admin/courses/show', { 
+              course, 
+              title: course.title, 
+              user: req.user || null, 
+              lectures, 
+              path: req.path  
+          });
+      } else if (req.user) {
+          course = await Course.findCourse(req.user.userId, req.params.id);
+          lectures = await Lecture.getLecturesByUserCourse(req.user.userId, req.params.id);
+          return res.status(200).render('public/course', { 
+              course, 
+              title: course.title, 
+              user: req.user || null, 
+              lectures, 
+              path: req.path  
+          });
+      }
+      
+      // For non-logged in users (but course has handout_pdf)
+      lectures = await Lecture.findByCourseId(req.params.id);
+      res.status(200).render('public/course', { 
+          course, 
+          title: course.title, 
+          user: req.user || null, 
+          lectures, 
+          path: req.path  
+      });
+      
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
 };
 
 const joinCourse = async (req, res) => {
