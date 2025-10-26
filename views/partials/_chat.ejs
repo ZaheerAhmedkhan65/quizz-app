@@ -149,6 +149,9 @@
   localStorage.setItem("sessionId", sessionId);
   let userId = "<%= user ? user.userId : null %>"
 </script>
+<!-- Markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 <script src="/js/aiChat.js"></script>
 <script src="/js/chatHistory.js"></script>
 <script>

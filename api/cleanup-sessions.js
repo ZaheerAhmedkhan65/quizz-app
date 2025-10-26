@@ -1,16 +1,14 @@
-// /api/cleanup-sessions.js
-const pool = require("../../config/db.js");
+const pool = require("../config/db");
 
-module.exports = async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
     const [result] = await pool.query(`
       DELETE FROM sessions
       WHERE JSON_EXTRACT(data, '$.cookie.expires') < NOW()
     `);
-
-    res.status(200).json({ deleted: result.affectedRows });
+    return res.status(200).json({ deleted: result.affectedRows });
   } catch (err) {
     console.error("Cleanup error:", err);
-    res.status(500).json({ error: "Failed to clean sessions" });
+    return res.status(500).json({ error: "Failed to clean sessions" });
   }
 };

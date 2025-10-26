@@ -10,9 +10,9 @@
            class="rounded-circle border shadow-sm"
            style="width:130px; height:130px; object-fit:cover;">
       <label for="avatarUpload"
-             class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2 shadow"
+             class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle px-2 py-1 shadow"
              style="cursor:pointer;">
-        <i class="fas fa-camera"></i>
+        <i class="bi bi-camera"></i>
       </label>
       <input type="file" id="avatarUpload" class="d-none" accept="image/*">
     </div>
@@ -52,15 +52,6 @@
             </span>
           </div>
         </div>
-      </div>
-
-      <!-- Profile Completion -->
-      <div class="card border-0 shadow-sm rounded-4 p-4 mt-4">
-        <h5 class="fw-semibold mb-3">Profile Completion</h5>
-        <div class="progress mb-2" style="height:8px;">
-          <div class="progress-bar bg-success" id="completionProgress" style="width: 0%;"></div>
-        </div>
-        <small id="completionText" class="text-muted">Complete your profile to unlock features</small>
       </div>
 
       <!-- Account Info -->
@@ -126,8 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const avatarUpload = document.getElementById('avatarUpload');
   const avatarPreview = document.getElementById('avatarPreview');
 
-  calculateCompletion();
-
   // Inline editing
   document.querySelectorAll('.editable-row').forEach(row => {
     row.addEventListener('click', () => startInlineEdit(row));
@@ -138,7 +127,7 @@ avatarUpload.addEventListener('change', async e => {
   const file = e.target.files[0];
   if (!file) return;
   if (file.size > 5 * 1024 * 1024) {
-    showAlert('Image must be under 5MB', 'error');
+    showNotification('Image must be under 5MB', 'error');
     return;
   }
 
@@ -166,11 +155,10 @@ avatarUpload.addEventListener('change', async e => {
       avatarPreview.src = result.data.avatar + '?t=' + new Date().getTime();
     }
 
-    showAlert('Avatar updated successfully!', 'success');
-    calculateCompletion();
+    showNotification('Avatar updated successfully!', 'success');
   } catch (err) {
     console.error(err);
-    showAlert(err.message, 'error');
+    showNotification(err.message, 'error');
   } finally {
     loadingModal.hide();
   }
@@ -210,7 +198,6 @@ function startInlineEdit(row) {
       const newValue = input.value.trim();
       await updateProfile({ field, value: newValue });
       input.replaceWith(createValueElement(field, newValue));
-      calculateCompletion();
     });
   }
 
@@ -243,36 +230,12 @@ function startInlineEdit(row) {
       const res = await fetch('/profile/update', { method: 'POST', body });
       const result = await res.json();
       if (!result.success) throw new Error(result.message || 'Failed to update');
-      showAlert('Profile updated!', 'success');
+      showNotification('Profile updated!', 'success');
     } catch (err) {
-      showAlert(err.message, 'error');
+      showNotification(err.message, 'error');
     } finally {
       loadingModal.hide();
     }
-  }
-
-  function calculateCompletion() {
-    const fields = ['program', 'degree', 'cgpa', 'avatar'];
-    let completed = 0;
-
-    if (!avatarPreview.src.includes('default.png')) completed++;
-    fields.slice(0, 3).forEach(f => {
-      const val = document.getElementById(f + 'Value')?.textContent.trim();
-      if (val && !val.includes('Add') && !val.includes('Select') && !val.includes('Enter')) completed++;
-    });
-
-    const percent = Math.round((completed / fields.length) * 100);
-    document.getElementById('completionProgress').style.width = percent + '%';
-    document.getElementById('completionText').textContent =
-      percent === 100 ? '🎉 Profile complete!' : `Complete ${fields.length - completed} more fields`;
-  }
-
-  function showAlert(msg, type) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : 'success'} text-center`;
-    alertDiv.textContent = msg;
-    document.body.appendChild(alertDiv);
-    setTimeout(() => alertDiv.remove(), 3000);
   }
 });
 </script>

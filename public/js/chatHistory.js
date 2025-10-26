@@ -1,3 +1,4 @@
+//chatHistory.js
 const chatHistoryContainer = document.getElementById("chat-history-container");
 
 // Initialize when DOM is loaded
@@ -12,10 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     if(userId){
-    // Set up event delegation first
-    setupEventDelegation();
-    // Then fetch chat history after a short delay (you can reduce or remove the delay if needed)
-    fetchChatHistory();
+        // Set up event delegation first
+        setupEventDelegation();
+        // Then fetch chat history after a short delay (you can reduce or remove the delay if needed)
+        fetchChatHistory();
     }
 });
 
@@ -24,7 +25,6 @@ function fetchChatHistory() {
     fetch('/api/gemini/get-chat-history')
         .then(response => response.json())
         .then(groupedChats => {
-
             if (Object.keys(groupedChats).length === 0) {
                 // Show empty state if no chats exist
                 chatHistoryContainer.innerHTML = `
@@ -64,7 +64,7 @@ function fetchChatHistory() {
                     chatItem.innerHTML = `
                     <div data-id="${chat.id}" class="chat-history-item" style="width: 160px;">
                         <div style="text-overflow: hidden; overflow: hidden; white-space: nowrap; border: 1px solid transparent;">
-                            ${chat.prompt}
+                            ${escapeHtml(chat.prompt)}
                         </div>
                     </div>
                     <div class="btn-group dropup">
@@ -107,21 +107,6 @@ function setupEventDelegation() {
             return;
         }
     });
-    // Assuming you have a container for all chat messages
-    const chatContainer = document.querySelector('.chat-messages');
-
-    chatContainer.addEventListener('click', async (event) => {
-        const feedbackButton = event.target.closest('[data-id$="_like"], [data-id$="_dislike"]');
-
-        if (feedbackButton) {
-            event.preventDefault();
-            event.stopPropagation();
-            await handleFeedbackClick(event);
-            return;
-        }
-
-        // Other click handlers...
-    });
 }
 
 // Load a specific chat history item
@@ -137,15 +122,71 @@ async function loadChatHistoryItem(chatItem) {
         if (!response.ok) throw new Error("Network response was not ok");
 
         const data = await response.json();
-        const aiMessage = document.createElement('div');
-        writeUserMessage(data.chat.prompt);
-        const formattedResponse = generateFormattedResponse(data.chat.response);
-        addMessageToChat(formattedResponse, aiMessage, data.chat);
-        chatMessages.appendChild(aiMessage);
+        
+        // Clear current chat
+        chatMessages.innerHTML = '';
+        
+        // Add user message using the new appendMessage function
+        appendMessage("user", data.chat.prompt);
+        
+        // Add AI message using the new typeMessage function (without typing animation for history)
+        const msgContainer = document.createElement("div");
+        msgContainer.classList.add("ai-message");
+
+        const messageContent = document.createElement("div");
+        messageContent.classList.add("message-content");
+        messageContent.innerHTML = marked.parse(data.chat.response);
+        msgContainer.appendChild(messageContent);
+
+        // Add feedback buttons for AI messages
+        if (data.chat) {
+            const feedbackContainer = document.createElement("div");
+            feedbackContainer.classList.add("feedback-container", "mt-2");
+            feedbackContainer.innerHTML = `
+                <div class="d-flex align-items-center justify-content-end gap-2">
+                    <button type="button" data-id="${data.chat.id}_like" 
+                            class="feedback-btn btn btn-sm ${data.chat.liked ? 'selected' : ''}">
+                        <i class="bi bi-hand-thumbs-up${data.chat.liked ? '-fill' : ''}"></i>
+                    </button>
+                    <button type="button" data-id="${data.chat.id}_dislike" 
+                            class="feedback-btn btn btn-sm ${data.chat.disliked ? 'selected' : ''}">
+                        <i class="bi bi-hand-thumbs-down${data.chat.disliked ? '-fill' : ''}"></i>
+                    </button>
+                </div>
+            `;
+            msgContainer.appendChild(feedbackContainer);
+        }
+
+        chatMessages.appendChild(msgContainer);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Apply syntax highlighting and add copy buttons
+        messageContent.querySelectorAll("pre code").forEach((block) => {
+            hljs.highlightElement(block);
+        });
+        addCopyButtons();
+
     } catch (err) {
         console.error("Error loading chat:", err);
-        alert("Failed to load chat history item");
+        appendMessage("ai", "⚠️ Error: Failed to load chat history item");
     }
+}
+
+function addCopyButtons() {
+    document.querySelectorAll("pre code").forEach((block) => {
+        const pre = block.parentElement;
+        if (!pre.querySelector(".copy-btn")) {
+            const button = document.createElement("button");
+            button.classList.add("copy-btn");
+            button.textContent = "Copy";
+            button.onclick = () => {
+                navigator.clipboard.writeText(block.textContent);
+                button.textContent = "Copied!";
+                setTimeout(() => (button.textContent = "Copy"), 1500);
+            };
+            pre.appendChild(button);
+        }
+    });
 }
 
 // Delete a chat item
@@ -165,13 +206,19 @@ async function deleteChatItem(deleteBtn) {
         listItem.style.transition = "opacity 0.3s";
         listItem.style.opacity = "0";
         setTimeout(() => listItem.remove(), 300);
+        
+        // Refresh chat history after deletion
+        setTimeout(() => {
+            fetchChatHistory();
+        }, 300);
+        
     } catch (err) {
         console.error("Delete error:", err);
         alert("Failed to delete chat");
     }
 }
 
-// Handle feedback clicks
+// Handle feedback clicks from chat history
 async function handleFeedbackClick(event) {
     // Check if the click came from a feedback button or its icon
     const feedbackBtn = event.target.closest('[data-id$="_like"], [data-id$="_dislike"]');
@@ -194,6 +241,7 @@ async function handleFeedbackClick(event) {
 
     const liked = action === "like" ? 1 : 0;
     const disliked = action === "dislike" ? 1 : 0;
+    
     try {
         const response = await fetch("/api/gemini/save-feedback", {
             method: "POST",
@@ -250,3 +298,21 @@ async function handleFeedbackClick(event) {
         console.error("Failed to send feedback:", error);
     }
 }
+
+// Helper function to escape HTML (for security)
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Add event listener for feedback buttons in chat history items
+document.addEventListener('click', async (event) => {
+    const feedbackButton = event.target.closest('[data-id$="_like"], [data-id$="_dislike"]');
+    if (feedbackButton) {
+        await handleFeedbackClick(event);
+    }
+});
