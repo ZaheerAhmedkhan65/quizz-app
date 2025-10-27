@@ -11,8 +11,13 @@ const signup = async (req, res) => {
         // Check if user already exists
         const existingUser = await User.findByEmail(email);
         if (existingUser) {
-            req.flash('error', 'User already exists with this email! Please choose a different email.');
-            res.redirect('/auth/create-account');
+            if (existingUser.google_id && !existingUser.password) {
+                req.flash('error', 'This email is already registered using Google. Please sign in using Google.');
+                return res.redirect('/auth/login');
+            } else {
+                req.flash('error', 'User already exists with this email! Please choose a different email.');
+                return res.redirect('/auth/create-account');
+            }
         }
 
         // Hash the password
@@ -91,71 +96,82 @@ const verifyEmail = async (req, res) => {
 
 const login = async (req, res) => {
     const { email, password } = req.body;
-    
+
     try {
-        // Find the user by email
+        // 1️⃣ Find the user by email
         const user = await User.findByEmail(email);
         if (!user) {
             req.flash('error', 'Invalid email or password!');
             return res.redirect('/auth/login');
         }
 
-        //Check if email is verified
+        // 2️⃣ If the user signed up using Google (google_id present)
+        if (user.google_id && !user.password) {
+            req.flash('error', 'This account was created using Google. Please sign in using Google instead.');
+            return res.redirect('/auth/login');
+        }
+
+        // 3️⃣ Check if email is verified
         if (!user.email_verified) {
-            req.flash('error', 'Your account was created, but your email is not verified. Please check your gmail inbox for verification instructions.');
+            req.flash(
+                'error',
+                'Your account was created, but your email is not verified. Please check your gmail inbox for verification instructions.'
+            );
             return res.redirect('/auth/verify-email');
         }
 
+        // 4️⃣ Handle blocked or deleted users
         if (user.status === 'blocked') {
             req.flash('error', 'Your account has been blocked. Please contact support.');
-            return res.redirect('/auth/login');  
+            return res.redirect('/auth/login');
         }
 
         if (user.status === 'deleted') {
             req.flash('error', 'Your account has been deleted. Please contact support.');
-            return res.redirect('/auth/login');  
+            return res.redirect('/auth/login');
         }
 
-        // Compare passwords
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
+        // 5️⃣ Compare passwords
+        const isPasswordValid = await bcrypt.compare(password, user.password || '');
         if (!isPasswordValid) {
             req.flash('error', 'Invalid email or password!');
             return res.redirect('/auth/login');
         }
-        
-        // Generate JWT with role
+
+        // 6️⃣ Generate JWT
         const token = jwt.sign(
-            { 
-                userId: user.id, 
+            {
+                userId: user.id,
                 username: user.username,
                 role: user.role,
-                email: user.email
-            }, 
-            process.env.SECRET_KEY , 
+                email: user.email,
+            },
+            process.env.SECRET_KEY,
             { expiresIn: '7d' }
         );
-        
-        // Set the token in a cookie
-        res.cookie('token', token, { 
-            httpOnly: true, 
+
+        // 7️⃣ Set JWT cookie
+        res.cookie('token', token, {
+            httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000 
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
+        // 8️⃣ Redirect based on role
         req.flash('success', 'Login successfully!');
-        if(user.role === 'admin') {
-           return res.redirect('/admin/dashboard');
-        }else{
+        if (user.role === 'admin') {
+            return res.redirect('/admin/dashboard');
+        } else {
             return res.redirect('/dashboard');
         }
     } catch (error) {
-        console.error(error);
+        console.error('Login error:', error);
         req.flash('error', 'Error logging in!');
         return res.redirect('/auth/login');
     }
-}
+};
+
 
 const forgotPassword = async (req, res) => {
     const { email } = req.body;

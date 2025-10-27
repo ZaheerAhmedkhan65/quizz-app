@@ -2,12 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const passport = require('passport');
 const MySQLStore = require('express-mysql-session')(session);
 const pool = require('./config/db'); // Import your MySQL pool
 const flash = require('connect-flash');
 const app = express();
 const path = require('path');
 require('dotenv').config();
+require('./config/passport');
 
 app.use(bodyParser.json());
 app.use(express.json());
@@ -15,6 +17,7 @@ app.use(cookieParser());
 app.use(express.static('public'));
 app.use(express.static('views'));
 app.use(express.urlencoded({ extended: true }));
+
 
 // Create MySQL session store
 const sessionStore = new MySQLStore({
@@ -45,6 +48,9 @@ app.use(session({
     }
 }));
 
+// Passport and flash middleware
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(flash());
 
 app.use((req, res, next) => {

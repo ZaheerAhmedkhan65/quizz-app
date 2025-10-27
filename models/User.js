@@ -14,21 +14,20 @@ class User {
             ORDER BY u.id
         `, [id]);
         
-        // Group courses by user
         const usersMap = new Map();
         
         results.forEach(row => {
             if (!usersMap.has(row.id)) {
-                // Create user object without course fields
-                const user = { ...row, created_at: formatDate(row.created_at),  // Format the date
-                    courses: []  };
+                const user = { 
+                    ...row, 
+                    created_at: formatDate(row.created_at),
+                    courses: []  
+                };
                 delete user.course_id;
                 delete user.course_title;
-                user.courses = [];
                 usersMap.set(row.id, user);
             }
             
-            // Add course if it exists (LEFT JOIN might return nulls)
             if (row.course_id) {
                 usersMap.get(row.id).courses.push({
                     id: row.course_id,
@@ -41,11 +40,9 @@ class User {
     }
 
     static async getUserStats() {
-        // 1. Get total users count
         const [totalUsersResult] = await db.query('SELECT COUNT(*) AS totalUsers FROM users');
         const totalUsers = totalUsersResult[0].totalUsers;
     
-        // 2. Get new users this month
         const [currentMonthResult] = await db.query(`
             SELECT COUNT(*) AS currentMonthUsers 
             FROM users 
@@ -53,7 +50,6 @@ class User {
         `);
         const currentMonthUsers = currentMonthResult[0].currentMonthUsers;
     
-        // 3. Get new users from last month
         const [lastMonthResult] = await db.query(`
             SELECT COUNT(*) AS lastMonthUsers 
             FROM users 
@@ -62,13 +58,11 @@ class User {
         `);
         const lastMonthUsers = lastMonthResult[0].lastMonthUsers;
     
-        // 4. Calculate percentage increase (compared to last month)
         let percentageIncrease = 0;
         if (lastMonthUsers > 0) {
             percentageIncrease = ((currentMonthUsers - lastMonthUsers) / lastMonthUsers) * 100;
         }
     
-        // 5. Calculate percentage since last month (if needed)
         let percentageSinceLastMonth = 0;
         if (totalUsers > 0 && lastMonthUsers > 0) {
             percentageSinceLastMonth = (currentMonthUsers / totalUsers) * 100;
@@ -98,6 +92,11 @@ class User {
         return rows[0];
     }
 
+    static async findByGoogleId(googleId) {
+        const [rows] = await db.query('SELECT * FROM users WHERE google_id = ?', [googleId]);
+        return rows[0];
+    }
+
     static async findByVerificationToken(token) {
         const [rows] = await db.query(
             'SELECT * FROM users WHERE verification_token = ? AND verification_token_expires > NOW()',
@@ -114,12 +113,25 @@ class User {
         return rows[0];
     }
 
-    static async create({ username, email, password, role = 'user', verificationToken, verificationTokenExpires }) {
+    /**
+     * Create a new user (email-password or Google)
+     * @param {Object} userData - user data
+     */
+    static async create({
+        username,
+        email,
+        password = null,
+        role = 'user',
+        verificationToken = null,
+        verificationTokenExpires = null,
+        google_id = null,
+        email_verified = false
+    }) {
         const [result] = await db.query(
             `INSERT INTO users 
             (username, email, password, role, verification_token, verification_token_expires, 
-             email_verified, is_online, status, avatar, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             email_verified, is_online, status, avatar, google_id, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 username,
                 email,
@@ -127,12 +139,13 @@ class User {
                 role,
                 verificationToken,
                 verificationTokenExpires,
-                false,               // email_verified starts as false
-                0,                    // is_online starts as 0 (offline)
-                "pending",             // status
-                '/uploads/avatars/default.png',  // default avatar
-                new Date(),           // created_at
-                new Date()           // updated_at
+                email_verified,
+                0, // is_online = false
+                email_verified ? "approved" : "pending", // status depends on email verification
+                '/uploads/avatars/default.png',
+                google_id,
+                new Date(),
+                new Date()
             ]
         );
         
@@ -198,7 +211,6 @@ class User {
         );
         return result.affectedRows;
     }
-    
 
     static async getAll() {
         const [rows] = await db.query('SELECT id, username, email, role, is_online FROM users');
