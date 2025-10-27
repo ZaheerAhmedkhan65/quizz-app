@@ -28,7 +28,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3"> -->
   <link rel="stylesheet" href="/assets/dist/css/styles.css">
   <link rel="stylesheet" href="/assets/dist/css/index.css">
-
+<!-- Syntax highlighting -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css"
+/>
   <!-- Custom styles for this template -->
   <link href="https://fonts.googleapis.com/css?family=Playfair&#43;Display:700,900&amp;display=swap" rel="stylesheet">
 </head>
@@ -179,7 +183,7 @@
                     <% if(user) { %>
                     <a class="nav-item nav-link link-body-emphasis <%= path.includes('dashboard') ? 'active' : '' %>" href="/dashboard">dashboard</a>
                     <% } else { %>
-                    <a class="nav-item nav-link link-body-emphasis <%= path.includes('/') ? 'active' : '' %>" href="/">home</a>
+                    <a class="nav-item nav-link link-body-emphasis <%= path === '/' ? 'active' : '' %>" href="/">home</a>
                     <% } %>
                 </div>
                 <div>

@@ -1,5 +1,4 @@
-
-
+//aiChat.js
 let chatModal = document.querySelector(".ask-ai-chat-modal");
 let openChatBtn = document.querySelector(".open-chat-btn");
 let closeChatBtn = document.querySelector(".close-chat-btn");
@@ -22,6 +21,8 @@ let removeFileBtn = document.querySelector(".remove-file-btn");
 
 let abortController = null;
 let currentPdfId = null;
+let isTyping = false;
+let currentTypingInterval = null;
 
 const fileInput = document.getElementById("file-input");
 const fileUploadButton = document.getElementById("file-upload-button");
@@ -134,8 +135,6 @@ shrinkChatBtn.addEventListener("click", () => {
     shrinkChatBtn.classList.add("d-none");
 });
 
-
-
 openChatBtn.addEventListener("click", () => {
     chatModal.classList.add("open");
     chatModal.style.transform = "translateX(0)";
@@ -150,44 +149,175 @@ closeChatBtn.addEventListener("click", () => {
     chatModal.style.visibility = "hidden";
 });
 
+async function sendMessage(message) {
+    appendMessage("user", message);
+    chatInput.value = "";
+    chatSendBtn.disabled = true;
+    
+    // Show stop button and hide send button
+    chatSendBtn.classList.add('d-none');
+    chatStopBtn.classList.remove('d-none');
+    chatStopBtn.style.color = "black";
 
-function sendMessage(message) {
-    message = message.trim();
-    if (message) {
-        // Show stop button and hide send button
-        chatSendBtn.classList.add('d-none');
-        chatStopBtn.classList.remove('d-none');
-        chatStopBtn.style.color = "black";
+    const typingDiv = document.createElement("div");
+    typingDiv.classList.add("ai-message");
+    typingDiv.innerHTML = `<div class="message-content">
+        <div class="getting-response">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>`;
+    chatMessages.appendChild(typingDiv);
+    
 
-        writeUserMessage(message);
-        scrollToBottom();
-      
-
-        // Create a new AbortController for this request
+    try {
         abortController = new AbortController();
+        const res = await fetch("/api/gemini/generate-response", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: abortController.signal,
+            body: JSON.stringify({
+                prompt: message,
+                userId,
+                sessionId,
+                currentPdfId,
+            }),
+        });
 
-        setTimeout(() => {
-            gettingResponse.innerHTML = `
-              <div class="getting-response">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-              </div>
-            `;
-            chatMessages.appendChild(gettingResponse);
-            fetchGeminiResponse(message, abortController);
-        }, 100);
+        const data = await res.json();
+        typingDiv.remove();
+        await typeMessage("ai", data.response, data.chatHistory);
+    } catch (err) {
+        if (err.name === 'AbortError') {
+            console.log('Request was aborted');
+            typingDiv.remove();
+            appendMessage("ai", "❌ Response generation stopped.");
+        } else {
+            typingDiv.remove();
+            appendMessage("ai", "⚠️ Error: Unable to get a response.");
+        }
+    } finally {
+        // Reset buttons
+        chatSendBtn.classList.remove('d-none');
+        chatStopBtn.classList.add('d-none');
+        chatStopBtn.style.color = "gray";
+        abortController = null;
     }
 }
 
-function writeUserMessage(message){
-    let messageElement = document.createElement("div");
-    messageElement.classList.add("sent");
-    messageElement.innerHTML = `<div class="message-content">${message}</div>`;
-    chatMessages.appendChild(messageElement);
+async function typeMessage(sender, text, chatHistory, speed = 20) {
+    const msgContainer = document.createElement("div");
+    msgContainer.classList.add(sender === "user" ? "sent" : "ai-message");
+
+    const messageContent = document.createElement("div");
+    messageContent.classList.add("message-content");
+    msgContainer.appendChild(messageContent);
+
+    chatMessages.appendChild(msgContainer);
+    
+
+    isTyping = true;
+    let i = 0;
+    
+    // Function to process and highlight code blocks in current content
+    const processCodeBlocks = () => {
+        messageContent.querySelectorAll("pre code").forEach((block) => {
+            // Remove existing copy buttons to avoid duplicates
+            const pre = block.parentElement;
+            const existingCopyBtn = pre.querySelector(".copy-btn");
+            if (existingCopyBtn) {
+                existingCopyBtn.remove();
+            }
+            
+            // Apply syntax highlighting
+            hljs.highlightElement(block);
+            
+            // Add copy button
+            const button = document.createElement("button");
+            button.classList.add("copy-btn");
+            button.textContent = "Copy";
+            button.onclick = () => {
+                navigator.clipboard.writeText(block.textContent);
+                button.textContent = "Copied!";
+                setTimeout(() => (button.textContent = "Copy"), 1500);
+            };
+            pre.appendChild(button);
+        });
+    };
+
+    while (i < text.length && isTyping) {
+        messageContent.innerHTML = marked.parse(text.slice(0, i + 1));
+        
+        // Process code blocks in real-time
+        processCodeBlocks();
+        
+        i++;
+        
+        await new Promise((resolve) => setTimeout(resolve, speed));
+    }
+
+    // Final processing after typing is complete or stopped
+    if (i >= text.length) {
+        processCodeBlocks();
+        
+        // Add feedback buttons for AI messages
+        if (sender === "ai" && chatHistory) {
+            const feedbackContainer = document.createElement("div");
+            feedbackContainer.classList.add("feedback-container", "mt-2");
+            feedbackContainer.innerHTML = `
+                <div class="d-flex align-items-center justify-content-end gap-2">
+                    <button type="button" data-id="${chatHistory.id}_like" 
+                            class="feedback-btn btn btn-sm ${chatHistory.liked ? 'selected' : ''}">
+                        <i class="bi bi-hand-thumbs-up${chatHistory.liked ? '-fill' : ''}"></i>
+                    </button>
+                    <button type="button" data-id="${chatHistory.id}_dislike" 
+                            class="feedback-btn btn btn-sm ${chatHistory.disliked ? 'selected' : ''}">
+                        <i class="bi bi-hand-thumbs-down${chatHistory.disliked ? '-fill' : ''}"></i>
+                    </button>
+                </div>
+            `;
+            msgContainer.appendChild(feedbackContainer);
+        }
+    }
+
+    isTyping = false;
+}
+
+function appendMessage(sender, message) {
+    const msgContainer = document.createElement("div");
+    msgContainer.classList.add(sender === "user" ? "sent" : "ai-message");
+
+    const messageContent = document.createElement("div");
+    messageContent.classList.add("message-content");
+    messageContent.innerHTML = marked.parse(message);
+    msgContainer.appendChild(messageContent);
+
+    chatMessages.appendChild(msgContainer);
+    
+
+    // Apply syntax highlighting and add copy buttons for code blocks
+    messageContent.querySelectorAll("pre code").forEach((block) => {
+        hljs.highlightElement(block);
+        const pre = block.parentElement;
+        if (!pre.querySelector(".copy-btn")) {
+            const button = document.createElement("button");
+            button.classList.add("copy-btn");
+            button.textContent = "Copy";
+            button.onclick = () => {
+                navigator.clipboard.writeText(block.textContent);
+                button.textContent = "Copied!";
+                setTimeout(() => (button.textContent = "Copy"), 1500);
+            };
+            pre.appendChild(button);
+        }
+    });
 }
 
 function stopMessage() {
+    // Stop the typing animation immediately
+    isTyping = false;
+    
     // Hide stop button and show send button
     chatSendBtn.classList.remove('d-none');
     chatStopBtn.classList.add('d-none');
@@ -200,8 +330,9 @@ function stopMessage() {
     }
 
     // Remove the "getting response" indicator
-    if (gettingResponse.parentNode) {
-        gettingResponse.remove();
+    const typingIndicator = document.querySelector('.ai-message .getting-response');
+    if (typingIndicator) {
+        typingIndicator.closest('.ai-message').remove();
     }
 }
 
@@ -220,257 +351,85 @@ function shrinkChat() {
     chatModal.classList.remove("expanded");
 }
 
-// Modify the fetchGeminiResponse function
-async function fetchGeminiResponse(prompt, controller) {
+// Handle feedback clicks
+async function handleFeedback(event) {
+    const feedbackBtn = event.target.closest('[data-id$="_like"], [data-id$="_dislike"]');
+
+    if (!feedbackBtn) {
+        console.log('No feedback button found - exiting');
+        return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const dataId = feedbackBtn.getAttribute("data-id");
+    if (!dataId) {
+        console.log('No data-id found - exiting');
+        return;
+    }
+
+    const [chatHistoryId, action] = dataId.split("_");
+
+    const liked = action === "like" ? 1 : 0;
+    const disliked = action === "dislike" ? 1 : 0;
+    
     try {
-        const res = await fetch("/api/gemini/generate-response", {
+        const response = await fetch("/api/gemini/save-feedback", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            signal: controller.signal,
             body: JSON.stringify({
-                prompt,
-                userId,
-                currentPdfId,
-                sessionId
+                chatHistoryId: parseInt(chatHistoryId),
+                liked,
+                disliked
             }),
         });
 
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error || 'API request failed');
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server error response:', errorText);
+            throw new Error("Feedback submission failed");
         }
 
-        const data = await res.json();
-        const aiMessage = document.createElement('div');
+        const responseData = await response.json();
+        const feedbackContainer = feedbackBtn.closest('.feedback-container');
 
-        // Hide stop button and show send button when done
-        chatSendBtn.classList.remove('d-none');
-        chatStopBtn.classList.add('d-none');
-        chatStopBtn.style.color = "gray";
+        if (feedbackContainer) {
+            // Get all buttons and their icons
+            const likeBtn = feedbackContainer.querySelector('[data-id$="_like"]');
+            const dislikeBtn = feedbackContainer.querySelector('[data-id$="_dislike"]');
+            const likeIcon = likeBtn.querySelector('i');
+            const dislikeIcon = dislikeBtn.querySelector('i');
 
-        if (!data.response) {
-            aiMessage.classList.add("ai-message");
-            aiMessage.innerHTML = `<div class="message-content">Server is busy. Please try again later.</div>`;
-            gettingResponse.remove();
-            chatMessages.appendChild(aiMessage);
-            return;
+            // Reset all buttons and icons
+            likeBtn.classList.remove('selected', 'active-feedback');
+            dislikeBtn.classList.remove('selected', 'active-feedback');
+            likeIcon.classList.remove('bi-hand-thumbs-up-fill');
+            likeIcon.classList.add('bi-hand-thumbs-up');
+            dislikeIcon.classList.remove('bi-hand-thumbs-down-fill');
+            dislikeIcon.classList.add('bi-hand-thumbs-down');
+
+            // Update the clicked button and icon
+            if (action === "like") {
+                likeBtn.classList.add('selected');
+                likeIcon.classList.remove('bi-hand-thumbs-up');
+                likeIcon.classList.add('bi-hand-thumbs-up-fill');
+            } else {
+                dislikeBtn.classList.add('selected');
+                dislikeIcon.classList.remove('bi-hand-thumbs-down');
+                dislikeIcon.classList.add('bi-hand-thumbs-down-fill');
+            }
+
+            // Add temporary active feedback effect
+            feedbackBtn.classList.add('active-feedback');
+            setTimeout(() => {
+                feedbackBtn.classList.remove('active-feedback');
+            }, 1000);
         }
-        setTimeout(() => {
-            const formattedResponse = generateFormattedResponse(data.response);
-            addMessageToChat(formattedResponse, aiMessage, data.chatHistory);
-            gettingResponse.remove();
-            chatMessages.appendChild(aiMessage);
-        }, 3000);
     } catch (error) {
-        // Hide stop button and show send button on error
-        chatSendBtn.classList.remove('d-none');
-        chatStopBtn.classList.add('d-none');
-        chatStopBtn.style.color = "gray";
-
-        if (error.name === 'AbortError') {
-            console.log('Fetch aborted by user');
-            return;
-        }
-
-        // Show error message to user
-        let errorMessage = document.createElement('div');
-        errorMessage.classList.add('ai-message');
-
-        let errorText = error.message;
-        if (errorText.includes('rate limit') || errorText.includes('quota')) {
-            errorText = "⚠️ " + errorText + "<br><br>Please try again later or consider upgrading your API plan.";
-        }
-
-        errorMessage.innerHTML = `<div class="message-content error-message">${errorText}</div>`;
-        chatMessages.appendChild(errorMessage);
-        scrollToBottom();
-
-        // Remove the "getting response" indicator
-        if (gettingResponse.parentNode) {
-            gettingResponse.remove();
-        }
-    } finally {
-        abortController = null;
+        console.error("Failed to send feedback:", error);
     }
 }
-
-
-function addMessageToChat(message, aiMessage, chatHistory) {
-    // Set the appropriate classes for the AI message
-    aiMessage.classList.add('ai-message');
-    const feedbackContainer = document.createElement('div');
-    feedbackContainer.classList.add('feedback-container', 'mt-2');
-    feedbackContainer.innerHTML = `
-        <div class="d-flex align-items-center justify-content-end gap-2">
-            <button type="button" data-id="${chatHistory.id}_like" 
-                    class="feedback-btn btn btn-sm ${chatHistory.liked ? 'selected' : ''}">
-                <i class="bi bi-hand-thumbs-up${chatHistory.liked ? '-fill' : ''}"></i>
-            </button>
-            <button type="button" data-id="${chatHistory.id}_dislike" 
-                    class="feedback-btn btn btn-sm ${chatHistory.disliked ? 'selected' : ''}">
-                <i class="bi bi-hand-thumbs-down${chatHistory.disliked ? '-fill' : ''}"></i>
-            </button>
-        </div>
-    `;
-    aiMessage.appendChild(feedbackContainer);
-
-    // Create message wrapper and content elements
-    const messageWrapper = document.createElement('div');
-    messageWrapper.classList.add('ai-message-wrapper');
-
-    const messageContent = document.createElement('div');
-    messageContent.classList.add('chat-message-text');
-
-    // Directly use the formatted HTML from generateFormattedResponse
-    messageContent.innerHTML = message;
-
-    // Append elements to build the proper structure
-    messageWrapper.appendChild(messageContent);
-    aiMessage.appendChild(messageWrapper);
-
-    // Add the message to the chat container
-    chatMessages.appendChild(aiMessage);
-
-    // Scroll to the bottom smoothly
-    scrollToBottom();
-}
-
-function scrollToBottom() {
-    chatMessages.scrollTo({
-        top: chatMessages.scrollHeight,
-        behavior: 'smooth'
-    });
-}
-
-
-function generateFormattedResponse(response) {
-    // If response is empty or undefined
-    if (!response) return;
-
-    // First, handle code blocks to prevent them from being modified by other formatting
-    let formattedResponse = response.replace(/```([\s\S]*?)```/g, (match, code) => {
-        return `<pre><code>${code.trim()}</code></pre>`;
-    }).replace(/`([^`]+)`/g, (match, code) => {
-        return `<code>${code}</code>`;
-    });
-
-    // Handle links
-    formattedResponse = formattedResponse.replace(/(https?:\/\/[^\s]+)/g, (url) => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-    });
-
-    // Handle different types of content
-    if (isMCQResponse(formattedResponse)) {
-        formattedResponse = formatMCQResponse(formattedResponse);
-    } else if (isNumberedList(formattedResponse)) {
-        formattedResponse = formatNumberedList(formattedResponse);
-    } else if (isBulletList(formattedResponse)) {
-        formattedResponse = formatBulletList(formattedResponse);
-    } else {
-        // Default formatting for plain text
-        formattedResponse = formatPlainText(formattedResponse);
-    }
-
-    return formattedResponse;
-}
-
-// Helper functions for different content types
-function isMCQResponse(text) {
-    // Checks for question patterns like "1. Question text" followed by options (a), (b) etc.
-    return /\d+\.\s.+?\n(\([a-d]\)\s.+?\n)+/g.test(text);
-}
-
-function formatMCQResponse(text) {
-    const questionRegex = /(\d+\.\s.*?)(?=(?:\d+\.\s)|$)/gs;
-    const questions = text.match(questionRegex);
-    let result = '';
-
-    if (questions) {
-        questions.forEach((qBlock, index) => {
-            const lines = qBlock.trim().split('\n').filter(line => line.trim() !== '');
-            const questionText = lines[0].replace(/\d+\.\s/, '').trim();
-            const optionsText = lines.slice(1).join('\n');
-
-            // Extract options, handling (correct) marker
-            const options = optionsText.match(/\([a-d]\)\s[^()]+(\(correct\))?/g) || [];
-
-            result += `
-        <div class="question-block"">
-          <p><strong>${index + 1}. ${cleanFormatting(questionText)}</strong></p>
-          <ul class="mcq-options">
-            ${options.map(option => {
-                const isCorrect = option.includes('(correct)');
-                const cleanOption = cleanFormatting(option.replace('(correct)', '').trim());
-                return `<li class="${isCorrect ? 'correct-option' : ''}">${cleanOption}</li>`;
-            }).join('')}
-          </ul>
-        </div>
-      `;
-        });
-    }
-
-    return result || `<div class="question-block">${text}</div>`;
-}
-
-function isNumberedList(text) {
-    // Checks for numbered items (1., 2., etc.) with more than 1 item
-    return (text.match(/\d+\.\s/g) || []).length > 1;
-}
-
-function formatNumberedList(text) {
-    const items = text.split(/\d+\.\s/).filter(item => item.trim() !== '');
-    let result = '';
-
-    items.forEach((item, index) => {
-        const content = item.trim();
-        const [heading, ...details] = content.split('\n');
-
-        result += `
-      <div class="numbered-item">
-        <p><strong>${index + 1}. ${cleanFormatting(heading)}</strong></p>
-        ${details.filter(d => d.trim()).map(d => `<p>${cleanFormatting(d)}</p>`).join('')}
-      </div>
-    `;
-    });
-
-    return result;
-}
-
-function isBulletList(text) {
-    // Checks for bullet points (-, *, •)
-    return /^(\s*[-*•]\s+.+(\n|$))+/gm.test(text);
-}
-
-function formatBulletList(text) {
-    const items = text.split(/^[-*•]\s+/gm).filter(item => item.trim() !== '');
-    let result = '<ul class="bullet-list">';
-
-    items.forEach(item => {
-        result += `<li>${cleanFormatting(item.trim())}</li>`;
-    });
-
-    result += '</ul>';
-    return result;
-}
-
-function formatPlainText(text) {
-    // Handle paragraphs separated by double newlines
-    const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim() !== '');
-    return paragraphs.map(p => `<p>${cleanFormatting(p)}</p>`).join('');
-}
-
-
-function cleanFormatting(text) {
-    // Clean markdown-style formatting
-    return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // **bold**
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')                // *italic*
-        .replace(/_(.*?)_/g, '<em>$1</em>')                  // _italic_
-        .replace(/~~(.*?)~~/g, '<del>$1</del>')              // ~~strikethrough~~
-        .replace(/`(.*?)`/g, '<code>$1</code>');             // `code`
-}
-
-
 
 let sideBarMenuBtn = document.querySelectorAll(".side-bar-menu-btn");
 sideBarMenuBtn.forEach((btn) => {
@@ -479,3 +438,11 @@ sideBarMenuBtn.forEach((btn) => {
         sideBar.classList.toggle("open");
     })
 })
+
+// Add event delegation for feedback buttons
+document.addEventListener('click', async (event) => {
+    const feedbackButton = event.target.closest('[data-id$="_like"], [data-id$="_dislike"]');
+    if (feedbackButton) {
+        await handleFeedback(event);
+    }
+});
