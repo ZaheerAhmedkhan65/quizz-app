@@ -64,6 +64,7 @@ router.get(
       });
   
       req.flash("success", "Login successful using Google!");
+
       if (user.role === "admin") {
         return res.redirect("/admin/dashboard");
       } else {

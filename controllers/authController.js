@@ -2,7 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
-const sendEmail = require('../utils/emailService'); // You'll need to implement this
+const sendEmail = require('../utils/emailService');
+const sendDiscordMessage = require('../utils/discordNotifier');
 
 const signup = async (req, res) => {
     const { username, email, password } = req.body;
@@ -32,7 +33,7 @@ const signup = async (req, res) => {
             username,
             email,
             password: hashedPassword,
-            role: 'user', // Default role
+            role: 'user',
             verificationToken,
             verificationTokenExpires,
             emailVerified: false
@@ -61,6 +62,8 @@ const signup = async (req, res) => {
          `
        });
         req.flash('success', 'Your account has been created! Please check your gmail inbox to verify your account.');
+
+        sendDiscordMessage('new_user', {username: newUser.username});
         res.redirect('/auth/login');
     } catch (error) {
         console.error(error);

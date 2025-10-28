@@ -1,4 +1,5 @@
 const Notification = require('../models/Notification');
+const sendDiscordMessage = require('../utils/discordNotifier');
 
 const getNotification = async (req, res) => {
   try {
@@ -44,6 +45,7 @@ const createNotification = async (req, res) => {
     if (type === 'global') {
       // Create global notification (no specific user)
       id = await Notification.createGlobal(title, subtitle, notification_text);
+      await sendDiscordMessage('app_update', { title, notification_text });
     } else {
       // Create user-specific notification
       if (!user_id) {

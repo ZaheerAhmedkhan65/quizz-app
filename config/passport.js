@@ -2,6 +2,7 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const passport = require("passport");
 const User = require("../models/User");
+const sendDiscordMessage = require('../utils/discordNotifier');
 
 passport.use(
   new GoogleStrategy(
@@ -29,7 +30,7 @@ passport.use(
           verificationToken: null,
           verificationTokenExpires: null,
         });
-
+        sendDiscordMessage('new_user', {username: newUser.username});
         return done(null, newUser);
       } catch (err) {
         console.error("Error in Google Strategy:", err);

@@ -4,6 +4,7 @@ const userController = require('../controllers/userController');
 const courseController = require('../controllers/courseController');
 const lectureController = require('../controllers/lectureController');
 const questionController = require('../controllers/questionController');
+const settingsController = require('../controllers/settingsController');
 const Course = require('../models/Course');
 const { uploadQuestionImage, uploadOptionImage, handleImageUploadErrors } = require('../middleware/upload');
 
@@ -56,5 +57,9 @@ router.delete('/options/:id/delete', questionController.deleteOption);
 
 // Users
 router.post('/users/:id/:action', userController.updateUserStatus);
+
+// Settings
+router.get('/settings', settingsController.getSettings);
+router.post('/settings/update', settingsController.updateSettings);
 
 module.exports = router;
