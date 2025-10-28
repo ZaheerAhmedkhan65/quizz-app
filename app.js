@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
 const MySQLStore = require('express-mysql-session')(session);
-const pool = require('./config/db'); // Import your MySQL pool
+const pool = require('./config/db');
 const flash = require('connect-flash');
 const app = express();
 const path = require('path');
@@ -18,11 +18,10 @@ app.use(express.static('public'));
 app.use(express.static('views'));
 app.use(express.urlencoded({ extended: true }));
 
-
 // Create MySQL session store
 const sessionStore = new MySQLStore({
-  expiration: 86400000, // 1 day in milliseconds
-  createDatabaseTable: true, // Will create sessions table if it doesn't exist
+  expiration: 86400000,
+  createDatabaseTable: true,
   schema: {
     tableName: 'sessions',
     columnNames: {
@@ -36,9 +35,9 @@ const sessionStore = new MySQLStore({
 app.set('trust proxy', 1);
 
 app.use(session({
-    secret: process.env.SECRET_KEY || 'fallback-secret-key-for-development-only',
-    resave: false,  // Changed from false to true
-    saveUninitialized: false,  // Changed from false to true
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: false,
     store: sessionStore,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
@@ -54,8 +53,8 @@ app.use(passport.session());
 app.use(flash());
 
 app.use((req, res, next) => {
-    res.locals.success = req.flash('success'); // array
-    res.locals.error = req.flash('error');     // array
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
     next();
 });
 
@@ -81,6 +80,7 @@ const assignmentRoutes = require("./routes/assignmentRoutes.js");
 const {bindUser, authenticate, isAdmin} = require('./middleware/authenticate');
 
 app.use(bindUser);
+
 app.use((req, res, next) => {
     res.locals.user = req.user || null;
     res.locals.path = req.path;
