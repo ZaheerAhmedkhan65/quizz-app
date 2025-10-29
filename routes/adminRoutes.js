@@ -42,7 +42,7 @@ router.post('/lectures/create', lectureController.create);
 router.get('/lectures/:id', lectureController.show);
 router.get('/lectures/:id/edit', lectureController.edit);
 router.post('/lectures/:id/update', lectureController.update);
-router.delete('/lectures/:id/delete', lectureController.deleteLecture);
+router.post('/lectures/:id/delete', lectureController.deleteLecture);
 
 
 // Questions
